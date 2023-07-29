@@ -1,0 +1,3 @@
+[submodule "emulator/chips-test"]
+	path = emulator/chips-test
+	url = https://github.com/floooh/chips-test.git
