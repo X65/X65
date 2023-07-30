@@ -1,3 +1,4 @@
 {
-  "cmake.sourceDirectory": "${workspaceFolder}/emulator"
+  "cmake.sourceDirectory": "${workspaceFolder}/emulator",
+  "cmake.copyCompileCommands": "${workspaceFolder}/emulator/compile_commands.json"
 }

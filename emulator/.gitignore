@@ -8,3 +8,6 @@ fips-files/deploy/
 .idea/
 CMakeUserPresets.json
 #<fips
+
+.cache/
+compile_commands.json
