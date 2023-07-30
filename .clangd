@@ -1,0 +1,4 @@
+# https://clangd.llvm.org/config.html
+---
+CompileFlags:
+  Add: [-DCHIPS_IMPL, -DCHIPS_USE_UI]
