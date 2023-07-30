@@ -4,3 +4,7 @@
 /fips-sdks/
 
 /emulator-chips/
+/fips-imgui/
+/fips-utils/
+/sokol-tools-bin/
+/sokol/
