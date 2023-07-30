@@ -2,6 +2,8 @@
   "cmake.sourceDirectory": "${workspaceFolder}/emulator",
   "cmake.copyCompileCommands": "${workspaceFolder}/emulator/compile_commands.json",
   "files.associations": {
-    ".clangd": "yaml"
-  }
+    ".clangd": "yaml",
+    ".clang-format": "yaml"
+  },
+  "editor.formatOnSave": true
 }

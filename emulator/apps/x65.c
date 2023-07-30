@@ -41,10 +41,10 @@ static struct {
     uint32_t frame_time_us;
     uint32_t ticks;
     double emu_time_ms;
-    #ifdef CHIPS_USE_UI
-        ui_x65_t ui;
-        x65_snapshot_t snapshots[UI_SNAPSHOT_MAX_SLOTS];
-    #endif
+#ifdef CHIPS_USE_UI
+    ui_x65_t ui;
+    x65_snapshot_t snapshots[UI_SNAPSHOT_MAX_SLOTS];
+#endif
 } state;
 
 #ifdef CHIPS_USE_UI
@@ -53,12 +53,12 @@ static void ui_boot_cb(x65_t* sys);
 static void ui_save_snapshot(size_t slot_index);
 static bool ui_load_snapshot(size_t slot_index);
 static void ui_load_snapshots_from_storage(void);
-#define BORDER_TOP (24)
+    #define BORDER_TOP (24)
 #else
-#define BORDER_TOP (8)
+    #define BORDER_TOP (8)
 #endif
-#define BORDER_LEFT (8)
-#define BORDER_RIGHT (8)
+#define BORDER_LEFT   (8)
+#define BORDER_RIGHT  (8)
 #define BORDER_BOTTOM (16)
 
 // audio-streaming callback
@@ -83,9 +83,9 @@ x65_desc_t x65_desc(x65_joystick_type_t joy_type, x65_memory_config_t mem_config
             .basic = { .ptr=dump_vic20_basic_901486_01_bin, .size=sizeof(dump_vic20_basic_901486_01_bin) },
             .kernal = { .ptr=dump_vic20_kernal_901486_07_bin, .size=sizeof(dump_vic20_kernal_901486_07_bin) },
         },
-        #if defined(CHIPS_USE_UI)
+#if defined(CHIPS_USE_UI)
         .debug = ui_x65_get_debug(&state.ui)
-        #endif
+#endif
     };
 }
 
@@ -116,9 +116,9 @@ void app_init(void) {
     x65_desc_t desc = x65_desc(joy_type, mem_config, c1530_enabled);
     x65_init(&state.x65, &desc);
     gfx_init(&(gfx_desc_t){
-        #ifdef CHIPS_USE_UI
+#ifdef CHIPS_USE_UI
         .draw_extra_cb = ui_draw,
-        #endif
+#endif
         .border = {
             .left = BORDER_LEFT,
             .right = BORDER_RIGHT,
@@ -131,16 +131,16 @@ void app_init(void) {
             .height = 2
         }
     });
-    keybuf_init(&(keybuf_desc_t){ .key_delay_frames=5 });
+    keybuf_init(&(keybuf_desc_t){ .key_delay_frames = 5 });
     clock_init();
     prof_init();
     fs_init();
     saudio_setup(&(saudio_desc){
         .logger.func = slog_func,
     });
-    #ifdef CHIPS_USE_UI
-        ui_init(ui_draw_cb);
-        ui_x65_init(&state.ui, &(ui_x65_desc_t){
+#ifdef CHIPS_USE_UI
+    ui_init(ui_draw_cb);
+    ui_x65_init(&state.ui, &(ui_x65_desc_t){
             .x65 = &state.x65,
             .boot_cb = ui_boot_cb,
             .dbg_texture = {
@@ -164,8 +164,8 @@ void app_init(void) {
                 .toggle_breakpoint = { .keycode = simgui_map_keycode(SAPP_KEYCODE_F9), .name = "F9" }
             }
         });
-        ui_load_snapshots_from_storage();
-    #endif
+    ui_load_snapshots_from_storage();
+#endif
     bool delay_input = false;
     if (sargs_exists("file")) {
         delay_input = true;
@@ -207,17 +207,17 @@ void app_input(const sapp_event* event) {
     if (event->type == SAPP_EVENTTYPE_FILES_DROPPED) {
         fs_start_load_dropped_file(FS_SLOT_IMAGE);
     }
-    #ifdef CHIPS_USE_UI
+#ifdef CHIPS_USE_UI
     if (ui_input(event)) {
         // input was handled by UI
         return;
     }
-    #endif
+#endif
     const bool shift = event->modifiers & SAPP_MODIFIER_SHIFT;
     switch (event->type) {
         int c;
         case SAPP_EVENTTYPE_CHAR:
-            c = (int) event->char_code;
+            c = (int)event->char_code;
             if ((c > 0x20) && (c < 0x7F)) {
                 // need to invert case (unshifted is upper caps, shifted is lower caps
                 if (isupper(c)) {
@@ -233,23 +233,23 @@ void app_input(const sapp_event* event) {
         case SAPP_EVENTTYPE_KEY_DOWN:
         case SAPP_EVENTTYPE_KEY_UP:
             switch (event->key_code) {
-                case SAPP_KEYCODE_SPACE:        c = 0x20; break;
-                case SAPP_KEYCODE_LEFT:         c = 0x08; break;
-                case SAPP_KEYCODE_RIGHT:        c = 0x09; break;
-                case SAPP_KEYCODE_DOWN:         c = 0x0A; break;
-                case SAPP_KEYCODE_UP:           c = 0x0B; break;
-                case SAPP_KEYCODE_ENTER:        c = 0x0D; break;
-                case SAPP_KEYCODE_BACKSPACE:    c = shift ? 0x0C : 0x01; break;
-                case SAPP_KEYCODE_ESCAPE:       c = shift ? 0x13 : 0x03; break;
-                case SAPP_KEYCODE_F1:           c = 0xF1; break;
-                case SAPP_KEYCODE_F2:           c = 0xF2; break;
-                case SAPP_KEYCODE_F3:           c = 0xF3; break;
-                case SAPP_KEYCODE_F4:           c = 0xF4; break;
-                case SAPP_KEYCODE_F5:           c = 0xF5; break;
-                case SAPP_KEYCODE_F6:           c = 0xF6; break;
-                case SAPP_KEYCODE_F7:           c = 0xF7; break;
-                case SAPP_KEYCODE_F8:           c = 0xF8; break;
-                default:                        c = 0; break;
+                case SAPP_KEYCODE_SPACE: c = 0x20; break;
+                case SAPP_KEYCODE_LEFT: c = 0x08; break;
+                case SAPP_KEYCODE_RIGHT: c = 0x09; break;
+                case SAPP_KEYCODE_DOWN: c = 0x0A; break;
+                case SAPP_KEYCODE_UP: c = 0x0B; break;
+                case SAPP_KEYCODE_ENTER: c = 0x0D; break;
+                case SAPP_KEYCODE_BACKSPACE: c = shift ? 0x0C : 0x01; break;
+                case SAPP_KEYCODE_ESCAPE: c = shift ? 0x13 : 0x03; break;
+                case SAPP_KEYCODE_F1: c = 0xF1; break;
+                case SAPP_KEYCODE_F2: c = 0xF2; break;
+                case SAPP_KEYCODE_F3: c = 0xF3; break;
+                case SAPP_KEYCODE_F4: c = 0xF4; break;
+                case SAPP_KEYCODE_F5: c = 0xF5; break;
+                case SAPP_KEYCODE_F6: c = 0xF6; break;
+                case SAPP_KEYCODE_F7: c = 0xF7; break;
+                case SAPP_KEYCODE_F8: c = 0xF8; break;
+                default: c = 0; break;
             }
             if (c) {
                 if (event->type == SAPP_EVENTTYPE_KEY_DOWN) {
@@ -260,17 +260,16 @@ void app_input(const sapp_event* event) {
                 }
             }
             break;
-        default:
-            break;
+        default: break;
     }
 }
 
 void app_cleanup(void) {
     x65_discard(&state.x65);
-    #ifdef CHIPS_USE_UI
-        ui_x65_discard(&state.ui);
-        ui_discard();
-    #endif
+#ifdef CHIPS_USE_UI
+    ui_x65_discard(&state.ui);
+    ui_discard();
+#endif
     saudio_shutdown();
     gfx_shutdown();
     sargs_shutdown();
@@ -342,7 +341,13 @@ static void draw_status_bar(void) {
     sdtx_canvas(w, h);
     sdtx_color3b(255, 255, 255);
     sdtx_pos(1.0f, (h / 8.0f) - 1.5f);
-    sdtx_printf("frame:%.2fms emu:%.2fms (min:%.2fms max:%.2fms) ticks:%d", (float)state.frame_time_us * 0.001f, emu_stats.avg_val, emu_stats.min_val, emu_stats.max_val, state.ticks);
+    sdtx_printf(
+        "frame:%.2fms emu:%.2fms (min:%.2fms max:%.2fms) ticks:%d",
+        (float)state.frame_time_us * 0.001f,
+        emu_stats.avg_val,
+        emu_stats.min_val,
+        emu_stats.max_val,
+        state.ticks);
 }
 
 #if defined(CHIPS_USE_UI)
@@ -356,9 +361,8 @@ static void ui_boot_cb(x65_t* sys) {
 }
 
 static void ui_update_snapshot_screenshot(size_t slot) {
-    ui_snapshot_screenshot_t screenshot = {
-        .texture = ui_create_screenshot_texture(x65_display_info(&state.snapshots[slot].x65))
-    };
+    ui_snapshot_screenshot_t screenshot = { .texture = ui_create_screenshot_texture(
+                                                x65_display_info(&state.snapshots[slot].x65)) };
     ui_snapshot_screenshot_t prev_screenshot = ui_snapshot_set_screenshot(&state.ui.snapshot, slot, screenshot);
     if (prev_screenshot.texture) {
         ui_destroy_texture(prev_screenshot.texture);
@@ -407,12 +411,12 @@ static void ui_load_snapshots_from_storage(void) {
 
 sapp_desc sokol_main(int argc, char* argv[]) {
     sargs_setup(&(sargs_desc){
-        .argc=argc,
-        .argv=argv,
+        .argc = argc,
+        .argv = argv,
         .buf_size = 512 * 1024,
     });
     const chips_display_info_t info = x65_display_info(0);
-    return (sapp_desc) {
+    return (sapp_desc){
         .init_cb = app_init,
         .frame_cb = app_frame,
         .event_cb = app_input,
