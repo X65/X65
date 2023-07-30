@@ -1,1 +1,6 @@
 /fips/
+/fips-build/
+/fips-deploy/
+/fips-sdks/
+
+/emulator-chips/

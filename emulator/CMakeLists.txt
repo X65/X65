@@ -1,14 +1,25 @@
 #
-# project: ..
+# project: X65 emulator
 #
 cmake_minimum_required(VERSION 3.21)
-project(..)
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "")
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_C_STANDARD 11)
+project([emulator])
+
 # include the fips main cmake file
 get_filename_component(FIPS_ROOT_DIR "../fips" ABSOLUTE)
 include("${FIPS_ROOT_DIR}/cmake/fips.cmake")
 
-# include_directories(src)
+include_directories(.)
 fips_setup()
-# add_subdirectory(src/...)
-# add_subdirectory(src/...)
-fips_finish()
+
+fips_ide_group(examples)
+add_subdirectory(chips-test/examples)
+
+fips_ide_group(chips)
+add_subdirectory(chips)
+fips_ide_group(systems)
+add_subdirectory(systems)
+fips_ide_group(apps)
+add_subdirectory(apps)

@@ -1,11 +1,18 @@
 #
-# ..
+# X65 emulator
 #
 ---
-#   imports:
-#       PROJ-NAME:
-#           git: GIT-URL
-#           branch: OPTIONAL BRANCH OR TAG NAME
+imports:
+  emulator-chips:
+    git: https://github.com/floooh/chips
+  fips-imgui:
+    git: https://github.com/fips-libs/fips-imgui.git
+  sokol:
+    git: https://github.com/floooh/sokol
+  sokol-tools-bin:
+    git: https://github.com/floooh/sokol-tools-bin
+  fips-utils:
+    git: https://github.com/fips-libs/fips-utils
 #   exports:
 #       header-dirs:
 #           - RELATIVE HEADER SEARCH PATH
