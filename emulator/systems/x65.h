@@ -18,17 +18,6 @@
     ~~~
         your own assert macro (default: assert(c))
 
-    You need to include the following headers before including x65.h:
-
-    - chips/chips_common.h
-    - chips/m6502.h
-    - chips/m6522.h
-    - chips/m6561.h
-    - chips/kbd.h
-    - chips/mem.h
-    - chips/clk.h
-    - systems/c1530.h
-
     ## The X65
 
 
@@ -59,6 +48,15 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+
+#include "chips/chips_common.h"
+#include "chips/m6502.h"
+#include "chips/m6522.h"
+#include "chips/m6561.h"
+#include "chips/kbd.h"
+#include "chips/mem.h"
+#include "chips/clk.h"
+#include "systems/c1530.h"
 
 #ifdef __cplusplus
 extern "C" {

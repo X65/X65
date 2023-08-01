@@ -19,10 +19,6 @@ fips_setup()
 
 fips_ide_group(examples)
 add_subdirectory(chips-test/examples)
+include_directories(chips-test/examples/common chips-test/examples/roms)
 
-fips_ide_group(chips)
-add_subdirectory(chips)
-fips_ide_group(systems)
-add_subdirectory(systems)
-fips_ide_group(apps)
 add_subdirectory(apps)

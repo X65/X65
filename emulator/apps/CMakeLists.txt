@@ -1,5 +1,3 @@
-include_directories(../chips-test/examples/common ../chips-test/examples/roms)
-
 fips_ide_group(emulator/x65)
 
 fips_begin_app(x65 windowed)

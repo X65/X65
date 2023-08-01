@@ -2,33 +2,12 @@
     x65.c
 */
 #define CHIPS_IMPL
-#include "chips/chips_common.h"
-#include "common.h"
-#include "chips/m6502.h"
-#include "chips/m6522.h"
-#include "chips/m6561.h"
-#include "chips/kbd.h"
-#include "chips/mem.h"
-#include "chips/clk.h"
-#include "systems/c1530.h"
 #include "systems/x65.h"
+#include "common.h"
 #include "vic20-roms.h"
 #if defined(CHIPS_USE_UI)
-    #define UI_DBG_USE_M6502
-    #include "ui.h"
-    #include "ui/ui_chip.h"
-    #include "ui/ui_memedit.h"
-    #include "ui/ui_memmap.h"
-    #include "ui/ui_dasm.h"
-    #include "ui/ui_dbg.h"
-    #include "ui/ui_m6502.h"
-    #include "ui/ui_m6522.h"
-    #include "ui/ui_m6561.h"
-    #include "ui/ui_audio.h"
-    #include "ui/ui_kbd.h"
-    #include "ui/ui_c1530.h"
-    #include "ui/ui_snapshot.h"
     #include "ui/ui_x65.h"
+    #include "ui.h"
 #endif
 
 typedef struct {
