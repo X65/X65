@@ -59,7 +59,6 @@
 #include "ui/ui_m6561.h"
 #include "ui/ui_audio.h"
 #include "ui/ui_kbd.h"
-#include "ui/ui_c1530.h"
 #include "ui/ui_snapshot.h"
 
 #ifdef __cplusplus
@@ -81,7 +80,6 @@ typedef struct {
 typedef struct {
     x65_t* x65;
     int dbg_scanline;
-    ui_c1530_t c1530;
     ui_x65_boot_cb boot_cb;
     ui_m6502_t cpu;
     ui_m6522_t via[2];
@@ -157,9 +155,6 @@ static void _ui_x65_draw_menu(ui_x65_t* ui) {
             ImGui::MenuItem("MOS 6522 #1 (VIA)", 0, &ui->via[0].open);
             ImGui::MenuItem("MOS 6522 #2 (VIA)", 0, &ui->via[1].open);
             ImGui::MenuItem("MOS 6561 (VIC-I)", 0, &ui->vic.open);
-            if (ui->c1530.valid) {
-                ImGui::MenuItem("C1530 (Datassette)", 0, &ui->c1530.open);
-            }
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Debug")) {
@@ -405,16 +400,6 @@ void ui_x65_init(ui_x65_t* ui, const ui_x65_desc_t* ui_desc) {
         desc.user_breaktypes[2].label = "Next Frame";
         ui_dbg_init(&ui->dbg, &desc);
     }
-    if (ui->x65->c1530.valid) {
-        x += dx;
-        y += dy;
-        ui_c1530_desc_t desc = { 0 };
-        desc.title = "C1530 Datassette";
-        desc.x = x;
-        desc.y = y;
-        desc.c1530 = &ui->x65->c1530;
-        ui_c1530_init(&ui->c1530, &desc);
-    }
     x += dx;
     y += dy;
     {
@@ -541,9 +526,6 @@ void ui_x65_init(ui_x65_t* ui, const ui_x65_desc_t* ui_desc) {
 void ui_x65_discard(ui_x65_t* ui) {
     CHIPS_ASSERT(ui && ui->x65);
     ui->x65 = 0;
-    if (ui->c1530.valid) {
-        ui_c1530_discard(&ui->c1530);
-    }
     ui_m6502_discard(&ui->cpu);
     ui_m6522_discard(&ui->via[0]);
     ui_m6522_discard(&ui->via[1]);
@@ -575,12 +557,6 @@ void ui_x65_draw_system(ui_x65_t* ui) {
             case X65_MEMCONFIG_MAX: mem_config = "MAX RAM"; break;
         }
         ImGui::Text("Memory Config: %s", mem_config);
-        if (ImGui::CollapsingHeader("Cassette Port", ImGuiTreeNodeFlags_DefaultOpen)) {
-            ImGui::Text("MOTOR: %d", (sys->cas_port & VIC20_CASPORT_MOTOR) ? 1 : 0);
-            ImGui::Text("WRITE: %d", (sys->cas_port & VIC20_CASPORT_WRITE) ? 1 : 0);
-            ImGui::Text("READ:  %d", (sys->cas_port & VIC20_CASPORT_READ) ? 1 : 0);
-            ImGui::Text("SENSE: %d", (sys->cas_port & VIC20_CASPORT_SENSE) ? 1 : 0);
-        }
         if (ImGui::CollapsingHeader("IEC Port", ImGuiTreeNodeFlags_DefaultOpen)) {
             ImGui::Text("RESET: %d", (sys->iec_port & X65_IECPORT_RESET) ? 1 : 0);
             ImGui::Text("SRQIN: %d", (sys->iec_port & X65_IECPORT_SRQIN) ? 1 : 0);
@@ -599,9 +575,6 @@ void ui_x65_draw(ui_x65_t* ui) {
         _ui_x65_update_memmap(ui);
     }
     ui_x65_draw_system(ui);
-    if (ui->c1530.valid) {
-        ui_c1530_draw(&ui->c1530);
-    }
     ui_audio_draw(&ui->audio, ui->x65->audio.sample_pos);
     ui_kbd_draw(&ui->kbd);
     ui_m6502_draw(&ui->cpu);

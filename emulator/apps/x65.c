@@ -47,9 +47,8 @@ static void push_audio(const float* samples, int num_samples, void* user_data) {
 }
 
 // get x65_desc_t struct based on joystick type
-x65_desc_t x65_desc(x65_joystick_type_t joy_type, x65_memory_config_t mem_config, bool c1530_enabled) {
+x65_desc_t x65_desc(x65_joystick_type_t joy_type, x65_memory_config_t mem_config) {
     return (x65_desc_t) {
-        .c1530_enabled = c1530_enabled,
         .joystick_type = joy_type,
         .mem_config = mem_config,
         .audio = {
@@ -91,8 +90,7 @@ void app_init(void) {
             mem_config = X65_MEMCONFIG_MAX;
         }
     }
-    bool c1530_enabled = sargs_exists("c1530");
-    x65_desc_t desc = x65_desc(joy_type, mem_config, c1530_enabled);
+    x65_desc_t desc = x65_desc(joy_type, mem_config);
     x65_init(&state.x65, &desc);
     gfx_init(&(gfx_desc_t){
 #ifdef CHIPS_USE_UI
@@ -275,9 +273,6 @@ static void handle_file_loading(void) {
             load_success = true;
             keybuf_put((const char*)fs_data(FS_SLOT_IMAGE).ptr);
         }
-        else if (fs_ext(FS_SLOT_IMAGE, "tap")) {
-            load_success = x65_insert_tape(&state.x65, fs_data(FS_SLOT_IMAGE));
-        }
         else if (fs_ext(FS_SLOT_IMAGE, "bin") || fs_ext(FS_SLOT_IMAGE, "prg") || fs_ext(FS_SLOT_IMAGE, "")) {
             if (sargs_exists("rom")) {
                 load_success = x65_insert_rom_cartridge(&state.x65, fs_data(FS_SLOT_IMAGE));
@@ -289,9 +284,6 @@ static void handle_file_loading(void) {
         if (load_success) {
             if (clock_frame_count_60hz() > (load_delay_frames + 10)) {
                 gfx_flash_success();
-            }
-            if (fs_ext(FS_SLOT_IMAGE, "tap")) {
-                x65_tape_play(&state.x65);
             }
             if (!sargs_exists("debug")) {
                 if (sargs_exists("input")) {
@@ -335,7 +327,7 @@ static void ui_draw_cb(void) {
 }
 
 static void ui_boot_cb(x65_t* sys) {
-    x65_desc_t desc = x65_desc(sys->joystick_type, sys->mem_config, sys->c1530.valid);
+    x65_desc_t desc = x65_desc(sys->joystick_type, sys->mem_config);
     x65_init(sys, &desc);
 }
 

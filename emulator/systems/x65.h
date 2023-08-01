@@ -56,7 +56,6 @@
 #include "chips/kbd.h"
 #include "chips/mem.h"
 #include "chips/clk.h"
-#include "systems/c1530.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,12 +91,6 @@ typedef enum {
 #define X65_JOYSTICK_RIGHT (1 << 3)
 #define X65_JOYSTICK_BTN   (1 << 4)
 
-// casette port bits, same as C1530_CASPORT_*
-#define VIC20_CASPORT_MOTOR (1 << 0)
-#define VIC20_CASPORT_READ  (1 << 1)
-#define VIC20_CASPORT_WRITE (1 << 2)
-#define VIC20_CASPORT_SENSE (1 << 3)
-
 // IEC port bits, same as C1541_IECPORT_*
 #define X65_IECPORT_RESET (1 << 0)
 #define X65_IECPORT_SRQIN (1 << 1)
@@ -107,7 +100,6 @@ typedef enum {
 
 // config parameters for x65_init()
 typedef struct {
-    bool c1530_enabled;                 // set to true to enable C1530 datassette emulation
     x65_joystick_type_t joystick_type;  // default is X65_JOYSTICK_NONE
     x65_memory_config_t mem_config;     // default is X65_MEMCONFIG_STANDARD
     chips_debug_t debug;                // optional debugging hook
@@ -129,7 +121,6 @@ typedef struct {
 
     x65_joystick_type_t joystick_type;
     x65_memory_config_t mem_config;
-    uint8_t cas_port;        // cassette port, shared with c1530_t if datasette is connected
     uint8_t iec_port;        // IEC serial port, shared with c1541_t if connected
     uint8_t kbd_joy_mask;    // current joystick state from keyboard-joystick emulation
     uint8_t joy_joy_mask;    // current joystick state from x65_joystick()
@@ -158,8 +149,6 @@ typedef struct {
     uint8_t rom_kernal[0x2000];  // 8 KB KERNAL V3 ROM image
     uint8_t ram_exp[4][0x2000];  // optional expansion 8K RAM blocks
     uint8_t fb[M6561_FRAMEBUFFER_SIZE_BYTES];
-
-    c1530_t c1530;  // c1530.valid = true if enabled
 
     mem_t mem_cart;  // special ROM cartridge memory mapping helper
 } x65_t;
@@ -190,18 +179,6 @@ bool x65_quickload(x65_t* sys, chips_range_t data);
 bool x65_insert_rom_cartridge(x65_t* sys, chips_range_t data);
 // remove current ROM cartridge
 void x65_remove_rom_cartridge(x65_t* sys);
-// insert tape as .TAP file (c1530 must be enabled)
-bool x65_insert_tape(x65_t* sys, chips_range_t data);
-// remove tape file
-void x65_remove_tape(x65_t* sys);
-// return true if a tape is currently inserted
-bool x65_tape_inserted(x65_t* sys);
-// start the tape (press the Play button)
-void x65_tape_play(x65_t* sys);
-// stop the tape (unpress the Play button
-void x65_tape_stop(x65_t* sys);
-// return true if tape motor is on
-bool x65_is_tape_motor_on(x65_t* sys);
 // take a snapshot, patches pointers to zero or offsets, returns snapshot version
 uint32_t x65_save_snapshot(x65_t* sys, x65_t* dst);
 // load a snapshot, returns false if snapshot version doesn't match
@@ -251,9 +228,6 @@ void x65_init(x65_t* sys, const x65_desc_t* desc) {
     memcpy(sys->rom_char, desc->roms.chars.ptr, sizeof(sys->rom_char));
     memcpy(sys->rom_basic, desc->roms.basic.ptr, sizeof(sys->rom_basic));
     memcpy(sys->rom_kernal, desc->roms.kernal.ptr, sizeof(sys->rom_kernal));
-
-    // datasette: motor off, no buttons pressed
-    sys->cas_port = VIC20_CASPORT_MOTOR | VIC20_CASPORT_SENSE;
 
     sys->pins = m6502_init(&sys->cpu, &(m6502_desc_t){ 0 });
     m6522_init(&sys->via_1);
@@ -352,22 +326,10 @@ void x65_init(x65_t* sys, const x65_desc_t* desc) {
     mem_map_ram(&sys->mem_cart, 0, 0x4000, 0x2000, sys->ram_exp[1]);
     mem_map_ram(&sys->mem_cart, 0, 0x6000, 0x2000, sys->ram_exp[2]);
     mem_map_ram(&sys->mem_cart, 0, 0xA000, 0x2000, sys->ram_exp[3]);
-
-    // optionally setup C1530 datasette drive
-    if (desc->c1530_enabled) {
-        c1530_init(
-            &sys->c1530,
-            &(c1530_desc_t){
-                .cas_port = &sys->cas_port,
-            });
-    }
 }
 
 void x65_discard(x65_t* sys) {
     CHIPS_ASSERT(sys && sys->valid);
-    if (sys->c1530.valid) {
-        c1530_discard(&sys->c1530);
-    }
     sys->valid = false;
 }
 
@@ -378,13 +340,9 @@ void x65_reset(x65_t* sys) {
     sys->via1_joy_mask = M6522_PA2 | M6522_PA3 | M6522_PA4 | M6522_PA5;
     sys->via2_joy_mask = M6522_PB7;
     sys->pins |= M6502_RES;
-    sys->cas_port = VIC20_CASPORT_MOTOR | VIC20_CASPORT_SENSE;
     m6522_reset(&sys->via_1);
     m6522_reset(&sys->via_2);
     m6561_reset(&sys->vic);
-    if (sys->c1530.valid) {
-        c1530_reset(&sys->c1530);
-    }
 }
 
 static uint64_t _x65_tick(x65_t* sys, uint64_t pins) {
@@ -462,16 +420,7 @@ static uint64_t _x65_tick(x65_t* sys, uint64_t pins) {
         // FIXME: SERIAL PORT
         // FIXME: RESTORE key to M6522_CA1
         via1_pins |= sys->via1_joy_mask | (M6522_PA0 | M6522_PA1 | M6522_PA7);
-        if (sys->cas_port & VIC20_CASPORT_SENSE) {
-            via1_pins |= M6522_PA6;
-        }
         via1_pins = m6522_tick(&sys->via_1, via1_pins);
-        if (via1_pins & M6522_CA2) {
-            sys->cas_port |= VIC20_CASPORT_MOTOR;
-        }
-        else {
-            sys->cas_port &= ~VIC20_CASPORT_MOTOR;
-        }
         if (via1_pins & M6522_IRQ) {
             pins |= M6502_NMI;
         }
@@ -503,9 +452,6 @@ static uint64_t _x65_tick(x65_t* sys, uint64_t pins) {
         uint8_t kbd_lines = ~kbd_scan_lines(&sys->kbd);
         M6522_SET_PA(via2_pins, kbd_lines);
         via2_pins |= sys->via2_joy_mask;
-        if (sys->cas_port & VIC20_CASPORT_READ) {
-            via2_pins |= M6522_CA1;
-        }
         via2_pins = m6522_tick(&sys->via_2, via2_pins);
         uint8_t kbd_cols = ~M6522_GET_PB(via2_pins);
         kbd_set_active_columns(&sys->kbd, kbd_cols);
@@ -537,10 +483,6 @@ static uint64_t _x65_tick(x65_t* sys, uint64_t pins) {
         }
     }
 
-    // optionally tick the C1530 datassette
-    if (sys->c1530.valid) {
-        c1530_tick(&sys->c1530);
-    }
     return pins;
 }
 
@@ -773,36 +715,6 @@ void x65_joystick(x65_t* sys, uint8_t joy_mask) {
     _x65_update_joymasks(sys);
 }
 
-bool x65_insert_tape(x65_t* sys, chips_range_t data) {
-    CHIPS_ASSERT(sys && sys->valid && sys->c1530.valid);
-    return c1530_insert_tape(&sys->c1530, data);
-}
-
-void x65_remove_tape(x65_t* sys) {
-    CHIPS_ASSERT(sys && sys->valid && sys->c1530.valid);
-    c1530_remove_tape(&sys->c1530);
-}
-
-bool x65_tape_inserted(x65_t* sys) {
-    CHIPS_ASSERT(sys && sys->valid && sys->c1530.valid);
-    return c1530_tape_inserted(&sys->c1530);
-}
-
-void x65_tape_play(x65_t* sys) {
-    CHIPS_ASSERT(sys && sys->valid && sys->c1530.valid);
-    c1530_play(&sys->c1530);
-}
-
-void x65_tape_stop(x65_t* sys) {
-    CHIPS_ASSERT(sys && sys->valid && sys->c1530.valid);
-    c1530_stop(&sys->c1530);
-}
-
-bool x65_is_tape_motor_on(x65_t* sys) {
-    CHIPS_ASSERT(sys && sys->valid && sys->c1530.valid);
-    return c1530_is_motor_on(&sys->c1530);
-}
-
 chips_display_info_t x65_display_info(x65_t* sys) {
     chips_display_info_t res = {
         .frame = {
@@ -840,7 +752,6 @@ uint32_t x65_save_snapshot(x65_t* sys, x65_t* dst) {
     chips_audio_callback_snapshot_onsave(&dst->audio.callback);
     m6502_snapshot_onsave(&dst->cpu);
     m6561_snapshot_onsave(&dst->vic);
-    c1530_snapshot_onsave(&dst->c1530);
     mem_snapshot_onsave(&dst->mem_cpu, sys);
     mem_snapshot_onsave(&dst->mem_vic, sys);
     mem_snapshot_onsave(&dst->mem_cart, sys);
@@ -858,7 +769,6 @@ bool x65_load_snapshot(x65_t* sys, uint32_t version, x65_t* src) {
     chips_audio_callback_snapshot_onload(&im.audio.callback, &sys->audio.callback);
     m6502_snapshot_onload(&im.cpu, &sys->cpu);
     m6561_snapshot_onload(&im.vic, &sys->vic);
-    c1530_snapshot_onload(&im.c1530, &sys->c1530);
     mem_snapshot_onload(&im.mem_cpu, sys);
     mem_snapshot_onload(&im.mem_vic, sys);
     mem_snapshot_onload(&im.mem_cart, sys);
