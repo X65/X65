@@ -68,41 +68,9 @@ extern "C" {
 #define X65_MAX_AUDIO_SAMPLES     (1024)  // max number of audio samples in internal sample buffer
 #define X65_DEFAULT_AUDIO_SAMPLES (128)   // default number of samples in internal sample buffer
 
-// X65 joystick types (only one joystick supported)
-typedef enum {
-    X65_JOYSTICKTYPE_NONE,
-    X65_JOYSTICKTYPE_DIGITAL,
-} x65_joystick_type_t;
-
-// memory configuration (used in x65_desc_t.mem_config)
-typedef enum {
-    X65_MEMCONFIG_STANDARD,  // unexpanded
-    X65_MEMCONFIG_8K,        // Block 1
-    X65_MEMCONFIG_16K,       // Block 1+2
-    X65_MEMCONFIG_24K,       // Block 1+2+3
-    X65_MEMCONFIG_32K,       // Block 1+2+3+5 (note that BASIC can only use blocks 1+2+3)
-    X65_MEMCONFIG_MAX        // 32K + 3KB at 0400..0FFF
-} x65_memory_config_t;
-
-// joystick mask bits
-#define X65_JOYSTICK_UP    (1 << 0)
-#define X65_JOYSTICK_DOWN  (1 << 1)
-#define X65_JOYSTICK_LEFT  (1 << 2)
-#define X65_JOYSTICK_RIGHT (1 << 3)
-#define X65_JOYSTICK_BTN   (1 << 4)
-
-// IEC port bits, same as C1541_IECPORT_*
-#define X65_IECPORT_RESET (1 << 0)
-#define X65_IECPORT_SRQIN (1 << 1)
-#define X65_IECPORT_DATA  (1 << 2)
-#define X65_IECPORT_CLK   (1 << 3)
-#define X65_IECPORT_ATN   (1 << 4)
-
 // config parameters for x65_init()
 typedef struct {
-    x65_joystick_type_t joystick_type;  // default is X65_JOYSTICK_NONE
-    x65_memory_config_t mem_config;     // default is X65_MEMCONFIG_STANDARD
-    chips_debug_t debug;                // optional debugging hook
+    chips_debug_t debug;  // optional debugging hook
     chips_audio_desc_t audio;
     struct {
         chips_range_t chars;   // 4 KByte character ROM dump
@@ -118,14 +86,6 @@ typedef struct {
     m6522_t via_2;
     m6561_t vic;
     uint64_t pins;
-
-    x65_joystick_type_t joystick_type;
-    x65_memory_config_t mem_config;
-    uint8_t iec_port;        // IEC serial port, shared with c1541_t if connected
-    uint8_t kbd_joy_mask;    // current joystick state from keyboard-joystick emulation
-    uint8_t joy_joy_mask;    // current joystick state from x65_joystick()
-    uint64_t via1_joy_mask;  // merged keyboard/joystick mask ready for or-ing with VIA1 input pins
-    uint64_t via2_joy_mask;  // merged keyboard/joystick mask ready for or-ing with VIA2 input pins
 
     kbd_t kbd;      // keyboard matrix state
     mem_t mem_cpu;  // CPU-visible memory mapping
@@ -149,8 +109,6 @@ typedef struct {
     uint8_t rom_kernal[0x2000];  // 8 KB KERNAL V3 ROM image
     uint8_t ram_exp[4][0x2000];  // optional expansion 8K RAM blocks
     uint8_t fb[M6561_FRAMEBUFFER_SIZE_BYTES];
-
-    mem_t mem_cart;  // special ROM cartridge memory mapping helper
 } x65_t;
 
 // initialize a new X65 instance
@@ -167,18 +125,10 @@ uint32_t x65_exec(x65_t* sys, uint32_t micro_seconds);
 void x65_key_down(x65_t* sys, int key_code);
 // send a key-up event to the X65
 void x65_key_up(x65_t* sys, int key_code);
-// enable/disable joystick emulation
-void x65_set_joystick_type(x65_t* sys, x65_joystick_type_t type);
-// get current joystick emulation type
-x65_joystick_type_t x65_joystick_type(x65_t* sys);
-// set joystick mask (combination of X65_JOYSTICK_*)
-void x65_joystick(x65_t* sys, uint8_t joy_mask);
 // quickload a .prg/.bin file
 bool x65_quickload(x65_t* sys, chips_range_t data);
 // load a .prg/.bin file as ROM cartridge
 bool x65_insert_rom_cartridge(x65_t* sys, chips_range_t data);
-// remove current ROM cartridge
-void x65_remove_rom_cartridge(x65_t* sys);
 // take a snapshot, patches pointers to zero or offsets, returns snapshot version
 uint32_t x65_save_snapshot(x65_t* sys, x65_t* dst);
 // load a snapshot, returns false if snapshot version doesn't match
@@ -214,10 +164,6 @@ void x65_init(x65_t* sys, const x65_desc_t* desc) {
 
     memset(sys, 0, sizeof(x65_t));
     sys->valid = true;
-    sys->joystick_type = desc->joystick_type;
-    sys->mem_config = desc->mem_config;
-    sys->via1_joy_mask = M6522_PA2 | M6522_PA3 | M6522_PA4 | M6522_PA5;
-    sys->via2_joy_mask = M6522_PB7;
     sys->debug = desc->debug;
     sys->audio.callback = desc->audio.callback;
     sys->audio.num_samples = _X65_DEFAULT(desc->audio.num_samples, X65_DEFAULT_AUDIO_SAMPLES);
@@ -276,24 +222,9 @@ void x65_init(x65_t* sys, const x65_desc_t* desc) {
     */
     mem_init(&sys->mem_cpu);
     mem_map_ram(&sys->mem_cpu, 1, 0x0000, 0x0400, sys->ram0);
-    if (desc->mem_config == X65_MEMCONFIG_MAX) {
-        mem_map_ram(&sys->mem_cpu, 1, 0x0400, 0x0C00, sys->ram_3k);
-    }
     mem_map_ram(&sys->mem_cpu, 1, 0x1000, 0x1000, sys->ram1);
-    if (desc->mem_config >= X65_MEMCONFIG_8K) {
-        mem_map_ram(&sys->mem_cpu, 1, 0x2000, 0x2000, sys->ram_exp[0]);
-    }
-    if (desc->mem_config >= X65_MEMCONFIG_16K) {
-        mem_map_ram(&sys->mem_cpu, 1, 0x4000, 0x2000, sys->ram_exp[1]);
-    }
-    if (desc->mem_config >= X65_MEMCONFIG_24K) {
-        mem_map_ram(&sys->mem_cpu, 1, 0x6000, 0x2000, sys->ram_exp[2]);
-    }
     mem_map_rom(&sys->mem_cpu, 1, 0x8000, 0x1000, sys->rom_char);
     mem_map_ram(&sys->mem_cpu, 1, 0x9400, 0x0400, sys->color_ram);
-    if (desc->mem_config >= X65_MEMCONFIG_32K) {
-        mem_map_ram(&sys->mem_cpu, 1, 0xA000, 0x2000, sys->ram_exp[3]);
-    }
     mem_map_rom(&sys->mem_cpu, 1, 0xC000, 0x2000, sys->rom_basic);
     mem_map_rom(&sys->mem_cpu, 1, 0xE000, 0x2000, sys->rom_kernal);
 
@@ -310,22 +241,7 @@ void x65_init(x65_t* sys, const x65_desc_t* desc) {
     // FIXME: can the VIC read the color RAM as data?
     // mem_map_rom(&sys->mem_vic, 0, 0x1400, 0x0400, sys->color_ram);      // CPU: 9400..97FF
     mem_map_rom(&sys->mem_vic, 0, 0x2000, 0x0400, sys->ram0);  // CPU: 0000..03FF
-    if (desc->mem_config == X65_MEMCONFIG_MAX) {
-        mem_map_rom(&sys->mem_vic, 0, 0x2400, 0x0C00, sys->ram_3k);  // CPU: 0400..0FFF
-    }
     mem_map_rom(&sys->mem_vic, 0, 0x3000, 0x1000, sys->ram1);  // CPU: 1000..1FFF
-
-    /*
-        A special memory mapping used to copy ROM cartridge PRG files
-        into the X65. Those PRG files may be merged from several files
-        and have gaps in them. The data in those gaps must not
-        scribble over the X65's RAM, ROM or IO regions.
-    */
-    mem_init(&sys->mem_cart);
-    mem_map_ram(&sys->mem_cart, 0, 0x2000, 0x2000, sys->ram_exp[0]);
-    mem_map_ram(&sys->mem_cart, 0, 0x4000, 0x2000, sys->ram_exp[1]);
-    mem_map_ram(&sys->mem_cart, 0, 0x6000, 0x2000, sys->ram_exp[2]);
-    mem_map_ram(&sys->mem_cart, 0, 0xA000, 0x2000, sys->ram_exp[3]);
 }
 
 void x65_discard(x65_t* sys) {
@@ -335,10 +251,6 @@ void x65_discard(x65_t* sys) {
 
 void x65_reset(x65_t* sys) {
     CHIPS_ASSERT(sys && sys->valid);
-    sys->kbd_joy_mask = 0;
-    sys->joy_joy_mask = 0;
-    sys->via1_joy_mask = M6522_PA2 | M6522_PA3 | M6522_PA4 | M6522_PA5;
-    sys->via2_joy_mask = M6522_PB7;
     sys->pins |= M6502_RES;
     m6522_reset(&sys->via_1);
     m6522_reset(&sys->via_2);
@@ -419,7 +331,7 @@ static uint64_t _x65_tick(x65_t* sys, uint64_t pins) {
     {
         // FIXME: SERIAL PORT
         // FIXME: RESTORE key to M6522_CA1
-        via1_pins |= sys->via1_joy_mask | (M6522_PA0 | M6522_PA1 | M6522_PA7);
+        via1_pins |= (M6522_PA0 | M6522_PA1 | M6522_PA7);
         via1_pins = m6522_tick(&sys->via_1, via1_pins);
         if (via1_pins & M6522_IRQ) {
             pins |= M6502_NMI;
@@ -451,7 +363,6 @@ static uint64_t _x65_tick(x65_t* sys, uint64_t pins) {
     {
         uint8_t kbd_lines = ~kbd_scan_lines(&sys->kbd);
         M6522_SET_PA(via2_pins, kbd_lines);
-        via2_pins |= sys->via2_joy_mask;
         via2_pins = m6522_tick(&sys->via_2, via2_pins);
         uint8_t kbd_cols = ~M6522_GET_PB(via2_pins);
         kbd_set_active_columns(&sys->kbd, kbd_cols);
@@ -588,131 +499,14 @@ bool x65_quickload(x65_t* sys, chips_range_t data) {
     return true;
 }
 
-bool x65_insert_rom_cartridge(x65_t* sys, chips_range_t data) {
-    CHIPS_ASSERT(sys && sys->valid && data.ptr && (data.size > 0));
-    if (data.size < 2) {
-        return false;
-    }
-
-    /* the cartridge ROM may be a special merged PRG with a gap between the
-       two memory regions with valid data, we cannot scribble over memory
-       in that gap, so use a temporary memory mapping
-    */
-    const uint8_t* ptr = (uint8_t*)data.ptr;
-    const uint16_t start_addr = ptr[1] << 8 | ptr[0];
-    ptr += 2;
-    const uint16_t end_addr = start_addr + (data.size - 2);
-    uint16_t addr = start_addr;
-    while (addr < end_addr) {
-        mem_wr(&sys->mem_cart, addr++, *ptr++);
-    }
-
-    // map the ROM cartridge into the CPU's memory layer 0
-    mem_unmap_layer(&sys->mem_cpu, 0);
-    if (start_addr == 0x2000) {
-        mem_map_rom(&sys->mem_cpu, 0, 0x2000, 0x2000, sys->ram_exp[0]);
-    }
-    else if (start_addr == 0x4000) {
-        mem_map_rom(&sys->mem_cpu, 0, 0x4000, 0x2000, sys->ram_exp[1]);
-    }
-    else if (start_addr == 0x6000) {
-        mem_map_rom(&sys->mem_cpu, 0, 0x6000, 0x2000, sys->ram_exp[2]);
-    }
-    mem_map_rom(&sys->mem_cpu, 0, 0xA000, 0x2000, sys->ram_exp[3]);
-    sys->pins |= M6502_RES;
-    return true;
-}
-
-void x65_remove_rom_cartridge(x65_t* sys) {
-    CHIPS_ASSERT(sys && sys->valid);
-    mem_unmap_layer(&sys->mem_cpu, 0);
-    sys->pins |= M6502_RES;
-}
-
-// generate precomputed VIA-1 and VIA-2 joystick port masks
-static void _x65_update_joymasks(x65_t* sys) {
-    uint8_t jm = sys->kbd_joy_mask | sys->joy_joy_mask;
-    sys->via1_joy_mask = M6522_PA2 | M6522_PA3 | M6522_PA4 | M6522_PA5;
-    sys->via2_joy_mask = M6522_PB7;
-    if (jm & X65_JOYSTICK_LEFT) {
-        sys->via1_joy_mask &= ~M6522_PA2;
-    }
-    if (jm & X65_JOYSTICK_DOWN) {
-        sys->via1_joy_mask &= ~M6522_PA3;
-    }
-    if (jm & X65_JOYSTICK_LEFT) {
-        sys->via1_joy_mask &= ~M6522_PA4;
-    }
-    if (jm & X65_JOYSTICK_BTN) {
-        sys->via1_joy_mask &= ~M6522_PA5;
-    }
-    if (jm & X65_JOYSTICK_RIGHT) {
-        sys->via2_joy_mask &= ~M6522_PB7;
-    }
-}
-
 void x65_key_down(x65_t* sys, int key_code) {
     CHIPS_ASSERT(sys && sys->valid);
-    if (sys->joystick_type == X65_JOYSTICKTYPE_NONE) {
-        kbd_key_down(&sys->kbd, key_code);
-    }
-    else {
-        uint8_t m = 0;
-        switch (key_code) {
-            case 0x20: m = X65_JOYSTICK_BTN; break;
-            case 0x08: m = X65_JOYSTICK_LEFT; break;
-            case 0x09: m = X65_JOYSTICK_RIGHT; break;
-            case 0x0A: m = X65_JOYSTICK_DOWN; break;
-            case 0x0B: m = X65_JOYSTICK_UP; break;
-            default: kbd_key_down(&sys->kbd, key_code); break;
-        }
-        if (m != 0) {
-            if (sys->joystick_type == X65_JOYSTICKTYPE_DIGITAL) {
-                sys->kbd_joy_mask |= m;
-                _x65_update_joymasks(sys);
-            }
-        }
-    }
+    kbd_key_down(&sys->kbd, key_code);
 }
 
 void x65_key_up(x65_t* sys, int key_code) {
     CHIPS_ASSERT(sys && sys->valid);
-    if (sys->joystick_type == X65_JOYSTICKTYPE_NONE) {
-        kbd_key_up(&sys->kbd, key_code);
-    }
-    else {
-        uint8_t m = 0;
-        switch (key_code) {
-            case 0x20: m = X65_JOYSTICK_BTN; break;
-            case 0x08: m = X65_JOYSTICK_LEFT; break;
-            case 0x09: m = X65_JOYSTICK_RIGHT; break;
-            case 0x0A: m = X65_JOYSTICK_DOWN; break;
-            case 0x0B: m = X65_JOYSTICK_UP; break;
-            default: kbd_key_up(&sys->kbd, key_code); break;
-        }
-        if (m != 0) {
-            if (sys->joystick_type == X65_JOYSTICKTYPE_DIGITAL) {
-                sys->kbd_joy_mask &= ~m;
-                _x65_update_joymasks(sys);
-            }
-        }
-    }
-}
-
-void x65_set_joystick_type(x65_t* sys, x65_joystick_type_t type) {
-    CHIPS_ASSERT(sys && sys->valid);
-    sys->joystick_type = type;
-}
-
-x65_joystick_type_t x65_joystick_type(x65_t* sys) {
-    CHIPS_ASSERT(sys && sys->valid);
-    return sys->joystick_type;
-}
-
-void x65_joystick(x65_t* sys, uint8_t joy_mask) {
-    CHIPS_ASSERT(sys && sys->valid);
-    sys->joy_joy_mask = joy_mask;
-    _x65_update_joymasks(sys);
+    kbd_key_up(&sys->kbd, key_code);
 }
 
 chips_display_info_t x65_display_info(x65_t* sys) {
@@ -754,7 +548,6 @@ uint32_t x65_save_snapshot(x65_t* sys, x65_t* dst) {
     m6561_snapshot_onsave(&dst->vic);
     mem_snapshot_onsave(&dst->mem_cpu, sys);
     mem_snapshot_onsave(&dst->mem_vic, sys);
-    mem_snapshot_onsave(&dst->mem_cart, sys);
     return X65_SNAPSHOT_VERSION;
 }
 
@@ -771,7 +564,6 @@ bool x65_load_snapshot(x65_t* sys, uint32_t version, x65_t* src) {
     m6561_snapshot_onload(&im.vic, &sys->vic);
     mem_snapshot_onload(&im.mem_cpu, sys);
     mem_snapshot_onload(&im.mem_vic, sys);
-    mem_snapshot_onload(&im.mem_cart, sys);
     *sys = im;
     return true;
 }

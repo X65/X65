@@ -1,7 +1,7 @@
 {
   "recommendations": [
-    "ms-vscode.cpptools",
-    "ms-vscode.cmake-tools",
+    "ziglang.vscode-zig",
+    "llvm-vs-code-extensions.vscode-clangd",
     "streetsidesoftware.code-spell-checker",
     "DavidAnson.vscode-markdownlint"
   ]

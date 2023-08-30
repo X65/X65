@@ -127,22 +127,9 @@ static void _ui_x65_draw_menu(ui_x65_t* ui) {
                 x65_reset(ui->x65);
                 ui_dbg_reset(&ui->dbg);
             }
-            if (ImGui::MenuItem("Remove Cartridge")) {
-                x65_remove_rom_cartridge(ui->x65);
-            }
             if (ImGui::MenuItem("Cold Boot")) {
                 ui->boot_cb(ui->x65);
                 ui_dbg_reboot(&ui->dbg);
-            }
-
-            if (ImGui::BeginMenu("Joystick")) {
-                if (ImGui::MenuItem("None", 0, ui->x65->joystick_type == X65_JOYSTICKTYPE_NONE)) {
-                    ui->x65->joystick_type = X65_JOYSTICKTYPE_NONE;
-                }
-                if (ImGui::MenuItem("Digital", 0, ui->x65->joystick_type == X65_JOYSTICKTYPE_DIGITAL)) {
-                    ui->x65->joystick_type = X65_JOYSTICKTYPE_DIGITAL;
-                }
-                ImGui::EndMenu();
             }
             ImGui::EndMenu();
         }
@@ -222,20 +209,14 @@ static void _ui_x65_mem_write(int layer, uint16_t addr, uint8_t data, void* user
 
 static void _ui_x65_update_memmap(ui_x65_t* ui) {
     CHIPS_ASSERT(ui && ui->x65);
-    const x65_memory_config_t cfg = ui->x65->mem_config;
     ui_memmap_reset(&ui->memmap);
     ui_memmap_layer(&ui->memmap, "SYS");
     ui_memmap_region(&ui->memmap, "RAM0", 0x0000, 0x0400, true);
-    ui_memmap_region(&ui->memmap, "RAM3K", 0x0400, 0x0C00, cfg == X65_MEMCONFIG_MAX);
     ui_memmap_region(&ui->memmap, "RAM1", 0x1000, 0x1000, true);
-    ui_memmap_region(&ui->memmap, "EXP1", 0x2000, 0x2000, cfg >= X65_MEMCONFIG_8K);
-    ui_memmap_region(&ui->memmap, "EXP2", 0x4000, 0x2000, cfg >= X65_MEMCONFIG_16K);
-    ui_memmap_region(&ui->memmap, "EXP3", 0x6000, 0x2000, cfg >= X65_MEMCONFIG_24K);
     ui_memmap_region(&ui->memmap, "CHAR", 0x8000, 0x1000, true);
     ui_memmap_region(&ui->memmap, "IO", 0x9000, 0x0200, true);
     // FIXME: color ram at variable address
     ui_memmap_region(&ui->memmap, "COLOR", 0x9400, 0x0800, true);
-    ui_memmap_region(&ui->memmap, "EXP4", 0xA000, 0x2000, cfg >= X65_MEMCONFIG_32K);
     ui_memmap_region(&ui->memmap, "BASIC", 0xC000, 0x2000, true);
     ui_memmap_region(&ui->memmap, "KERNAL", 0xE000, 0x2000, true);
 }
@@ -546,25 +527,7 @@ void ui_x65_draw_system(ui_x65_t* ui) {
     }
     x65_t* sys = ui->x65;
     ImGui::SetNextWindowSize({ 200, 250 }, ImGuiCond_Once);
-    if (ImGui::Begin("VIC-20 System", &ui->system_window_open)) {
-        const char* mem_config = "???";
-        switch (sys->mem_config) {
-            case X65_MEMCONFIG_STANDARD: mem_config = "standard"; break;
-            case X65_MEMCONFIG_8K: mem_config = "+8K RAM"; break;
-            case X65_MEMCONFIG_16K: mem_config = "+16K RAM"; break;
-            case X65_MEMCONFIG_24K: mem_config = "+24K RAM"; break;
-            case X65_MEMCONFIG_32K: mem_config = "+32K RAM"; break;
-            case X65_MEMCONFIG_MAX: mem_config = "MAX RAM"; break;
-        }
-        ImGui::Text("Memory Config: %s", mem_config);
-        if (ImGui::CollapsingHeader("IEC Port", ImGuiTreeNodeFlags_DefaultOpen)) {
-            ImGui::Text("RESET: %d", (sys->iec_port & X65_IECPORT_RESET) ? 1 : 0);
-            ImGui::Text("SRQIN: %d", (sys->iec_port & X65_IECPORT_SRQIN) ? 1 : 0);
-            ImGui::Text("DATA:  %d", (sys->iec_port & X65_IECPORT_DATA) ? 1 : 0);
-            ImGui::Text("CLK:   %d", (sys->iec_port & X65_IECPORT_CLK) ? 1 : 0);
-            ImGui::Text("ATN:   %d", (sys->iec_port & X65_IECPORT_ATN) ? 1 : 0);
-        }
-    }
+    if (ImGui::Begin("VIC-20 System", &ui->system_window_open)) {}
     ImGui::End();
 }
 
