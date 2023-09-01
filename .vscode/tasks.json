@@ -8,6 +8,9 @@
       "type": "process",
       "command": "zig",
       "args": ["build", "cdb"],
+      "options": {
+        "cwd": "${workspaceFolder}/emulator"
+      },
       "group": "build",
       "runOptions": {
         "runOn": "folderOpen"
