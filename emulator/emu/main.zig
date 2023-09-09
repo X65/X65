@@ -8,6 +8,7 @@ const sokol = @import("sokol");
 const slog = sokol.log;
 const sapp = sokol.app;
 const saudio = sokol.audio;
+const sdtx = sokol.debugtext;
 
 const emu = @cImport({
     @cInclude("systems/x65.h");
@@ -134,7 +135,7 @@ fn app_frame() callconv(.C) void {
     const emu_start_time = emu.stm_now();
     state.ticks = emu.x65_exec(&state.x65, state.frame_time_us);
     state.emu_time_ms = emu.stm_ms(emu.stm_since(emu_start_time));
-    // draw_status_bar();
+    draw_status_bar();
     emu.gfx_draw(emu.x65_display_info(&state.x65));
     // handle_file_loading();
     // send_keybuf_input();
@@ -233,6 +234,23 @@ fn app_cleanup() callconv(.C) void {
     }
     saudio.shutdown();
     emu.gfx_shutdown();
+}
+
+fn draw_status_bar() void {
+    emu.prof_push(emu.PROF_EMU, @floatCast(state.emu_time_ms));
+    const emu_stats = emu.prof_stats(emu.PROF_EMU);
+    const w = sapp.widthf();
+    const h = sapp.heightf();
+    sdtx.canvas(w, h);
+    sdtx.color3b(255, 255, 255);
+    sdtx.pos(1.0, (h / 8.0) - 1.5);
+    sdtx.print("frame:{d:.2}ms emu:{d:.2}ms (min:{d:.2}ms max:{d:.2}ms) ticks:{d}", .{
+        @as(f32, @floatFromInt(state.frame_time_us)) * 0.001,
+        emu_stats.avg_val,
+        emu_stats.min_val,
+        emu_stats.max_val,
+        state.ticks,
+    });
 }
 
 fn ui_draw_cb() callconv(.C) void {
