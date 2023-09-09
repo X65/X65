@@ -1,5 +1,7 @@
 const std = @import("std");
 
+const argsParser = @import("args");
+
 const UI = @import("build_options").ui;
 
 const sokol = @import("sokol");
@@ -301,7 +303,42 @@ fn ui_load_snapshots_from_storage() callconv(.C) void {
     }
 }
 
-pub fn main() void {
+pub fn main() !u8 {
+    var argsAllocator = std.heap.page_allocator;
+
+    const Options = struct {
+        // This declares long options for double hyphen
+        console: bool = false,
+        fs: ?[]const u8 = null,
+        help: bool = false,
+
+        // This declares short-hand options for single hyphen
+        pub const shorthands = .{
+            .c = "console",
+        };
+
+        pub const meta = .{
+            .usage_summary = "[options] [ROM file]",
+            .full_text = "X65 system emulator.\nhttp://x65.zone",
+            .option_docs = .{
+                .console = "connect UART to stdin/out",
+                .fs = "internal RIA filesystem directory",
+                .help = "Print this help",
+            },
+        };
+    };
+    const options = argsParser.parseForCurrentProcess(Options, argsAllocator, .print) catch return 1;
+    defer options.deinit();
+
+    if (options.options.help) {
+        try argsParser.printHelp(
+            Options,
+            options.executable_name orelse "emu",
+            std.io.getStdOut().writer(),
+        );
+        return 0;
+    }
+
     const info = emu.x65_display_info(0);
     sapp.run(.{
         .init_cb = app_init,
@@ -315,4 +352,5 @@ pub fn main() void {
         .enable_dragndrop = true,
         .logger = .{ .func = slog.func },
     });
+    return 0;
 }

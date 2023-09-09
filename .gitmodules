@@ -13,3 +13,6 @@
 [submodule "emulator/ext/imgui"]
 	path = emulator/ext/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "emulator/ext/zig-args"]
+	path = emulator/ext/zig-args
+	url = https://github.com/MasterQ32/zig-args.git

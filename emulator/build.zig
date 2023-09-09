@@ -54,6 +54,10 @@ pub fn build(b: *std.Build) void {
 
     exe.addOptions("build_options", options);
 
+    exe.addModule("args", b.addModule("args", .{ .source_file = .{
+        .path = "ext/zig-args/args.zig",
+    } }));
+
     exe.addAnonymousModule("sokol", .{
         .source_file = .{ .path = "ext/sokol-zig/src/sokol/sokol.zig" },
     });
