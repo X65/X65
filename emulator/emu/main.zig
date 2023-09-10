@@ -36,16 +36,14 @@ var state: struct {
     frame_time_us: u32 = 0,
     ticks: u32 = 0,
     emu_time_ms: f64 = 0,
-    ui: if (UI) emu.ui_x65_t else void,
-    snapshots: if (UI) [emu.UI_SNAPSHOT_MAX_SLOTS]x65_snapshot_t else void,
-} = .{
-    .x65 = undefined,
-    .frame_time_us = 0,
-    .ticks = 0,
-    .emu_time_ms = 0,
-    .ui = undefined,
-    .snapshots = undefined,
-};
+    ui: if (UI) emu.ui_x65_t else void = undefined,
+    snapshots: if (UI) [emu.UI_SNAPSHOT_MAX_SLOTS]x65_snapshot_t else void = undefined,
+    allocator: std.mem.Allocator = undefined,
+    console: bool = false,
+    console_queue: ConsoleQueue = undefined,
+} = .{};
+
+const ConsoleQueue = std.atomic.Queue([]u8);
 
 fn push_audio(samples: [*c]const f32, num_samples: c_int, user_data: ?*anyopaque) callconv(.C) void {
     _ = user_data;
@@ -139,6 +137,7 @@ fn app_frame() callconv(.C) void {
     emu.gfx_draw(emu.x65_display_info(&state.x65));
     // handle_file_loading();
     // send_keybuf_input();
+    if (state.console) send_receive_uart();
 }
 
 fn app_input(event: [*c]const sapp.Event) callconv(.C) void {
@@ -253,6 +252,45 @@ fn draw_status_bar() void {
     });
 }
 
+fn send_receive_uart() void {
+    const stdout = std.io.getStdOut().writer();
+
+    while (state.console_queue.get()) |node| {
+        const line = node.data;
+        stdout.print("{s}\n", .{node.data}) catch |err| {
+            std.debug.panic("Failure getting console queue: {}\n", .{err});
+        };
+
+        state.allocator.free(line);
+        state.allocator.destroy(node);
+    }
+}
+
+fn read_console_uart() void {
+    const stdin = std.io.getStdIn().reader();
+
+    var array_list = std.ArrayList(u8).init(state.allocator);
+    defer array_list.deinit();
+
+    while (true) {
+        stdin.streamUntilDelimiter(array_list.writer(), '\n', 128) catch |err| {
+            std.debug.panic("Failure reading stdin: {}", .{err});
+        };
+        const line = array_list.toOwnedSlice() catch |err| {
+            std.debug.panic("Failure getting stdin: {}", .{err});
+        };
+        const node: *ConsoleQueue.Node = state.allocator.create(ConsoleQueue.Node) catch |err| {
+            std.debug.panic("Failure allocating console queue node: {}", .{err});
+        };
+        node.* = .{
+            .prev = undefined,
+            .next = undefined,
+            .data = line,
+        };
+        state.console_queue.put(node);
+    }
+}
+
 fn ui_draw_cb() callconv(.C) void {
     emu.ui_x65_draw(&state.ui);
 }
@@ -322,7 +360,7 @@ fn ui_load_snapshots_from_storage() callconv(.C) void {
 }
 
 pub fn main() !u8 {
-    var argsAllocator = std.heap.page_allocator;
+    state.allocator = std.heap.page_allocator;
 
     const Options = struct {
         // This declares long options for double hyphen
@@ -345,7 +383,7 @@ pub fn main() !u8 {
             },
         };
     };
-    const options = argsParser.parseForCurrentProcess(Options, argsAllocator, .print) catch return 1;
+    const options = argsParser.parseForCurrentProcess(Options, state.allocator, .print) catch return 1;
     defer options.deinit();
 
     if (options.options.help) {
@@ -356,6 +394,16 @@ pub fn main() !u8 {
         );
         return 0;
     }
+
+    state.console = options.options.console;
+    _ = if (state.console) thr: {
+        const console_thread = try std.Thread.spawn(.{}, read_console_uart, .{});
+        console_thread.detach();
+
+        state.console_queue = std.atomic.Queue([]u8).init();
+
+        break :thr console_thread;
+    } else null;
 
     const info = emu.x65_display_info(0);
     sapp.run(.{
