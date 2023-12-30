@@ -11,11 +11,14 @@ project([emulator])
 get_filename_component(FIPS_ROOT_DIR "../fips" ABSOLUTE)
 include("${FIPS_ROOT_DIR}/cmake/fips.cmake")
 
-include_directories(.)
 fips_setup()
 
 fips_ide_group(examples)
-add_subdirectory(chips-test/examples)
-include_directories(chips-test/examples/common chips-test/examples/roms)
+include_directories(ext/chips-test/examples/common ext/chips-test/examples/roms)
+add_subdirectory(ext/chips-test/examples/common)
+fips_ide_group(roms)
+add_subdirectory(ext/chips-test/examples/roms)
 
+fips_ide_group(apps)
+include_directories(.)
 add_subdirectory(apps)
