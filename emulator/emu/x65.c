@@ -6,8 +6,8 @@
 #include "common.h"
 #include "vic20-roms.h"
 #if defined(CHIPS_USE_UI)
-    #include "ui/ui_x65.h"
     #include "ui.h"
+    #include "systems/ui_x65.h"
 #endif
 
 typedef struct {
