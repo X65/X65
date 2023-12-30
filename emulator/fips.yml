@@ -1,0 +1,33 @@
+#
+# X65 emulator
+#
+---
+imports:
+  emulator-chips:
+    git: https://github.com/floooh/chips
+  fips-imgui:
+    git: https://github.com/fips-libs/fips-imgui.git
+  sokol:
+    git: https://github.com/floooh/sokol
+  sokol-tools-bin:
+    git: https://github.com/floooh/sokol-tools-bin
+  fips-utils:
+    git: https://github.com/fips-libs/fips-utils
+#   exports:
+#       header-dirs:
+#           - RELATIVE HEADER SEARCH PATH
+#           - ...
+#       lib-dirs:
+#           - RELATIVE LIB SEARCH PATH
+#           - ...
+#       defines:
+#           KEY: VALUE (C preprocessor defines)
+#           ...: ...
+#       modules:
+#           NAME:   DIRECTORY WITH CMakeLists.txt of MODULE
+#           ...: ...
+#   run:
+#       TARGET-NAME:
+#           cwd:    WORKING DIRECTORY FOR 'fips run target'
+#       ...
+

@@ -1,31 +1,15 @@
 # X65 emulator
 
-## Preparation
+## Prerequisites
 
-This project makes use of git submodules, so you need to `git clone --recursive`.
+- python (3.x strongly preferred, even though 2.x might still work)
+- cmake (3.21.0 or newer)
+- a working C/C++ development environment:
+  - on OSX: Xcode + command line tools
+  - on Linux: make/gcc (or clang)
+  - on Windows: VS2015 or better
+- git (2.41.0 or newer)
 
-## Building
+Check for tools availability by running:
 
-[`zig`][1] v. 0.12 required.
-
-    zig build
-
-[1]: https://ziglang.org
-
-## Running
-
-Without UI
-
-    zig build run
-
-With UI
-
-    zig build run -Dui
-
-## IDE
-
-Build `compile_commands.json` required by `clangd`.
-
-    zig build cdb
-
-This is required only first time, or after adding new files to build.
+    ./fips diag tools

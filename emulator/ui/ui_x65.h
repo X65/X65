@@ -527,7 +527,7 @@ void ui_x65_draw_system(ui_x65_t* ui) {
     }
     x65_t* sys = ui->x65;
     ImGui::SetNextWindowSize({ 200, 250 }, ImGuiCond_Once);
-    if (ImGui::Begin("VIC-20 System", &ui->system_window_open)) {}
+    if (ImGui::Begin("X65 System", &ui->system_window_open)) {}
     ImGui::End();
 }
 

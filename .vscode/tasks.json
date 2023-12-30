@@ -1,24 +1,15 @@
 {
-  // See https://go.microsoft.com/fwlink/?LinkId=733558
-  // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "🗃️ Update compilation database",
-      "type": "process",
-      "command": "zig",
-      "args": ["build", "cdb"],
-      "options": {
-        "cwd": "${workspaceFolder}/emulator"
-      },
-      "group": "build",
-      "runOptions": {
-        "runOn": "folderOpen"
-      },
+      "label": "fips: gen",
+      "type": "shell",
+      "command": "emulator/fips gen",
       "presentation": {
-        "reveal": "never",
-        "panel": "shared"
-      }
+        "reveal": "always",
+        "panel": "new"
+      },
+      "runOptions": { "runOn": "folderOpen" }
     }
   ]
 }

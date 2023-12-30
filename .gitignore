@@ -1,1 +1,10 @@
-zig-cache/
+/fips/
+/fips-build/
+/fips-deploy/
+/fips-sdks/
+
+/emulator-chips/
+/fips-imgui/
+/fips-utils/
+/sokol-tools-bin/
+/sokol/

@@ -1,18 +1,3 @@
-[submodule "emulator/ext/chips-test"]
-	path = emulator/ext/chips-test
+[submodule "emulator/chips-test"]
+	path = emulator/chips-test
 	url = https://github.com/floooh/chips-test.git
-[submodule "emulator/ext/chips"]
-	path = emulator/ext/chips
-	url = https://github.com/floooh/chips.git
-[submodule "emulator/ext/sokol-zig"]
-	path = emulator/ext/sokol-zig
-	url = https://github.com/floooh/sokol-zig.git
-[submodule "emulator/ext/sokol"]
-	path = emulator/ext/sokol
-	url = https://github.com/floooh/sokol.git
-[submodule "emulator/ext/imgui"]
-	path = emulator/ext/imgui
-	url = https://github.com/ocornut/imgui.git
-[submodule "emulator/ext/zig-args"]
-	path = emulator/ext/zig-args
-	url = https://github.com/MasterQ32/zig-args.git

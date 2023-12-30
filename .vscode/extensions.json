@@ -1,9 +1,8 @@
 {
   "recommendations": [
-    "ziglang.vscode-zig",
     "llvm-vs-code-extensions.vscode-clangd",
     "SharpNinja.cc65",
-    "ms-vscode.makefile-tools",
+    "ms-vscode.cmake-tools",
     "streetsidesoftware.code-spell-checker",
     "DavidAnson.vscode-markdownlint"
   ]
