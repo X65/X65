@@ -19,6 +19,6 @@ add_subdirectory(ext/chips-test/examples/common)
 fips_ide_group(roms)
 add_subdirectory(ext/chips-test/examples/roms)
 
-fips_ide_group(apps)
+fips_ide_group(emu)
 include_directories(.)
-add_subdirectory(apps)
+add_subdirectory(emu)
