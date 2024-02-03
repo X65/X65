@@ -4,10 +4,10 @@
 fips-files/build/
 fips-files/deploy/
 *.pyc
-.vscode/
 .idea/
 CMakeUserPresets.json
 #<fips
 
 .cache/
+build/
 compile_commands.json

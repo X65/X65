@@ -3,6 +3,7 @@
     "llvm-vs-code-extensions.vscode-clangd",
     "SharpNinja.cc65",
     "ms-vscode.cmake-tools",
+    "ms-vscode.cpptools",
     "streetsidesoftware.code-spell-checker",
     "DavidAnson.vscode-markdownlint"
   ]
