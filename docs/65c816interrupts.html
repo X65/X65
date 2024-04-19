@@ -1,14 +1,13 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-  <title>INVESTIGATING 65C816 INTERRUPTS &mdash; &copy;1994&ndash;2024 by BCS Technology Limited</title>
+<!-- Saved from http://sbc.bcstechnology.net/65c816interrupts.html at 2024-03-13T14:33:17Z using monolith v2.7.0 -->
+<!DOCTYPE html><html><head>
+  <title>INVESTIGATING 65C816 INTERRUPTS — ©1994–2024 by BCS Technology Limited</title>
   <meta content="text/html; charset=windows-1252" http-equiv="Content-Type">
   <meta content="BCS Technology Limited (BDD)" name="author">
   <meta content="Investigating interrupts with the 65C816 microprocessor." name="description">
-</head>
-<body background="images/graph.gif">
+<link rel="icon" href="data:image/x-icon;base64,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G//+Jhv//iYb//4mG//+Jhv//iYb//4mG//+Jhv//iYb//4kGf//FxD/4wcF/+MHBf//FxD//icb//40JP//Nyb//zcm//83Jv//Nyb//zcm//83Jv//Nyb//zcm//83Jv//Nyb//zcm//83Jv//Nyb//zcm//83Jv//Nyb//zcm//83Jv//Nyb//zcm//83Jv//Nyb//zcm//83Jv//NCT//iYb//8XEP/jBwX/4wcF//8XEP/+Jxv//zcm//5EMP/+RzH//kcx//5HMf/+RzH//kcx//5HMf/+RzH//kcx//5HMf/+RzH//kcx//5HMf/+RzH//kcx//5HMf/+RzH//kcx//5HMf/+RzH//kcx//5HMf/+RzH//kQw//83Jv/+Jhv//xcQ/+MHBf/jBwX//xcQ//4nG///Nyb//kcy//5UOv/+Vjz//lY8//5WPP/+Vjz//lY8//5WPP/+Vjz//lY8//5WPP/+Vjz//lY8//5WPP/+Vjz//lY8//5WPP/+Vjz//lY8//5WPP/+Vjz//lY8//5UOv/+RzH//zcm//4mG///FxD/4wcF/+MHBf//FxD//icb//83Jv/+RzL//lc8//5kRf//Z0f//2dH//9nR///Z0f//2dH//9nR///Z0f//2dH//9nR///Z0f//2dH//9nR///Z0f//2dH//9nR///Z0f//2dH//9nR//+ZEb//lc8//5HMf//Nyb//iYb//8XEP/jBwX/4wcF//8XEP/+Jxv//zcm//5HMv/+Vzz//mdH//50UP//dlL//3ZS//92Uv//dlL//3ZS//92Uv//dlL//3ZS//92Uv//dlL//3ZS//92Uv//dlL//3ZS//92Uv//dlL//nRQ//9nR//+Vzz//kcx//83Jv/+Jhv//xcQ/+MHBf/jBwX//xcQ//4nG///Nyb//kcy//5XPP/+Z0f//3dS//6FXP/+h17//ode//6HXv/+h17//ode//6HXv/+h17//ode//6HXv/+h17//ode//6HXv/+h17//ode//6FXP//dlL//2dH//5XPP/+RzH//zcm//4mG///FxD/4wcF/+MHBf//FxD//icb//83Jv/+RzL//lY8//5nR///d1L//ode//6VZ//+l2j//pdo//6XaP/+l2j//pdo//6XaP/+l2j//pdo//6XaP/+l2j//pdo//6XaP/+lWf//ode//92Uv//Z0f//lc8//5HMf//Nyb//iYb//8XEP/jBwX/4wcF//8XEP/7LSH/+aih//rt6//63Nb/+7Cf//yDYv/+iF3//pho//6lcv/+qHP//K19//rcyf/89O///PHp//vTu//9rHz//qhz//6oc//8sIL//NzJ//zy7P/78u7/+9nP//qWgf/9Vjz//kcx//83Jv/+Jhv//xcQ/+MHBf/jBwX//hYQ//i6t////////////////////////Pn3//u/qP/9mWr//qhz//61fP/76tv//v7+//////////////////z07f/8wI///bmB//vz6v///////////////////////v7+//irn//+RzH//zcm//4mG///FxD/4wcF/+MHBf/+FhD/+sfE////////////+/f1//7+/v////////////vYxf/+qHP/+8OT//7+/v///////v7+//38+P////////////z06v/8z5z//v7+//7+/v/75tv/+9fJ//39/f///////f38//xaR///Nyb//iYb//8XEP/jBwX/4wcF//4WEP/5h4H//v7+///////5jnz/+Yt0//zv6////////v7+//vCnf/7zKX////////////979T//dmY//zx1/////////////vVqf/84sv/+9vG//2Za//+iF3/+uPc///////+/v7/+m9f//83Jv/+Jhv//xcQ/+MHBf/jBwX//xcQ//s+NP/9/Pz///////nKwf/+Z0f//KeR/////////////NnA//zHm/////////////312P/+56D//ueh//zz0v/88Nr//cqQ//63fv/+qHP//pdo//m4nv/9/v7///////vm4v/9TDf//zcm//4mG///FxD/4wcF/+MHBf//FxD//icb//rCvv///////v39//vPxf/76eT///////3+/v/7wp3//bqC//379v///////v32//71rP/+9Kj//uef///Xlf/+x4n//rd+//6oc//6uZj//f39///////77Oj/+WxV//1HMf//Nyb//iYb//8XEP/jBwX/4wcF//8XEP/+Jxv/+m1h//7+/v///////////////////////PPt//y3i//+uH7/++TJ/////////////fnQ//70qP/+55///d6o//3duf/9uYL//qdz//vt5f///////fz7//mBZ//6d2H/+bKp//xQQv/+Jhv//xcQ/+MHBf/jBwX//xcQ//4nG//8OCf/+9zY////////////+tXL//39/P///////f37//vRq//8zJP//fv2///////+/fr//eyv//7knv/8+Ov///////vdxP/8qHT//fv4///////85+H//GZH//nQyP//////+cbD//4mG///FxD/4wcF/+MHBf//FxD//icb//83Jv/5g3T////////////6uKT/+qB///zy7P///////vz6//zNlP/84bb//v7+///////8+e7//dud//zz4f///////fXu//6nc//75tr///////79/f/4jnf/+byx///////9/Pv/+y4j//8XEP/jBwX/4wcF//8XEP/+Jxv//zcm//pnVv/+/v7///////rj3P/7q43/+tzP/////////////dSm//7Iiv/74sP//v7+///////89+7//Pbs///////9+vf//qdz//qwjP/8/Pv///////36+f/53df///////z7+//6LiP//xcQ/+MHBf/jBwX//xcQ//4nG///Nyb/+YZ5//////////////////////////////////z69v/8vIj//rh+//24f//62b3//v7+//////////////////vr3f/+p3P//pdo//qwk//8+vj/////////////////+cG8//4mG///FxD/4wcF/+MHBf//FxD//icb//83Jv/9RzH/+oh2//rQx//99PL//v7+//78+v/76Nz/+7qR//6odP/+qHT//qh0//2odP/7vpn/+urf//7+/f/88Of//LaL//6lcv/+l2j//ode//uNbv/7z8T//fb1//rX0//6TT///iYb//8XEP/jBwX/4wcF//8XEP/+Jxv//zcm//5HMv/+Vzz//mdH//13Uv/7i2L//JZp//2YaP/+mGj//pho//6YaP/+mGj//pho//6YaP/9mGj//Jps//2YaP/+mGj//pdo//6VZ//+h17//3ZS//9nR//9Vjz//Ucx//83Jv/+Jhv//xcQ/+MHBf/jBwX//xcQ//4nG///Nyb//kcy//5XPP/+Z0f//3dS//6FXP/+h17//ode//6HXv/+h17//ode//6HXv/+h17//ode//6HXv/+h17//ode//6HXv/+h17//ode//6FXP//dlL//2dH//5XPP/+RzH//zcm//4mG///FxD/4wcF/+MHBf//FxD//icb//83Jv/+RzL//lc8//5nR///dFD//3dS//93Uv//d1L//3dS//93Uv//d1L//3dS//93Uv//d1L//3dS//93Uv//d1L//3dS//93Uv//d1L//3dS//50UP//Z0f//lc8//5HMf//Nyb//iYb//8XEP/jBwX/4wcF//8XEP/+Jxv//zcm//5HMv/+Vzz//mRF//5nR//+Z0f//mdH//5nR//+Z0f//mdH//5nR//+Z0f//mdH//5nR//+Z0f//mdH//5nR//+Z0f//mdH//5nR//+Z0f//mdH//5kRv/+Vzz//kcx//83Jv/+Jhv//xcQ/+MHBf/jBwX//xcQ//4nG///Nyb//kcy//5UOv/+Vzz//lc8//5XPP/+Vzz//lc8//5XPP/+Vzz//lc8//5XPP/+Vzz//lc8//5XPP/+Vzz//lc8//5XPP/+Vzz//lc8//5XPP/+Vzz//lc8//5UOv/+RzH//zcm//4mG///FxD/4wcF/+MHBf//FxD//icb//83Jv/+RDD//kcy//5HMv/+RzL//kcy//5HMv/+RzL//kcy//5HMv/+RzL//kcy//5HMv/+RzL//kcy//5HMv/+RzL//kcy//5HMv/+RzL//kcy//5HMv/+RzL//kcy//5EMP//Nyb//iYb//8XEP/jBwX/4wcF//8XEP/+Jxv//jQk//83Jv//Nyb//zcm//83Jv//Nyb//zcm//83Jv//Nyb//zcm//83Jv//Nyb//zcm//83Jv//Nyb//zcm//83Jv//Nyb//zcm//83Jv//Nyb//zcm//83Jv//Nyb//zcm//40JP/+Jhv//xcQ/+MHBf/jBwX//xcQ//4kGf/+Jxv//icb//4nG//+Jxv//icb//4nG//+Jxv//icb//4nG//+Jxv//icb//4nG//+Jxv//icb//4nG//+Jxv//icb//4nG//+Jxv//icb//4nG//+Jxv//icb//4nG//+Jxv//icb//4kGf//FxD/4wcF/+MHBf/+FA7//xcQ//8XEP//FxD//xcQ//8XEP//FxD//xcQ//8XEP//FxD//xcQ//8XEP//FxD//xcQ//8XEP//FxD//xcQ//8XEP//FxD//xcQ//8XEP//FxD//xcQ//8XEP//FxD//xcQ//8XEP//FxD//xcQ//4UDv/jBwX/ywQD/+MHBf/jBwX/4wcF/+MHBf/jBwX/4wcF/+MHBf/jBwX/4wcF/+MHBf/jBwX/4wcF/+MHBf/jBwX/4wcF/+MHBf/jBwX/4wcF/+MHBf/jBwX/4wcF/+MHBf/jBwX/4wcF/+MHBf/jBwX/4wcF/+MHBf/jBwX/4wcF/8sEA/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="></link></head>
+<body background="data:image/gif;base64,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">
 <font face="helvetica,arial">
-<h1><font color="#0000ff">INVESTIGATING&nbsp;&nbsp;65C816&nbsp;&nbsp;INTERRUPTS</font><a href="http://bcstechnology.net" target="_blank"><img alt="BCS Technology Limited Logo" title="BCS Technology Limited" src="images/40_bcslogo2.jpeg" style="border: 2px solid; width: 80px; height: 80px; border: 2px solid;" align="right"></a></h1>
+<h1><font color="#0000ff">INVESTIGATING&nbsp;&nbsp;65C816&nbsp;&nbsp;INTERRUPTS</font><a href="http://bcstechnology.net" target="_blank"><img alt="BCS Technology Limited Logo" title="BCS Technology Limited" src="data:image/jpeg;base64,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" style="border: 2px solid; width: 80px; height: 80px; border: 2px solid;" align="right"></a></h1>
 <h5>Published by <font color="#0000ff" face="Challenge Extra Bold">BCS Technology Limited</font></h5>
 <hr size="2" width="100%">
 <div align="justify">
@@ -19,9 +18,9 @@
       <br>
       <br>
     </b></li>
-  <li><a href="#toc:acronyms_symbols"><b>ACRONYMS, SYMBOLS <font size="-1">AND</font> NOTES</a></b><br>
+  <li><a href="#toc:acronyms_symbols"><b>ACRONYMS, SYMBOLS <font size="-1">AND</font> NOTES</b></a><br>
       <br>
-    </b></li>
+    </li>
   <li><a href="#toc:interrupts"><b>65C816 INTERRUPTS</b></a>:<br>
     <br>
   </li>
@@ -104,7 +103,7 @@ developed a sound coding style, knows what an interrupt is and
 understands why computers use interrupts.&nbsp;
 If these assumptions don’t describe you then you need to seek other references
 before continuing.&nbsp;
-One such reference is Garth Wilson&rsquo;s <a target="_blank" href="http://wilsonminesco.com/6502interrupts/index.html"><b>6502 interrupt primer</b></a>,
+One such reference is Garth Wilson’s <a target="_blank" href="http://wilsonminesco.com/6502interrupts/index.html"><b>6502 interrupt primer</b></a>,
 which starts with the basics and explains in detail how the 6502 family behaves when interrupted.&nbsp;
 Code examples of common interrupt-driven tasks that would be performed in a typical
 6502-powered system are also presented and in many cases, can be pasted directly
@@ -113,12 +112,12 @@ Enjoy the 1980s-vintage cartoons as well!
 <br>
 <br>
 <b><i>We caution you that if you do not understand the concepts presented in 
-Garth&rsquo;s primer then you will experience difficulty in understanding the 
-material presented herein</i></b>.&nbsp; This article has not been written to the level of a novice.&nbsp; An enormous amount of information about the 6502 family can be found both in printed form and on-line, as it is arguably the most documented microprocessor family ever developed.&nbsp; Two good places at which to start looking on-line are <a target="_blank" href="http://6502.org"><b>6502.org</b></a> and <a target="_blank" href="http://wilsonminesco.com"><b>wilsonminesco.com</b></a>, the latter which is Garth Wilson&rsquo;s extensive 6502-oriented website.&nbsp; Or enter “65C816” into your favorite search engine.
+Garth’s primer then you will experience difficulty in understanding the 
+material presented herein</i></b>.&nbsp; This article has not been written to the level of a novice.&nbsp; An enormous amount of information about the 6502 family can be found both in printed form and on-line, as it is arguably the most documented microprocessor family ever developed.&nbsp; Two good places at which to start looking on-line are <a target="_blank" href="http://6502.org"><b>6502.org</b></a> and <a target="_blank" href="http://wilsonminesco.com"><b>wilsonminesco.com</b></a>, the latter which is Garth Wilson’s extensive 6502-oriented website.&nbsp; Or enter “65C816” into your favorite search engine.
 <br>
 <br>
 For a general reference to the 6502 family assembly language, we recommend the
-Western Design Center&rsquo;s <a target="_blank" href="http://65xx.com/65xx-store-2/65xxcoding/"><b>programming reference manual</b></a>.&nbsp;
+Western Design Center’s <a target="_blank" href="http://65xx.com/65xx-store-2/65xxcoding/"><b>programming reference manual</b></a>.&nbsp;
 Encompassing some 450 pages, this manual has a wealth of information for the beginning 6502 assembly language programmer, as well considerable detail for those who already know the 6502 assembly language and want to get the most out of the 65C816.
 <br>
 <br>
@@ -136,7 +135,7 @@ refer to 65C816 features, frequently-used programming elements and other concept
   <table bgcolor="#ccffff" border="3" cellpadding="5" cellspacing="2">
     <tbody>
       <tr>
-        <td align="center" valign="middle">&Oslash;2</td>
+        <td align="center" valign="middle">Ø2</td>
         <td align="justify" valign="middle">System clock signal, pronounced <i>fee 2</i></td>
       </tr>
       <tr>
@@ -220,7 +219,7 @@ Text references to the 65C816’s registers are as follows:
       <tr>
         <td align="center" valign="middle"><code>SR</code></td>
         <td align="left" valign="middle">Status</td>
-        <td align="center" valign="middle"<code>8</code></td>
+        <td align="center" valign="middle" <code="">8</td>
       </tr>
       <tr>
         <td align="center" valign="middle"><code>m</code></td>
@@ -340,7 +339,7 @@ the signal level makes a transition from logic one (high) to logic zero.</li>
 aspects of interrupt circuit design, understanding the characteristics 
 of level versus edge sensitive interrupt inputs, as well as other factors, is essential to writing a
  trouble-free interrupt service routine, especially for a system that 
-will run at a high &Oslash;2 rate (the 65C816 has been successfully operated at
+will run at a high Ø2 rate (the 65C816 has been successfully operated at
  speeds as high as 20 megahertz (MHz) in commercial products, and much higher speeds
  are attainable in FPGA designs).&nbsp; Some discussion on this will be 
 presented later on.
@@ -385,18 +384,18 @@ simultaneously asserted, the 65C816 will respond to <code>ABORTB</code> and then
 the currently executing instruction has been completed.&nbsp; When response 
 to an interrupt does occur, the 65C816 has to save its state on the 
 stack before loading the interrupt vector and proceeding.&nbsp; If the 65C816
- is operating in native mode, eight &Oslash;2 clock cycles will be consumed in 
+ is operating in native mode, eight Ø2 clock cycles will be consumed in 
 responding to the interrupt and saving state.&nbsp; If the interrupt happens 
 to occur just as the current instruction’s opcode is being fetched, as 
-many as eight additional &Oslash;2 cycles may elapse before interrupt 
-recognition.&nbsp; Therefore, an <a href="http://en.wikipedia.org/wiki/Interrupt_latency" target="_blank""><b>interrupt latency</b></a> of as many as 16 &Oslash;2 cycles is possible, depending on the instruction being executed and when 
+many as eight additional Ø2 cycles may elapse before interrupt 
+recognition.&nbsp; Therefore, an <a href="http://en.wikipedia.org/wiki/Interrupt_latency" target="_blank" "=""><b>interrupt latency</b></a> of as many as 16 Ø2 cycles is possible, depending on the instruction being executed and when 
 during the instruction sequence the interrupt input is asserted.&nbsp; The 
 effects of variable interrupt latency will be discussed later on.</li>
 </ul>
 A more detailed explanation of each interrupt type follows.&nbsp;
 In the lists that describe the sequence of actions for each interrupt type, the
  event numbers are merely for list purposes, and do not imply how many 
-&Oslash;2 clock cycles have elapsed at any given point in the sequence.
+Ø2 clock cycles have elapsed at any given point in the sequence.
 <ul>
   <li><b><a name="toc:interrupt_abort"></a>Abort</b></li>
 </ul>
@@ -404,10 +403,10 @@ In the lists that describe the sequence of actions for each interrupt type, the
 management logic to cope with unusual hardware conditions that may arise
  during program execution.&nbsp; In such systems, an abort interrupt might be
  triggered if a running program accesses memory that either doesn’t 
-exist&mdash;a “page fault” in a virtual memory system, or is privileged&mdash;an 
+exist—a “page fault” in a virtual memory system, or is privileged—an 
 “access violation” or “memory fault” in a multitasking protected memory 
 environment.&nbsp; Few homebrew computers are likely to be built with such 
-features&mdash;the required hardware logic is quite complicated.&nbsp; Hence discussion on processing an abort interrupt will be 
+features—the required hardware logic is quite complicated.&nbsp; Hence discussion on processing an abort interrupt will be 
 limited to describing how the 65C816 reacts when <code>ABORTB</code> is asserted.&nbsp; If
  you are sufficiently hardware-savvy to be able to design a system that 
 can take advantage of this interrupt then it is a sure bet you won’t need 
@@ -442,7 +441,7 @@ return to and again execute the aborted instruction in the interrupted
 program.<br>
   <br>
 It should be noted that despite the interrupt’s name, <b><i>an “aborted” 
-instruction isn’t actually aborted</i></b>&mdash;all steps of the instruction will be 
+instruction isn’t actually aborted</i></b>—all steps of the instruction will be 
 completed before the 65C816 reacts to the interrupt.&nbsp; What is aborted 
 are computational changes to a register and/or memory that the 
 instruction would have made had it not been “aborted.”&nbsp; <code>ABORTB</code> has 
@@ -488,7 +487,7 @@ When the 65C816 receives an interrupt request, the following actions
   <ol>
     <li>All steps of the current instruction are completed and memory 
 and/or registers are updated as required.</li>
-    <li>The <code>I</code> bit in <code>SR</code> is tested and if set, the IRQ is ignored&mdash;none of
+    <li>The <code>I</code> bit in <code>SR</code> is tested and if set, the IRQ is ignored—none of
  the following steps will be executed.</li>
     <li>If the <code>I</code> bit in SR is clear the 65C816 will process the 
 interrupt and start by pushing <code>PB</code> to the stack.</li>
@@ -572,7 +571,7 @@ When <code>RESB</code> is brought low the 65C816 will immediately halt whatever
 it is doing and remain in a halted state as long as <code>RESB</code> is held low.&nbsp; 
 Upon release of <code>RESB</code>, the following actions will occur:<br>
   <ol>
-    <li>The internal clock, which is driven by the &Oslash;2 clock generator 
+    <li>The internal clock, which is driven by the Ø2 clock generator 
 circuit, will be restarted if it had previously been stopped by an <code>STP</code> 
 or <code>WAI</code> instruction (described in the <a href="#toc:high_speed_interrupt"><b>high speed interrupt response 
 subsection</b></a>).</li>
@@ -687,7 +686,7 @@ and 2 is altered within the interrupt service routine, the 65C816 will
 execute the next instruction in the interrupted program.&nbsp; As <code>PC</code> is twice
 incremented before being pushed to the stack, the “next instruction” 
 will be at the address of the <code>BRK</code> instruction plus two.&nbsp; The interceding
- signature byte is ignored by the 65C816 and can be anything&mdash;a <code>NOP</code> (<code>$EA</code>)
+ signature byte is ignored by the 65C816 and can be anything—a <code>NOP</code> (<code>$EA</code>)
  is customary during debugging, unless the <code>BRK</code> handler refers to the 
 signature.<br>
   <br>
@@ -707,7 +706,7 @@ another software interrupt, and it is up to the imagination of the
 system designer (you) to decide how to use it.&nbsp;
 As no floating point hardware that is bus-compatible with the 65C816 is known to exist at 
 this time, <code>COP</code> may be (mis)used in a number of ways, one being as a 
-operating system service call instruction&mdash;more on that to follow.
+operating system service call instruction—more on that to follow.
 <br>
 <br>
 Upon executing <code>COP</code> the following actions occur:
@@ -757,7 +756,7 @@ environment to suit operating system requirements.
 <br>
 <h2><a name="toc:software_engineering"></a>SOFTWARE ENGINEERING</h2>
 A well-designed interrupt service routine represents a significant 
-challenge for many programmers&mdash;as well as an occasionally rude lesson on
+challenge for many programmers—as well as an occasionally rude lesson on
  the value of disciplined coding habits.&nbsp; In addition to meeting the 
 obvious requirement of being able to correctly service and clear interrupts, an 
 interrupt service routine should be:<br>
@@ -809,7 +808,7 @@ and pulling them from the stack when the interrupt service routine has
 completed its work.&nbsp; <b><i>Note that it is not necessary to preserve a 
 register that the interrupt service routine does not touch</i></b>.&nbsp; For 
 example, if your interrupt service routine only uses <code>.X</code> and <code>.Y</code>, there’s 
-no good reason to preserve the accumulator&mdash;doing so would simply waste 
+no good reason to preserve the accumulator—doing so would simply waste 
 valuable clock cycles and stack space.&nbsp; If you can guarantee that your 
 interrupt service routine will not touch any of the registers, a 
 possibility in some tightly-written embedded applications, do not waste 
@@ -911,7 +910,7 @@ change the stack pointer after register preservation has been
 accomplished to prevent interrupt service routine stack accesses from 
 inadvertently affecting the foreground task(s) stack(s).&nbsp; However, doing
  so may compromise transparency and most likely will prevent 
-    <a href="#toc:reentrant"><b>reentrancy</b></a>&mdash;use caution.<br>
+    <a href="#toc:reentrant"><b>reentrancy</b></a>—use caution.<br>
     <br>
   </li>
   <li>If you do assign a separate stack area to the 
@@ -1001,10 +1000,10 @@ rti&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp
 As the IRQ handler typically sees much more activity than the other 
 interrupt service routines in most systems, <code>CRTI</code> (<b>C</b>ommon <b>R</b>e<b>T</b>urn from <b>
 I</b>nterrupt) should be in-line with the IRQ handler to reduce execution 
-time&mdash;that is, the IRQ handler should be able to “fall through” to <code>CRTI</code> 
+time—that is, the IRQ handler should be able to “fall through” to <code>CRTI</code> 
 to avoid the time penalty of a branch or jump instruction.&nbsp; Other 
 interrupt service routines should use <code>BRA</code>, <code>BRL</code> or <code>JMP</code> to get to <code>CRTI</code>, 
-with <code>BRA</code> being preferred.&nbsp; Avoid use of <code>BRL</code> in interrupt service routines unless you are writing relocatable code.&nbsp; <code>BRL</code> uses four &Oslash;2 cycles, whereas <code>BRA</code> and <code>JMP</code> use three.
+with <code>BRA</code> being preferred.&nbsp; Avoid use of <code>BRL</code> in interrupt service routines unless you are writing relocatable code.&nbsp; <code>BRL</code> uses four Ø2 cycles, whereas <code>BRA</code> and <code>JMP</code> use three.
 <h3><a name="toc:reentrant"></a>Reentrancy</h3>
 An interrupt service routine is said to be “reentrant” if it can be 
 interrupted and made to process a new interrupt without disturbing any 
@@ -1051,7 +1050,7 @@ thousands or even tens of thousands of times per second.&nbsp; Clearly, any
 effort expended on improving the execution speed of the NMI handler 
 would be better applied to the IRQ handler’s code.<br>
   <br>
-Unfortunately, the goal of succinctness can be elusive&mdash;there is usually
+Unfortunately, the goal of succinctness can be elusive—there is usually
  a tradeoff between code size and speed.  However, with the 65C816 there
  are often ways to improve speed without a corresponding increase in code size:
 <ul>
@@ -1081,7 +1080,7 @@ for later operations.<br>
 isn’t needed</b>:</li>
 </ul>
 <blockquote>Many 6502 family hardware devices, such as the 65C22, indicate that 
-they are interrupting by setting bit 7 in a flag register&mdash;bit 7 is 
+they are interrupting by setting bit 7 in a flag register—bit 7 is 
 logically wired to the device’s <span style="text-decoration: overline;"><code>IRQ</code></span> output.&nbsp; Owing to how the flag bits 
 are arranged in the register, it may be possible to determine the reason
  why the device is interrupting solely by the effect of a <code>BIT</code> 
@@ -1122,7 +1121,7 @@ to the branch instruction, since the branch will be taken during 255 consecutive
 <ul>
   <li><b>Don’t use 16-bit operations unless necessary</b>:</li>
 </ul>
-<blockquote>Yes, this advice seems to contradict the previous bit of wisdom.&nbsp; However, if a sequence of operations can be performed with eight-bit memory accesses, there’s nothing to be gained by employing 16-bit loads and stores.&nbsp; All 16-bit operations on memory consume an extra clock cycle to load or store the MSB.&nbsp; Also, any 16-bit immediate mode instruction will obviously require a 16-bit operand&mdash;even if the operand’s MSB is <code>$00</code>, increasing the size of the instruction, as well as the time required to decode and execute it.<br>
+<blockquote>Yes, this advice seems to contradict the previous bit of wisdom.&nbsp; However, if a sequence of operations can be performed with eight-bit memory accesses, there’s nothing to be gained by employing 16-bit loads and stores.&nbsp; All 16-bit operations on memory consume an extra clock cycle to load or store the MSB.&nbsp; Also, any 16-bit immediate mode instruction will obviously require a 16-bit operand—even if the operand’s MSB is <code>$00</code>, increasing the size of the instruction, as well as the time required to decode and execute it.<br>
   </blockquote>
 <ul>
   <li><b>Avoid multiple successive 24-bit loads and stores</b>:</li>
@@ -1145,7 +1144,7 @@ loop&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs
   <code>;</code><br>
   <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code>...program continues...<br>
   </blockquote>
-<blockquote>Performance suffers where performance matters the most: in the read-modify-write loop.&nbsp; Two 24-bit accesses plus the <code>INC A</code> instruction are required to make up for the lack of an equivalent 24-bit read-modify-write operation&mdash;unfortunately, <code>INC $AB1234,X</code> isn’t in the 65C816’s instruction set.<br>
+<blockquote>Performance suffers where performance matters the most: in the read-modify-write loop.&nbsp; Two 24-bit accesses plus the <code>INC A</code> instruction are required to make up for the lack of an equivalent 24-bit read-modify-write operation—unfortunately, <code>INC $AB1234,X</code> isn’t in the 65C816’s instruction set.<br>
   </blockquote>
 <blockquote>Now consider the following code, which temporarily changes <code>DB</code> to accomplish the same task:<br>
   </blockquote>
@@ -1190,13 +1189,13 @@ code</b>:</li>
 <ul>
   <li><b>Use linear code</b>:</li>
 </ul>
-<blockquote>The use of subroutines in an interrupt service routine can substantially degrade performance, as each <code>JSR &ndash; RTS</code> pair will consume 12 clock cycles, or 14 cycles if using <code>JSL &ndash; RTL</code>.&nbsp; If your interrupt handler includes three calls to the same subroutine and is processing a 100 Hz jiffy interrupt, 3600 clock cycles will be consumed per second just in executing <code>JSR</code> and <code>RTS</code> instructions.&nbsp; A lot of foreground processing can be completed in 3600 cycles!&nbsp; Only use subroutines if you have to squeeze every last byte out of the available address space.<br>
+<blockquote>The use of subroutines in an interrupt service routine can substantially degrade performance, as each <code>JSR – RTS</code> pair will consume 12 clock cycles, or 14 cycles if using <code>JSL – RTL</code>.&nbsp; If your interrupt handler includes three calls to the same subroutine and is processing a 100 Hz jiffy interrupt, 3600 clock cycles will be consumed per second just in executing <code>JSR</code> and <code>RTS</code> instructions.&nbsp; A lot of foreground processing can be completed in 3600 cycles!&nbsp; Only use subroutines if you have to squeeze every last byte out of the available address space.<br>
 </blockquote>
 <blockquote></blockquote>
 <ul>
   <li><b>Avoid multiple device register accesses</b>:</li>
 </ul>
-<blockquote>Operating the 65C816 at &Oslash;2 rates over 8 MHz may necessitate the use of hardware <a target="_blank" href="http://en.wikipedia.org/wiki/Wait_state"><b>wait-states</b></a> when I/O devices must be accessed.&nbsp; A wait-state halts the microprocessor for one or more Ø2 cycles, during which time it will be doing absolutely nothing.&nbsp; If your interrupt service routine accesses the same I/O device register multiple times and access to that device requires a wait-state, the microprocessor will be doing absolutely nothing multiple times.&nbsp; If possible, access a device register only once and if the register content is needed later on, push it to the stack.<br>
+<blockquote>Operating the 65C816 at Ø2 rates over 8 MHz may necessitate the use of hardware <a target="_blank" href="http://en.wikipedia.org/wiki/Wait_state"><b>wait-states</b></a> when I/O devices must be accessed.&nbsp; A wait-state halts the microprocessor for one or more Ø2 cycles, during which time it will be doing absolutely nothing.&nbsp; If your interrupt service routine accesses the same I/O device register multiple times and access to that device requires a wait-state, the microprocessor will be doing absolutely nothing multiple times.&nbsp; If possible, access a device register only once and if the register content is needed later on, push it to the stack.<br>
   </blockquote>
 <h3><b><a name="toc:spurious_interrupts"></a></b>Spurious Interrupts</h3>
 <h3></h3>
@@ -1257,7 +1256,7 @@ logic zero to logic one at its interrupt input.&nbsp; If logic one has not
 been attained by the time the interrupt service routine has completed 
 its work and returned control to the interrupted foreground task, the 
 microprocessor will start another interrupt sequence, even though no 
-device is interrupting&mdash;a spurious interrupt.<br>
+device is interrupting—a spurious interrupt.<br>
   <br>
 In general, your interrupt service routine should poll and clear all 
 interrupt sources as soon as possible after preliminary steps (for 
@@ -1271,7 +1270,7 @@ interrupt.<br>
 In many chip designs, an interrupt status register has to be read to 
 determine if the device is interrupting and if so, which event(s) caused
  the interrupt.&nbsp; Oftentimes, reading the interrupt status register will 
-automatically clear the interrupt&mdash;which implies that the register value 
+automatically clear the interrupt—which implies that the register value 
 may have to be preserved for later processing if the device has multiple
  interrupt events (push it to the stack if necessary).&nbsp; In other cases, 
 explicit action will be required to clear an interrupt, such as writing a
@@ -1332,11 +1331,11 @@ designs, and can be reduced even more by using the somewhat-arcane <code>WAI</co
 the currently executing instruction has been completed.&nbsp; When response 
 to an interrupt does occur, the 65C816 has to save its state on the 
 stack before loading the interrupt vector and proceeding.&nbsp; If the 65C816
- is operating in native mode, eight &Oslash;2 clock cycles will be consumed in 
+ is operating in native mode, eight Ø2 clock cycles will be consumed in 
 responding to the interrupt and saving state.&nbsp; If the interrupt happens 
 to occur just as the current instruction’s opcode is being fetched, as 
-many as eight additional &Oslash;2 cycles may elapse before interrupt 
-recognition.&nbsp; Therefore, an interrupt latency of as many as 16 &Oslash;2 cycles
+many as eight additional Ø2 cycles may elapse before interrupt 
+recognition.&nbsp; Therefore, an interrupt latency of as many as 16 Ø2 cycles
  is possible, depending on the instruction being executed and when 
 during the instruction sequence the interrupt input is asserted.</small></td>
         </tr>
@@ -1360,28 +1359,28 @@ via001&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </blockquote>
 The above sequence disables IRQs with <code>SEI</code> and then stalls the 
 microprocessor with <code>WAI</code>.&nbsp; <code>WAI</code> actually stops the 65C816’s internal clock
- in the &Oslash;2 high state, putting the microprocessor into a sort of 
+ in the Ø2 high state, putting the microprocessor into a sort of 
 catatonia, reducing its power consumption to micro-amperes and halting 
 all processing (hardware note: executing <code>WAI</code> also causes the 
-65C816’s bi-directional <code>RDY</code> pin to go low&mdash;knowing that is a clue to what is 
+65C816’s bi-directional <code>RDY</code> pin to go low—knowing that is a clue to what is 
 going on inside while the 65C816 is <code>WAI</code>ting).&nbsp;
 The system will appear to have gone completely dead.<br>
   <br>
 However, as soon as any hardware interrupt other than a
- reset occurs the microprocessor will restart and exactly one &Oslash;2 cycle after the
+ reset occurs the microprocessor will restart and exactly one Ø2 cycle after the
  interrupt was received, the <code>LDA&nbsp;VIA001</code> instruction will be executed.&nbsp; 
 In other words, interrupt latency in this scenario will always equal 
-exactly one &Oslash;2 cycle&mdash;70 nanoseconds at the 65C816’s maximum 
-officially-rated &Oslash;2 frequency of 14 MHz.&nbsp;
+exactly one Ø2 cycle—70 nanoseconds at the 65C816’s maximum 
+officially-rated Ø2 frequency of 14 MHz.&nbsp;
 Unlike the usual 
 behavior when a hardware interrupt input is asserted, there is no delay 
-while the current instruction finishes execution&mdash;there is no “current 
+while the current instruction finishes execution—there is no “current 
 instruction” while <code>WAI</code>ting, and the 65C816 performs no stack operations 
 upon awakening.<br>
   <br>
 This method of handling interrupts obviously isn’t practical in a 
 general purpose computer that has to process foreground tasks along with
- interrupts&mdash;all foreground processing will cease upon execution of <code>WAI</code>.&nbsp; 
+ interrupts—all foreground processing will cease upon execution of <code>WAI</code>.&nbsp; 
  It is, however, a technique that is eminently suited to any system where all processing is 
 interrupt-driven, such as might be the case in a high speed data 
 acquisition unit.&nbsp; This programming technique is also useful in 
@@ -1394,7 +1393,7 @@ Note that the <code>STP</code> (<b>ST</b>o<b>P</b>) instruction could be used in
   <code>STP</code>’s internal effect on the microprocessor is essentially the same.&nbsp; 
 However, the only interrupt input to which the microprocessor will 
 respond following execution of <code>STP</code> is <code>RESB</code>, which means that 
-single-cycle response isn’t possible&mdash;three &Oslash;2 cycles will elapse 
+single-cycle response isn’t possible—three Ø2 cycles will elapse 
 following the assertion and subsequent release of <code>RESB</code> before the 65C816
  starts the actual reset sequence.&nbsp; Naturally, a reset will cause the 
 65C816 to switch back to emulation mode and execute the code pointed to 
@@ -1489,7 +1488,7 @@ program errors and/or malicious coding.<br>
 <br>
 Calling APIs via a kernel trap offers the advantages of portability and 
 isolation.&nbsp; User programs don’t need to know specific addresses to 
-access the kernel API&mdash;applications only need to know API index numbers.&nbsp;
+access the kernel API—applications only need to know API index numbers.&nbsp;
  If a new kernel is released with a new API-accessible function, the 
 lowest unused API index number is assigned to the new function, which 
 will not affect any applications that were written prior to the kernel 
@@ -1510,7 +1509,7 @@ code complexity, heavy stack usage and slower execution.&nbsp; As will be
 seen, a kernel trap API ultimately involves a software interrupt to 
 switch execution from user mode to kernel mode.&nbsp; Therefore, code in both
  the API “front end” and “back end” is essentially a specialized form of
- an interrupt service routine&mdash;which naturally adds some complexity to the kernel.&nbsp; 
+ an interrupt service routine—which naturally adds some complexity to the kernel.&nbsp; 
 Also, since the API entry point is the same for all APIs, dispatch code is 
 required to select the specific function that must be executed for a 
 particular API, as well as determine how many parameters are expected by the API.&nbsp; 
@@ -1754,7 +1753,7 @@ purported meaning, the operand can be anything that is known at assembly
 assembled into the program and pushed, mode first and then the pathname 
 address, the same order as shown in the MC68000 API call.&nbsp; The same 
 procedure could be achieved by loading a 16 bit register and pushing 
-it&mdash;the choice is implementation-dependent.&nbsp; Ultimately, all that has to 
+it—the choice is implementation-dependent.&nbsp; Ultimately, all that has to 
 be accomplished is placing parameters of the correct size on the stack 
 in the correct order.<br>
   <br>
@@ -1845,11 +1844,11 @@ The stack picture is something that we will refer to a number of times,
 as it gives insight on how to write kernel trap API front and back end 
 code.&nbsp; First, the front end that will be invoked when <code>COP</code> is executed:<br>
 
-<blockquote><code>;KERNEL API FRONT END &mdash; EXECUTED IN RESPONSE TO A COP INSTRUCTION</code><br>
+<blockquote><code>;KERNEL API FRONT END — EXECUTED IN RESPONSE TO A COP INSTRUCTION</code><br>
   <code>;</code><br>
-  <code>;&nbsp;&nbsp; &nbsp;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</code><br>
+  <code>;&nbsp;&nbsp; &nbsp;——————————————————————————————————————————————————————————————————</code><br>
   <code>;&nbsp;&nbsp;&nbsp; .A must be loaded with the 8 bit API index prior to executing COP.</code><br>
-  <code>;&nbsp;&nbsp; &nbsp;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</code><br>
+  <code>;&nbsp;&nbsp; &nbsp;——————————————————————————————————————————————————————————————————</code><br>
   <code>;</code><br>
   <code>icop&nbsp;&nbsp;&nbsp;&nbsp; rep #%00110000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;16 bit registers</code><br>
   <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
@@ -1873,7 +1872,7 @@ cli&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp
  ;mask garbage in .B (16 bit mask)</code><br>
   <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; beq 
 icop01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
- ;API index cannot be zero</code><sup>&#8224;</sup><br>
+ ;API index cannot be zero</code><sup>†</sup><br>
   <code>;</code><br>
   <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; dec 
 a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1883,7 +1882,7 @@ a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&
 ;index in range (16 bit comparison)?</code><br>
   <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bcs 
 icop01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
- ;no, error</code><sup>&#8224;</sup><br>
+ ;no, error</code><sup>†</sup><br>
   <code>;</code><br>
   <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; asl 
 a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -1905,7 +1904,7 @@ apioff&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <table bgcolor="#ccffff" border="0" cellpadding="3" cellspacing="0" height="33" width="50%">
     <tbody>
       <tr>
-        <td align="center" valign="top"><small><sup>&#8224;</sup></small></td>
+        <td align="center" valign="top"><small><sup>†</sup></small></td>
         <td align="justify" valign="top"><small>Although system-dependent, a typical UNIX kernel reaction to an
  invalid API index is a core dump, followed by forcible process 
 termination.&nbsp; The only likely cause of an invalid index is a 
@@ -2068,7 +2067,7 @@ of <code>.B</code> from affecting the following instructions.&nbsp; After maskin
 index is tested for range (API index <code>$00</code> is usually deemed to be illegal
  for a user API call) and if the range is acceptable, the index is 
 doubled to create the <code>apidptab</code> dispatch jump table offset.&nbsp; This API 
-dispatch method supports a maximum of 255 callable API functions&mdash;more could be supported by passing a 16 bit index.<br>
+dispatch method supports a maximum of 255 callable API functions—more could be supported by passing a 16 bit index.<br>
       <br>
     </li>
   <li>Another look-up table, <code>sparmtab</code>, is consulted to find out how many 
@@ -2101,7 +2100,7 @@ Stack cleanup is a relatively painless process with the
 65C816.&nbsp; In this subsection, we will demonstrate how to perform stack
 cleanup in the kernel API back end code, clearing the user stack frame 
 as well as the register stack frame.&nbsp; We are not advocating that 
-user stack frame disposal occur within the kernel&mdash;use what is best for your application.<br>
+user stack frame disposal occur within the kernel—use what is best for your application.<br>
 <br>
 In general, the stack housekeeping process is one of shifting the register 
 and library stack frames up the stack by the total number of bytes in 
@@ -2255,7 +2254,7 @@ operands.<br>
     </table>
   </blockquote>
   You may well be wondering how the stack index for <code>.Y</code> ended up being 
-    <code>$05</code>&mdash;it previously was <code>$01</code>.&nbsp; The register and library stack frames were 
+    <code>$05</code>—it previously was <code>$01</code>.&nbsp; The register and library stack frames were 
 shifted upward by the size of the user stack frame, which was <code>$04</code> bytes.&nbsp;
   However, <code>SP</code> was not disturbed by any preceding instructions and thus 
 is still <code>$CFEF</code>.&nbsp; Therefore, <code>$01+$04=$05</code> and <code>$CFF4-$05=$CFEF</code>.<br>
@@ -2421,7 +2420,7 @@ effectively making the instruction <code>LDA ($CFFC),Y</code>, although such an
 addressing mode doesn’t exist in reality.&nbsp; Note that a check is made for
  an excessively long pathname, the maximum permissible length being 
 defined by <code>PATH_MAX</code>.&nbsp; Labels such as <code>.0000010</code> and <code>.0000020</code> are local 
-labels&mdash;use whatever syntax is implemented in your assembler.<br>
+labels—use whatever syntax is implemented in your assembler.<br>
   <br>
 Return the open file descriptor to the calling function via the eight 
 bit accumulator by overwriting the appropriate register stack frame 
@@ -2492,14 +2491,15 @@ Please contact <a href="http://bcstechnology.net" target="_blank"><font color="#
 Limited</font></a> to report any errors and/or omissions, or to suggest edits.
 <br>
 <br>
-<small>2013/11/01 &mdash; BDD (updated 2021/01/18)
+<small>2013/11/01 — BDD (updated 2021/01/18)
 <hr size="2" width="100%">
 <a target="_top" href="http://sbc.bcstechnology.net"><b>The POC W65C816S Single-Board Computer Website</b></a>
 <hr size="2" width="100%">
-Copyright &copy;1994&ndash;2024 by <a target="_blank" href="http://bcstechnology.net"><font color="#0000ff" face="Challenge Extra Bold">BCS Technology Limited</font></a>.&nbsp; All rights reserved.<br>
+Copyright ©1994–2024 by <a target="_blank" href="http://bcstechnology.net"><font color="#0000ff" face="Challenge Extra Bold">BCS Technology Limited</font></a>.&nbsp; All rights reserved.<br>
 Please contact us for permission before posting our technical publications on any publicly-accessible website.&nbsp;
 We prefer that you link to this article so future revisions will be visible to your site visitors.
 <br>
 <b><i>Posting an edited copy of this article is strictly prohibited</i></b>.</small>
-</body>
-</html>
+
+
+</div></font></body></html>
