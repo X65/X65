@@ -4,3 +4,6 @@
 [submodule "firmware"]
 	path = firmware
 	url = https://github.com/X65/firmware.git
+[submodule "schematic"]
+	path = schematic
+	url = https://github.com/X65/schematic.git
