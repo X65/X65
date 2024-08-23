@@ -17,62 +17,58 @@ MODE            = $2B           ;  $00=XAM, $7F=STOR, $AE=BLOCK XAM
 ; Other Variables
 
 IN              = $0200         ;  Input buffer to $027F
-KBD             = $D010         ;  PIA.A keyboard input
-KBDCR           = $D011         ;  PIA.A keyboard control register
-DSP             = $D012         ;  PIA.B display output register
-DSPCR           = $D013         ;  PIA.B display control register
+UART_STATUS     = $FFE0         ;  bit 7 - TX FIFO not full. Ok to send. / bit 6 - RX FIFO has data ready.
+UART_DATA       = $FFE1         ;  Write bytes to the UART. / Read bytes from the UART.
 
-               .org $FF00
+               .org $F000
                .export RESET
 
 RESET:          CLD             ; Clear decimal arithmetic mode.
                 CLI
-                LDY #$7F        ; Mask for DSP data direction register.
-                STY DSP         ; Set it up.
-                LDA #$A7        ; KBD and DSP control register mask.
-                STA KBDCR       ; Enable interrupts, set CA1, CB1, for
-                STA DSPCR       ; positive edge sense/output mode.
-NOTCR:          CMP #'_'+$80    ; "_"?
+                LDY #$7F        ; Original UART initialization
+                LDA #$A7        ; is used for bootstraping the key reading loop.
+NOTCR:          CMP #$08        ; Backspace?
                 BEQ BACKSPACE   ; Yes.
-                CMP #$9B        ; ESC?
+                CMP #$1B        ; ESC?
                 BEQ ESCAPE      ; Yes.
                 INY             ; Advance text index.
                 BPL NEXTCHAR    ; Auto ESC if > 127.
-ESCAPE:         LDA #'\'+$80    ; "\".
+ESCAPE:         LDA #'\'        ; "\".
                 JSR ECHO        ; Output it.
-GETLINE:        LDA #$8D        ; CR.
+GETLINE:        LDA #$0D        ; CR.
                 JSR ECHO        ; Output it.
                 LDY #$01        ; Initialize text index.
 BACKSPACE:      DEY             ; Back up text index.
                 BMI GETLINE     ; Beyond start of line, reinitialize.
-NEXTCHAR:       LDA KBDCR       ; Key ready?
-                BPL NEXTCHAR    ; Loop until ready.
-                LDA KBD         ; Load character. B7 should be ‘1’.
+NEXTCHAR:       BIT UART_STATUS ; Key ready?
+                BVC NEXTCHAR    ; Loop until ready.
+                LDA UART_DATA   ; Load character. B7 will be ‘0’.
                 STA IN,Y        ; Add to text buffer.
                 JSR ECHO        ; Display character.
-                CMP #$8D        ; CR?
+                CMP #$0D        ; CR?
                 BNE NOTCR       ; No.
                 LDY #$FF        ; Reset text index.
                 LDA #$00        ; For XAM mode.
                 TAX             ; 0->X.
-SETSTOR:        ASL             ; Leaves $7B if setting STOR mode.
-SETMODE:        STA MODE        ; $00=XAM $7B=STOR $AE=BLOK XAM
+SETBLOCK:       ASL             ; Leaves $B8 if setting BLOCK XAM mode.
+SETSTOR:        ASL             ; Leaves $74 if setting STOR mode.
+SETMODE:        STA MODE        ; $00=XAM $74=STOR $B8=BLOK XAM
 BLSKIP:         INY             ; Advance text index.
 NEXTITEM:       LDA IN,Y        ; Get character.
-                CMP #$8D        ; CR?
+                CMP #$0D        ; CR?
                 BEQ GETLINE     ; Yes, done this line.
-                CMP #'.'+$80    ; "."?
+                CMP #'.'        ; "."?
                 BCC BLSKIP      ; Skip delimiter.
-                BEQ SETMODE     ; Yes. Set STOR mode.
-                CMP #':'+$80    ; ":"?
+                BEQ SETBLOCK    ; Yes. Set BLOCK XAM mode.
+                CMP #':'        ; ":"?
                 BEQ SETSTOR     ; Yes. Set STOR mode.
-                CMP #'R'+$80    ; "R"?
+                CMP #'R'        ; "R"?
                 BEQ RUN         ; Yes. Run user program.
                 STX L           ; $00-> L.
-                STX H           ; and H.
+                STX H           ;   and H.
                 STY YSAV        ; Save Y for comparison.
 NEXTHEX:        LDA IN,Y        ; Get character for hex test.
-                EOR #$B0        ; Map digits to $0-9.
+                EOR #$30        ; Map digits to $0-9.
                 CMP #$0A        ; Digit?
                 BCC DIG         ; Yes.
                 ADC #$88        ; Map letter "A"-"F" to $FA-FF.
@@ -109,15 +105,15 @@ SETADR:         LDA L-1,X       ; Copy hex data to
                 DEX             ; Next of 2 bytes.
                 BNE SETADR      ; Loop unless X=0.
 NXTPRNT:        BNE PRDATA      ; NE means no address to print.
-                LDA #$8D        ; CR.
+                LDA #$0D        ; CR.
                 JSR ECHO        ; Output it.
                 LDA XAMH        ; ‘Examine index’ high-order byte.
                 JSR PRBYTE      ; Output it in hex format.
                 LDA XAML        ; Low-order ‘examine index’ byte.
                 JSR PRBYTE      ; Output it in hex format.
-                LDA #':'+$80    ; ":".
+                LDA #':'        ; ":".
                 JSR ECHO        ; Output it.
-PRDATA:         LDA #$A0        ; Blank.
+PRDATA:         LDA #$20        ; Blank.
                 JSR ECHO        ; Output it.
                 LDA (XAML,X)    ; Get data byte at ‘examine index’.
                 JSR PRBYTE      ; Output it in hex format.
@@ -141,20 +137,11 @@ PRBYTE:         PHA             ; Save A for LSD.
                 JSR PRHEX       ; Output hex digit.
                 PLA             ; Restore A.
 PRHEX:          AND #$0F        ; Mask LSD for hex print.
-                ORA #'0'+$80    ; Add "0".
-                CMP #$BA        ; Digit?
+                ORA #$30        ; Add "0".
+                CMP #$3A        ; Digit?
                 BCC ECHO        ; Yes, output it.
                 ADC #$06        ; Add offset for letter.
-ECHO:           BIT DSP         ; bit (B7) cleared yet?
-                BMI ECHO        ; No, wait for display.
-                STA DSP         ; Output character. Sets DA.
+ECHO:           BIT UART_STATUS ; bit (B7) set?
+                BPL ECHO        ; No, wait for display.
+                STA UART_DATA   ; Output character. Sets DA.
                 RTS             ; Return.
-
-                BRK             ; unused
-                BRK             ; unused
-
-; Interrupt Vectors
-
-                .WORD $0F00     ; NMI
-                .WORD RESET     ; RESET
-                .WORD $0000     ; BRK/IRQ
