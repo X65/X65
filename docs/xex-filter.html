@@ -1,0 +1,675 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>XEX Filter</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="keywords" content="vitoco, victor, parada, ++vitoco, xex, filter, xex-filter, xex filter, atari, basic, 8-bits" />
+<meta name="description" content="A tool for XEX analysis and manupulation" />
+<meta name="author" content="Victor Parada" />
+<meta name="copyright" content="&copy; 2020-2022 Victor Parada" />
+<meta name="date" content="2022-02-03T10:22:11-03:00" />
+<meta name="language" content="en" />
+<meta http-equiv="Pragma" content="no-cache" />
+<style type="text/css">
+<!--
+body { background-color:#F0E0D0 }
+pre { font-family: "Courier New", "Lucida Console", monospace; color: black; margin: 0.2em 3% 0.6em; padding: 2px 5px; }
+a:link, a:visited, a:active { text-decoration: none; color: blue; }
+.codigo { font-family: "Courier New", "Lucida Console", monospace; }
+.consola { font-family: "Courier New", "Lucida Console", monospace; color: white; background-color: black;}
+h1, h2, h3 { font-family: 'Arial','Times New Roman',Times,serif; color: #000050; font-weight: bold; padding: 0; margin-top: 1em; margin-bottom: 0.4em; }
+p { font-family: 'Times New Roman',Times,serif; color: #000000; font-weight: normal; padding: 0; margin-top: 1em; margin-bottom: 0.4em; }
+table, tr, th, td { border-collapse: collapse; border: 1px solid black; padding: 4px 12px;}
+.ejemplos { padding-left: 10px; }
+.ejemplo { border: 1px solid grey; border-radius: 4px; background-color: black; color: white; font-family: "Courier New", "Lucida Console", monospace; color: font-weight: bold; padding: 0px 7px; }
+.ejemplo > a:hover { text-decoration: none; color: yellow; }
+.gris { color:grey; }
+.autor { font-weight: bold; margin-top: 0; }
+-->
+</style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-9SB9H8CT4B"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-9SB9H8CT4B');
+</script>
+</head>
+
+<body>
+
+<h1>XEX Filter - A toolkit to analyze and manipulate Atari binary files</h1>
+
+<p class="autor">Copyright &copy; 2020-2022 by Víctor Parada</p>
+<p>Current version: <a href="#download">1.7</a> (2022-02-02)</p>
+
+<h2>A bit of history</h2>
+
+<p>Every time I needed to review the file structure of an Atari 8-bit binary file (EXE, COM or OBJ, all of them known today as XEX), I had to write and/or customize a special and personalized tool to display the required information in a simple way (other than to use a sector editor or an hex editor). More tools were needed to modify them or to manipulate to create new binary files in the way I wanted.</p>
+
+<p>In the 80's I did it in Atari BASIC (with some USR routines). I created a whole toolkit of utilities to perform very different tasks, and I had to run each of the required ones when I needed to do many operations in a sequence to get a final EXE binary file.</p>
+
+<p>During the recent years, I got fun time rewriting some of those old tools in perl language, in order to work over XEX files directly on my modern computer instead of having to setup an ATR file and run my original tools in an emulator, which takes too much extra time. These new tools became more flexible than their respective original ones in BASIC, and they allowed me to add more features and to include many steps in a single run.</p>
+
+<p>This year (2020), as most of the tools were similar in its internals (some scripts were modifications of previous ones), I decided to merge them in a single bigger tool, in order to allow me to perfom many different tasks at the same time. Then, this XEX Filter toolkit was born.</p>
+
+<h2>Atari 8-bit binary file structure</h2>
+
+<p>A8 binary files contains programs and/or data in a special file structure: a sequence of data blocks. These blocks specify where in memory to load, and it might be an initialization and/or a run vector.</p>
+
+<p>Each block has the following structure:</p>
+
+<table>
+  <tr>
+    <th>Position</th>
+    <th>Content</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>1-2</td>
+    <td>Binary header</td>
+    <td>Contains the value $FFFF. This must be present in the first segment, and it is optional for the next ones.</td>
+  </tr>
+  <tr>
+    <td>3-4</td>
+    <td>Initial load address</td>
+    <td>Pointer (A) to the memory address where the data of this block will be loaded.</td>
+  </tr>
+  <tr>
+    <td>5-6</td>
+    <td>Last load address</td>
+    <td>Pointer (B) to the memory address for the last byte of this block.</td>
+  </tr>
+  <tr>
+    <td>7-x</td>
+    <td>Data</td>
+    <td>Sequence of (B-A+1) bytes to be loaded into memory.</td>
+  </tr>
+</table>
+
+<p>There are two special memory locations that perform different actions when data is loaded there:</p>
+
+<dl>
+  <dt>INITAD ($02E2-$02E3)</dt>
+  <dd>Every time a block is loaded, the loader must check if this vector was changed by the loaded data. If the loader finds a new value, it transfers the control to the subroutine pointed by that vector and waits for it to continue with the next block of the file. Splash screens are initialized this way. Many blocks in the same file might load vectors in this address, and the loader will transfer the control each time.</dd>
+  <dt>RUNAD ($02E0-$02E1)</dt>
+  <dd>When all the blocks in the file have been loaded into memory, the loader checks if this vector has been loaded and transfers the control to the code at that memory location.</dd>
+</dl>
+
+<p>If none of these memory adresses are loaded, it depends on the loader or DOS if the control is transfered to the loaded data, usually the start address of the first or the last block.</p>
+
+<h2>Toolkit overview</h2>
+
+<p>XEX Filter is a tool that reads one or more XEX files, analyses and shows their binary structure, and optionally creates a new XEX file applying one or more filters to manipulate the file structure and it contents. With these filters it is possible to extract a binary block with its address headers from the file, remove unwanted blocks from it (like a splash screen that is displayed during the load), split or join blocks in a file, split or join files, change the loading order of the blocks, extract portions of the file as raw data (images or charsets to be edited), assign a new load address to a given block, etc.</p>
+
+<p>Help screen is as follows:</p>
+
+<pre class="consola">
+  
+xex-filter version 1.7 (2022-02-02)
+Copyright (c) 2020-2022 by Victor Parada
+&lt;https://www.vitoco.cl/atari/xex-filter/&gt;
+
+Usage: xex-filter.pl [-option]... [--] FILE1.XEX [FILE2.XEX]...
+
+Options:
+  -i n1,n2-n3,...  List of indexes for blocks selection
+  -x n1,n2-n3,...  List of indexes for blocks exclusion
+  -s a1,a2-a3,...  List of memory addresses where to split blocks
+  -e a1,a2-a3,...  List of memory addresses for data extraction
+  -a a1,a2-a3,...  New address list to assign to output blocks
+  -v a1=v1,v2,...  Append blocks with byte value at $0000 or address
+  -w a1=v1,v2,...  Append blocks with word value at RUNAD or address
+  -z max           Max number of bytes to fill between blocks
+  -r               Removes zeros if there are more than 4 in a row
+  -d               Writes data without address pointers or header
+  -b               Reads input as blocks up to 64K of data at $0000
+  -f               Fix corrupt files by filling or discarding data
+  -m               Makes a memory map with the selected blocks
+  -o NEW.XEX       Output file (mandatory for -i -x -s -e -a -z -r -d and -m)
+
+Addresses between 0 and 65535 or in $hhhh format. Use "-" for a range.
+
+</pre>
+
+<p>The structure of each input file is displayed during the load of them, and a sequence number is assigned to each of the identified blocks. Then, a new file is created applying one or more filters to the selected blocks.</p>
+
+<p>The output file will always have a leading $FFFF word, and any other instance of it in the middle of the input files will be ignored and removed.</p>
+
+<p>Both decimal and hexadecimal numbers are used to display input and output file structures. If a block start address has a label assigned to it, that label will be displayed in the block description.</p>
+
+<p>Some filter options requires a list of values, and values may be specified using decimal or hexadecimal notation, or using one of the defined labels.</p>
+
+<p>Currently defined labels are:</p>
+
+<pre>
+RUNAD=$2E0     SDLSTL=560     CH1=754
+INITAD=$2E2    COLOR0=708     CHBAS=756
+PORTB=$D301    COLOR1=709     CH=764
+BOOT=9         COLOR2=710     BASICF=1016
+DOSVEC=10      COLOR3=711     BANK=$4000
+SOUNDR=65      COLOR4=712     CARTB=$8000
+RAMTOP=106     MEMTOP=$2E5    CARTA=$A000
+COLDST=580     MEMLO=$2E7     ATRACT=77
+SDMCTL=559
+</pre>
+
+<p>This tool will abort with an error message if an undefined label is found in an option.</p>
+
+
+<h2>Filter options</h2>
+
+<p>Some options change the behavior on how input XEX files are read, and some options modifies the way the blocks are written to the new XEX file. Some options might be used in conjunction and some of them cannot be used at the same time, having to run the tool in steps if required.</p>
+
+<p>Notes about options:</p>
+
+<ul>
+  <li>All options use lowercase letters.</li>
+  <li>Options may be specified in any order. You won't get a different XEX file by changing the order of the options in the command line.</li>
+  <li>Options can be specified only once. If an option appears many times, the first ones will be ignored.</li>
+  <li>Values for an option might be appended to it (no space between them).</li>
+  <li>Values supplied for an option cannot include spaces.</li>
+  <li>A value for a word or an address can be entered as a number between 0 and 65535, in hexadecimal format using a leading dollar sign as in $FFFF, or as one of the recognized labels.</li>
+  <li>A value for a byte can be entered as a number between 0 and 255 or in hexadecimal format using a leading dollar sign, as in $FF.</li>
+  <li>Many values might be specified for some options as a list, using a comma between values.</li>
+  <li>Some options accept ranges using an hyphen between values. No explicit open ranges are allowed.</li>
+  <li>Options that do not need a value might be appended together in a combined option, or included at the begin of another option that requires a value.</li>
+  <li>If the name of an input file starts with a hyphen, insert a double hyphen "<span class="codigo">--</span>" to say that there are no more options in the command line.</li>
+  <li>Options to modify the XEX content require "-o" output option to be also specified.</li>
+  <li>Use "<span class="codigo">--help</span>" option to display the help screen.</li>
+  <li>Use "<span class="codigo">--version</span>" option to display current version number of the tool.</li>
+</ul>
+
+<h3>(no options)</h3>
+
+<p>When no options are specified, the file structure is displayed for all the input files.</p>
+<p class="ejemplos">Examples: <a href="#1"><span class="ejemplo">1</span></a> <a href="#10"><span class="ejemplo">10</span></a></p>
+
+<h3><span class="codigo">-o</span> | Output filename</h3>
+
+<p>Specifies a filename for a new XEX file to be created. This option is required for many other options. Warning: If the file already exists, it will be overwritten!</p>
+<p class="ejemplos">Examples: <a href="#2"><span class="ejemplo">2</span></a> <a href="#3"><span class="ejemplo">3</span></a> <a href="#4"><span class="ejemplo">4</span></a> <a href="#5"><span class="ejemplo">5</span></a> <a href="#6"><span class="ejemplo">6</span></a> <a href="#7"><span class="ejemplo">7</span></a> <a href="#8"><span class="ejemplo">8</span></a> <a href="#9"><span class="ejemplo">9</span></a> <a href="#10"><span class="ejemplo">10</span></a> <a href="#11"><span class="ejemplo">11</span></a></p>
+
+<h3><span class="codigo">-i</span> | Indexes for block selection</h3>
+
+<p>Allows the selection of the required blocks from the input file(s) to be sent to the output file, probably altered by any other option. If this option is not specified, all the blocks from the input files will be included in the same original order. The list of selected blocks must be specified as integer decimal numbers separated by comma, and the specified order is relevant because that will be the order to be written in the output file. Ranges are allowed by using a hyphen between two numbers. Decreasing order is allowed for any of the specified ranges.</p>
+<p class="ejemplos">Examples: <a href="#3"><span class="ejemplo">3</span></a> <a href="#7"><span class="ejemplo">7</span></a> <a href="#8"><span class="ejemplo">8</span></a> <a href="#9"><span class="ejemplo">9</span></a> <a href="#11"><span class="ejemplo">11</span></a></p>
+
+<h3><span class="codigo">-x</span> | Indexes for block exclusion</h3>
+
+<p>You can specify the blocks from the input file(s) that you don't want to be in the output file. This is the complement to the <span class="codigo">-i</span> option and both option cannot be used in the same command line. The blocks order is not relevant, as the blocks not excluded will be written in the same order they are read from the input file. The list of excluded blocks must be specified as integer decimal numbers separated by comma. Ranges are allowed by using a hyphen between two numbers. Decreasing order is allowed for any of the specified ranges, but it is not relevant in the result.</p>
+<p class="ejemplos">Examples: <a href="#3"><span class="ejemplo">3</span></a></a></p>
+
+<h3><span class="codigo">-s</span> | Split at address</h3>
+
+<p>List of addresses where blocks had to be splitted. With this option, if a selected block contains a byte located at any address from the list, the block will be split there, with that byte being the first one of the next block. If a range of address is specified, two splits should be done, resulting in a isolated block with those address in the header (if both bytes were in the same block from the input file) between the reminders of the originally selected block.</p>
+<p class="ejemplos">Examples:<a href="#4"><span class="ejemplo">4</span></a> <a href="#8"><span class="ejemplo">8</span></a></p>
+
+<h3><span class="codigo">-a</span> | Change load address</h3>
+
+<p>Specifies a list of new loading memory addresses, one for each block selected for output, which must be in the same order, and addresses for all blocks must be provided. If a range of addresses is specified for a block, an implicit split will happen if the block was larger than the range, and a fill with zeros will happen to complete the range if the block was shorter.</p>
+<p class="ejemplos">Examples: <a href="#8"><span class="ejemplo">8</span></a> <a href="#9"><span class="ejemplo">9</span></a></p>
+
+<h3><span class="codigo">-e</span> | Extract data for a range of memory</h3>
+
+<p>Simulates the load into memory of the selected blocks from the input files and creates new blocks from the specified ranges. A single memory address in the list identifies a starting byte for a block, which will end at the beginning of the next block in the list, or at $FFFF if there are no more blocks in the list.</p>
+<p class="ejemplos">Examples: <a href="#7"><span class="ejemplo">7</span></a></p>
+
+<h3><span class="codigo">-m</span> | Memory map</h3>
+
+<p>Dumps a 64K memory map block which will be the result of the "load" of the selected blocks from the input files. The block will be initialized with zeros. The output is the same than "<span class="codigo">-e0</span>".</p>
+<p class="ejemplos">Examples: <a href="#8"><span class="ejemplo">8</span></a></p>
+
+<h3><span class="codigo">-w</span> | Add a word block</h3>
+
+<p>Includes a block that contains a word value (two bytes) to be loaded at the specified address, in low-high order. It can be used to load a vector into any system pointer. The list can contain many values separated by comma, and the load address for each of them may be included in the form "<span class="codigo">addr=val</span>". If no address is specified, it continues with the next address from the previous value of the list. The default address for the first value is RUNAD ($02E0 or 736).</p>
+<p class="ejemplos">Examples: <a href="#9"><span class="ejemplo">9</span></a></p>
+
+<h3><span class="codigo">-v</span> | Add a byte block</h3>
+
+<p>Includes a block that contains a byte value to be loaded at the specified address. It can be used to modify any system register during a load. The list can contain many values separated by comma, and the load address for each of them may be included in the form "<span class="codigo">addr=val</span>". If no address is specified for a value, it continues with the next address from the previous value of the list. The default address for the first value is 0.</p>
+<p class="ejemplos">Examples: <a href="#7"><span class="ejemplo">7</span></a> <a href="#9"><span class="ejemplo">9</span></a></p>
+
+<h3><span class="codigo">-z</span> | Fill with zeros</h3>
+
+<p>Merges consecutive blocks, filling with up to the specified number of bytes with the value of zero (null byte). If more bytes are required to merge two blocks, neither the merge nor the fill will be done there. Specify "<span class="codigo">-z0</span>" to merge only immediately consecutive blocks, where no filling is required.</p>
+<p class="ejemplos">Examples: <a href="#5"><span class="ejemplo">5</span></a> <a href="#7"><span class="ejemplo">7</span></a></p>
+
+<h3><span class="codigo">-r</span> | Remove zeros</h3>
+
+<p>Removes sequences of null bytes longer than 4 bytes from the blocks, splitting them if required. This is used to reduce the size of the XEX file under the asumption that the memory locations for those omitted bytes were clean before the load. If a block only has null bytes, the whole block will be removed. Null bytes at the beginning or the end of a block will also be removed, even when they are less than four per side. It does not removes zeros from blocks shorter than 3 bytes, because those usually are NOT simple data, but a vector or a value for some system register.</p>
+<p class="ejemplos">Examples: <a href="#6"><span class="ejemplo">6</span></a></p>
+
+<h3><span class="codigo">-d</span> | Write data only</h3>
+
+<p>Do not write address pointers to the output file, just the data. Be aware that if more than one block have to be written, all the data will be concatenated without any filler.</p>
+<p class="ejemplos">Examples: <a href="#8"><span class="ejemplo">8</span></a></p>
+
+<h3><span class="codigo">-b</span> | Read as binary data</h3>
+
+<p>This is usefull to add load address information from input files that only contains raw data, in order to create blocks for XEX files. If the input file already has address information, that will be considered as part of the data. Every input file is asigned to a different block with address 0. If the length of a file is more than 64K, it will be splitted into many blocks. To assign any load address to a raw data block, use "<span class="codigo">-a</span>" option.</p>
+<p class="ejemplos">Examples: <a href="#8"><span class="ejemplo">8</span></a></p>
+
+<h3><span class="codigo">-f</span> | Fix input file errors</h3>
+
+<p>Allow some common errors in XEX binary files to be ignored: file without $FFFF headers, truncated files and gargabe at the end. Truncated blocks are filled with null bytes instead of to adjust the end address.</p>
+<p class="ejemplos">Examples: <a href="#10"><span class="ejemplo">10</span></a></p>
+
+<h2>Examples</h2>
+
+<h3><a name="1">(1) Analyzing XEX content</a></h3>
+
+<p>This example simply shows the binary structure of an XEX file. There is no output XEX file.</p>
+
+<pre class="consola">
+&gt; xex-filter.pl GAME.XEX
+Analyzing "GAME.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+</pre>
+
+<h3><a name="2">(2) Concatenating two XEX files</a></h3>
+
+<p>To insert a splash screen to be displayed while loading a long game, just concatenate both files into a new one.</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o NEWGAME.XEX SPLASH.XEX GAME.XEX
+Analyzing "SPLASH.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  1536-1791  [$0600-$06FF]   (256) &lt;- CODE/DATA
+  2:   738-739   [$02E2-$02E3]     (2) INITAD -&gt; 1536 [$0600]
+Analyzing "GAME.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  3:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  4: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  5:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+Writing "NEWGAME.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  1536-1791  [$0600-$06FF]   (256) &lt;- CODE/DATA
+  2:   738-739   [$02E2-$02E3]     (2) INITAD -&gt; 1536 [$0600]
+  3:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  4: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  5:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+17504 bytes written
+</pre>
+
+<h3><a name="3">(3) Select or remove some blocks from XEX file</a></h3>
+
+<p>To remove unwanted blocks from a file, just list them using <span class="codigo">-x</span>.</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o GAMEONLY.XEX -x 1,2 NEWGAME.XEX
+Analyzing "NEWGAME.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  1536-1791  [$0600-$06FF]   (256) &lt;- CODE/DATA
+  2:   738-739   [$02E2-$02E3]     (2) INITAD -&gt; 1536 [$0600]
+  3:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  4: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  5:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+Writing "GAMEONLY.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+17238 bytes written
+</pre>
+
+<p>Other way to get the same result is to select only the required ones to be included in the new XEX file with <span class="codigo">-i</span>. In this case, a range of blocks is selected.</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o GAMEONLY.XEX -i 3-5 NEWGAME.XEX
+Analyzing "NEWGAME.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  1536-1791  [$0600-$06FF]   (256) &lt;- CODE/DATA
+  2:   738-739   [$02E2-$02E3]     (2) INITAD -&gt; 1536 [$0600]
+  3:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  4: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  5:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+Writing "GAMEONLY.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+17238 bytes written
+</pre>
+
+<h3><a name="4">(4) Splitting a block</a></h3>
+
+<p>This command line splits a block at a given address. The resulting blocks will have their own address pointers.</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o SPLITTED.XEX -s $6000 GAME.XEX
+Analyzing "GAME.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+Writing "SPLITTED.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-24575 [$4000-$5FFF]  (8192) BANK &lt;- CODE/DATA
+  3: 24576-32767 [$6000-$7FFF]  (8192) &lt;- CODE/DATA
+  4:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+17242 bytes written
+</pre>
+
+<h3><a name="5">(5) Joining blocks</a></h3>
+
+<p>To join two consecutive block, specify a zero bytes fill.</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o JOINED.XEX -z 0 SPLITTED.XEX
+Analyzing "SPLITTED.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-24575 [$4000-$5FFF]  (8192) BANK &lt;- CODE/DATA
+  3: 24576-32767 [$6000-$7FFF]  (8192) &lt;- CODE/DATA
+  4:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+Writing "JOINED.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+17238 bytes written
+</pre>
+
+<h3><a name="6">(6) Removing null bytes</a></h3>
+
+<p>To shrink an XEX file, it is possible to remove rows of the byte zero from within the blocks. Be careful, if memory of the Atari is not clean at the loading addresses range, the squeezed XEX will fail when run.</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o SQUEEZED.XEX -r GAME.XEX
+Analyzing "GAME.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+Writing "SQUEEZED.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-8198  [$2000-$2006]     (7) &lt;- CODE/DATA
+  2:  8254-8275  [$203E-$2053]    (22) &lt;- CODE/DATA
+  3:  8292-8313  [$2064-$2079]    (22) &lt;- CODE/DATA
+<span class="gris">{removed}</span>
+ 81: 32677-32684 [$7FA5-$7FAC]     (8) &lt;- CODE/DATA
+ 82: 32694-32697 [$7FB6-$7FB9]     (4) &lt;- CODE/DATA
+ 83: 32754-32756 [$7FF2-$7FF4]     (3) &lt;- CODE/DATA
+ 84:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+14170 bytes written
+</pre>
+
+<h3><a name="7">(7) Recover a squeezed XEX</a></h3>
+
+<p>A squeezed XEX file has many blocks with non-zero data and can be loaded into clean memory to get the full program and run it. When Atari's memory was previously used by another program, it is better to load a single block with its zeros included. The following command inserts up to 250 null bytes between blocks.</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o RECOVERED.XEX -z 250 SQUEEZED.XEX
+Analyzing "SQUEEZED.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-8198  [$2000-$2006]     (7) &lt;- CODE/DATA
+  2:  8254-8275  [$203E-$2053]    (22) &lt;- CODE/DATA
+  3:  8292-8313  [$2064-$2079]    (22) &lt;- CODE/DATA
+<span class="gris">{removed}</span>
+ 81: 32677-32684 [$7FA5-$7FAC]     (8) &lt;- CODE/DATA
+ 82: 32694-32697 [$7FB6-$7FB9]     (4) &lt;- CODE/DATA
+ 83: 32754-32756 [$7FF2-$7FF4]     (3) &lt;- CODE/DATA
+ 84:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+Writing "RECOVERED.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9027  [$2000-$2343]   (836) &lt;- CODE/DATA
+  2: 16384-32756 [$4000-$7FF4] (16373) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+17225 bytes written
+</pre>
+
+<p>A filler of up to 250 bytes was enough to recover de file, but note that both main blocks are 2 bytes shorter than before. If we didn't know that, probably the new XEX would be fine, but if we really want to fix them, we have different ways to do that:</p>
+
+<p>Method 1: Simulate a load and extract the same blocks with the right length:</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o RECOVERED-1.XEX -e $2000-$2345,$4000-$7FFF,736-737 RECOVERED.XEX
+nalyzing "RECOVERED.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9027  [$2000-$2343]   (836) &lt;- CODE/DATA
+  2: 16384-32756 [$4000-$7FF4] (16373) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+Writing "RECOVERED-1.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+17238 bytes written
+</pre>
+
+<p>Method 2: Include bytes at the original memory location of each block's last byte, then change the sequence of the blocks and fill with enough zeros to join the corresponding sub-blocks:</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o RECOVERED-2.XEX -v $2345=0,$7FFF=0 -i 1,4,2,5,3 -z 100 RECOVERED.XEX
+Analyzing "RECOVERED.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9027  [$2000-$2343]   (836) &lt;- CODE/DATA
+  2: 16384-32756 [$4000-$7FF4] (16373) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+Adding values...
+  4:  9029-9029  [$2345-$2345]     (1) = 0 [$00] '00000000'
+  5: 32767-32767 [$7FFF-$7FFF]     (1) = 0 [$00] '00000000'
+Writing "RECOVERED-2.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+17238 bytes written
+</pre>
+
+<h3><a name="8">(8) Modify a charset of a game</a></h3>
+
+<p>To change the characters or sprites of a game, you can use any character editor if you give it the right file. If the address where the charset resides inside an XEX has not been identified yet, it is possible to map the whole XEX into a 64K block and search for the bitmaps inside it.</p> 
+
+<pre class="consola">
+&gt; xex-filter.pl -o MAP.DAT -m -d GAME.XEX
+Analyzing "GAME.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+Writing "MAP.DAT"...
+1: (65536)
+65536 bytes written
+</pre>
+
+<p>In this example, the charset was identified to be at $5400, so you can extract it and then insert it again after customization. The extraction could be easyly done using "<span class="codigo">-e $5400-$5BFF</span>" option, but it won't be easy to insert it back if the XEX file is not previously prepared, so the first step is to create a 2K block inside the file by splitting at that addresses:</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o GAMECHAR.XEX -s $5400-$5BFF GAME.XEX
+Analyzing "GAME.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+Writing "GAMECHAR.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-21503 [$4000-$53FF]  (5120) BANK &lt;- CODE/DATA
+  3: 21504-23551 [$5400-$5BFF]  (2048) &lt;- CODE/DATA
+  4: 23552-32767 [$5C00-$7FFF]  (9216) &lt;- CODE/DATA
+  5:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+17246 bytes written
+</pre>
+
+<p>The second step is to extract the 2K block and save it without binary headers:</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o CHARSET.FNT -i 3 -d GAMECHAR.XEX
+Analyzing "GAMECHAR.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-21503 [$4000-$53FF]  (5120) BANK &lt;- CODE/DATA
+  3: 21504-23551 [$5400-$5BFF]  (2048) &lt;- CODE/DATA
+  4: 23552-32767 [$5C00-$7FFF]  (9216) &lt;- CODE/DATA
+  5:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+Writing "CHARSET.FNT"...
+1: (2048)
+2048 bytes written
+</pre>
+
+<p>After the new charset has been saved by your favourite editor, it must be converted to XEX format:</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o CHARSET.XEX -b -a $5400 CHARSET.FNT
+Analyzing "CHARSET.FNT"...
+  1:     0-2047  [$0000-$07FF]  (2048) &lt;- CODE/DATA
+Writing "CHARSET.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1: 21504-23551 [$5400-$5BFF]  (2048) &lt;- CODE/DATA
+2054 bytes written
+</pre>
+
+<p>The last step is to merge the new charset into the game, replacing the original 3rd block with the new one:</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o MYGAME.XEX -i 1-2,6,4-5 -z 0 GAMECHAR.XEX CHARSET.XEX
+Analyzing "GAMECHAR.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-21503 [$4000-$53FF]  (5120) BANK &lt;- CODE/DATA
+  3: 21504-23551 [$5400-$5BFF]  (2048) &lt;- CODE/DATA
+  4: 23552-32767 [$5C00-$7FFF]  (9216) &lt;- CODE/DATA
+  5:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+Analyzing "CHARSET.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  6: 21504-23551 [$5400-$5BFF]  (2048) &lt;- CODE/DATA
+Writing "MYGAME.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+17238 bytes written
+</pre>
+
+<h3><a name="9">(9) Load a cartridge into its original address</a></h3>
+
+<p>If a cartridge game was converted to an XEX, it is usually loaded at low memory and extra code is included to setup the game after the load and start it. It is possible to discard the setup routine and load the cartridge data directly in its original address, and this is how that could be set up.</p>
+
+<p>The first step is to move the game data into a temporary file, and change the load address at the same time:</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o CART.XEX -i 2 -a $8000 MYGAME.XEX
+Analyzing "MYGAME.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+Writing "CART.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1: 32768-49151 [$8000-$BFFF] (16384) CARTB &lt;- CODE/DATA
+16390 bytes written
+</pre>
+
+<p>As the cartridge data will be loaded on top of the display list and garbage could be seen, we can add a mini block that loads a zero over SDMCTL register (559 or $22F), turning off the screen. Also, the load will fail if BASIC ROM is enabled on XL/XE computers, so we can also disable it by writing a $B3 into PORTB ($D301 or 54017), and we must move RAMTOP (106 or $6A) just below the cartridge data. At last, a RUNAD must specified to call the cartridge initialization routine, which in this example is at $8000. All this steps can be done in a single command:</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o CARTGAME.XEX -v 559=0,PORTB=$B3,106=$80 -w 8000 -i 2-4,1,5 CART.XEX
+Analyzing "CART.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1: 32768-49151 [$8000-$BFFF] (16384) CARTB &lt;- CODE/DATA
+Adding values...
+  2:   559-559   [$022F-$022F]     (1) SDMCTL = 0 [$00] '00000000'
+  3: 54017-54017 [$D301-$D301]     (1) PORTB = 179 [$B3] '10110011'
+  4:   106-106   [$006A-$006A]     (1) RAMTOP = 128 [$80] '10000000'
+Adding words...
+  5:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8000 [$1F40]
+Writing "CARTGAME.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:   559-559   [$022F-$022F]     (1) SDMCTL = 0 [$00] '00000000'
+  2: 54017-54017 [$D301-$D301]     (1) PORTB = 179 [$B3] '10110011'
+  3:   106-106   [$006A-$006A]     (1) RAMTOP = 128 [$80] '10000000'
+  4: 32768-49151 [$8000-$BFFF] (16384) CARTB &lt;- CODE/DATA
+  5:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8000 [$1F40]
+16411 bytes written
+</pre>
+
+
+<h3><a name="10">(10) Clean a XEX game extracted from a tape or block devices</a></h3>
+
+<p>Some tape loaders were unable to detect the end of file from the tape chunks, as well as some boot disk loaders that only managed sequential sectors instead of a file system, so copiers added a couple of bytes (usually $FEFE or $FFFE) as a flag at the end of the stored XEX, and that the loader could identify to finish the loading loop and start the game. You can detect this situation by an error message during the XEX analysis:</p>
+
+<pre class="consola">
+&gt; xex-filter.pl TAPEGAME.XEX
+Analyzing "TAPEGAME.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+ERROR - Extra pointers at end of file
+</pre>
+
+<p>In order to discard those extra bytes, create a new XEX using the following command:</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o CLEANED.XEX -f TAPEGAME.XEX
+Analyzing "TAPEGAME.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+Writing "CLEANED.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-9029  [$2000-$2345]   (838) &lt;- CODE/DATA
+  2: 16384-32767 [$4000-$7FFF] (16384) BANK &lt;- CODE/DATA
+  3:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+17238 bytes written
+</pre>
+
+<h3><a name="11">(11) Make an XEX to be loaded from high mem to low mem</a></h3>
+
+<p>If you have a squeezed XEX file, composed by a lot of short blocks, it is possible to make them load in reverse order, just for fun or to confuse curious people. "<span class="codigo">-i</span>" option allows ranges from a high value to a lower one, and this is useful for this trick:</p>
+
+<pre class="consola">
+&gt; xex-filter.pl -o REVERSED.XEX -i 83-1,84 SQUEEZED.XEX
+Analyzing "SQUEEZED.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1:  8192-8198  [$2000-$2006]     (7) &lt;- CODE/DATA
+  2:  8254-8275  [$203E-$2053]    (22) &lt;- CODE/DATA
+  3:  8292-8313  [$2064-$2079]    (22) &lt;- CODE/DATA
+<span class="gris">{removed}</span>
+ 81: 32677-32684 [$7FA5-$7FAC]     (8) &lt;- CODE/DATA
+ 82: 32694-32697 [$7FB6-$7FB9]     (4) &lt;- CODE/DATA
+ 83: 32754-32756 [$7FF2-$7FF4]     (3) &lt;- CODE/DATA
+ 84:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+Writing "REVERSED.XEX"...
+  -: 65535       [$FFFF]               BINHEAD
+  1: 32754-32756 [$7FF2-$7FF4]     (3) &lt;- CODE/DATA
+  2: 32694-32697 [$7FB6-$7FB9]     (4) &lt;- CODE/DATA
+  3: 32677-32684 [$7FA5-$7FAC]     (8) &lt;- CODE/DATA
+<span class="gris">{removed}</span>
+ 81:  8292-8313  [$2064-$2079]    (22) &lt;- CODE/DATA
+ 82:  8254-8275  [$203E-$2053]    (22) &lt;- CODE/DATA
+ 83:  8192-8198  [$2000-$2006]     (7) &lt;- CODE/DATA
+ 84:   736-737   [$02E0-$02E1]     (2) RUNAD -&gt; 8192 [$2000]
+14170 bytes written
+</pre>
+
+
+<h2><a name="download">Download</a></h2>
+
+<p><a href="xex-filter.zip">XEX Filter version 1.7 (2022-02-02)</a></p>
+
+<p>To run this tool you need to have the perl interpreter without any special module in your computer. It might be a linux box (perl is native there), Windows (with Strawberry Perl or ActivePerl) or Mac. It doesn't have a GUI, it just works in the command line (shell), using unix-like options.</p>
+
+<p>Outside Windows, it might be needed to change the shebang (first line of the perl script) to set the path to the perl 5 interpreter (like "<span class="codigo">#!/usr/bin/perl</span>" or "<span class="codigo">#!/usr/local/bin/perl</span>").</p>
+
+
+<h2>Feedback</h2>
+
+<p>I'd like to receive bug reports and suggestions to improve this tool. Help requests or any comment about it are welcome too. Please post them in the "XEX Filter" thread at <a href="https://atariage.com/forums/topic/300572-xex-filter-tool/">AtariAge forum</a> or PM me through the forum.</p>
+
+<hr />
+
+<address>&copy; 2020-2022 by <a href="https://www.vitoco.cl/atari/">Víctor Parada</a> - 2020-01-13 (updated: 2022-02-03)</address>
+
+</body>
+</html>
