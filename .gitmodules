@@ -7,3 +7,6 @@
 [submodule "emulator"]
 	path = emulator
 	url = https://github.com/X65/emu.git
+[submodule "examples"]
+	path = examples
+	url = https://github.com/X65/examples.git
