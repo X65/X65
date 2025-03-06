@@ -13,7 +13,7 @@ author = 'Tomasz Sterna'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['breathe']
+extensions = ['breathe', 'sphinx_sitemap']
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -28,7 +28,6 @@ html_static_path = ['_static']
 html_theme_options = {
     'canonical_url': '',
     'analytics_id': '',  #  Provided by Google in your dashboard
-    'display_version': True,
     'prev_next_buttons_location': 'bottom',
     'style_external_links': False,
     
@@ -43,7 +42,7 @@ html_theme_options = {
 }
 # html_logo = ''
 # github_url = ''
-# html_baseurl = ''
+# html_baseurl = '' # sphinx-sitemap
 
 # Breathe Configuration
 breathe_default_project = 'X65'

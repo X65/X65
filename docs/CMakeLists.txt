@@ -52,6 +52,7 @@ add_custom_command(OUTPUT ${SPHINX_INDEX_FILE}
 
 # Nice named target so we can run the job easily
 add_custom_target(Sphinx ALL DEPENDS ${SPHINX_INDEX_FILE})
+add_dependencies(Sphinx Doxygen)
 
 # Add an install target to install the docs
 include(GNUInstallDirs)
