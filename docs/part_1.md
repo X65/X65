@@ -4,6 +4,12 @@ This section covers the **hardware and design philosophy** behind the X65, detai
 
 ```{toctree}
 1/1_introduction.md
+1/2_overview.md
+1/3_memory_storage.md
+1/4_graphics.md
+1/5_audio.md
+1/6_io.md
+1/7_devel.md
 ```
 
 ## Key Topics Covered
