@@ -1,2 +1,8 @@
 breathe
-sphinx_sitemap
+furo
+myst-parser
+sphinx-sitemap
+sphinx-design
+sphinxext-opengraph
+sphinx-inline-tabs
+sphinx-copybutton

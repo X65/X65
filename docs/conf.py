@@ -13,7 +13,14 @@ author = 'Tomasz Sterna'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['breathe', 'sphinx_sitemap']
+extensions = ['breathe',
+    'sphinx_sitemap',
+    'myst_parser',
+    'sphinx_design',
+    'sphinxext.opengraph',
+    'sphinx_inline_tabs',
+    'sphinx_copybutton',
+]
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -23,27 +30,19 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'furo'
 html_static_path = ['_static']
 html_theme_options = {
-    'canonical_url': '',
-    'analytics_id': '',  #  Provided by Google in your dashboard
-    'prev_next_buttons_location': 'bottom',
-    'style_external_links': False,
-    
-    'logo_only': False,
-
-    # Toc options
-    'collapse_navigation': True,
-    'sticky_navigation': True,
-    'navigation_depth': 4,
-    'includehidden': True,
-    'titles_only': False
+    # 'source_repository': 'https://github.com/X65/X65/',
+    # 'source_branch': 'main',
+    # 'source_directory': 'docs/',
 }
-# html_logo = ''
-# github_url = ''
 html_baseurl = 'docs.x65.zone' # sphinx-sitemap
 
 # Breathe Configuration
 breathe_default_project = 'X65'
 breathe_default_members = ('members', 'undoc-members')
+
+myst_enable_extensions = ['colon_fence']
+
+ogp_site_url = 'http://docs.x65.zone'

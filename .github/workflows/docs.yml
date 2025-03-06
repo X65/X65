@@ -28,9 +28,6 @@ jobs:
     steps:
       - name: Requirements
         run: sudo apt install doxygen sphinx-doc cmake
-          && pip install sphinx-rtd-theme
-          && pip install breathe
-          && pip install sphinx-sitemap
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
@@ -38,7 +35,8 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Build docs
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+        run: pip install -r docs/requirements.txt
+          && cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
           && cmake --build build
           && cd build/docs/sphinx
           && touch .nojekyll
