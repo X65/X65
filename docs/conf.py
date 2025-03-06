@@ -13,7 +13,10 @@ author = 'Tomasz Sterna'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['breathe',
+extensions = [
+    'sphinx.ext.todo',     # To-do list support
+    'sphinx.ext.mathjax',  # Math support
+    'breathe',
     'sphinx_sitemap',
     'myst_parser',
     'sphinx_design',
@@ -25,7 +28,7 @@ extensions = ['breathe',
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-
+todo_include_todos = True
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -40,7 +43,10 @@ html_theme_options = {
 html_baseurl = 'docs.x65.zone' # sphinx-sitemap
 
 # Breathe Configuration
-breathe_default_project = 'X65'
+breathe_projects = {
+    "firmware": "../build/docs/doxygen/xml/",
+}
+breathe_default_project = 'firmware'
 breathe_default_members = ('members', 'undoc-members')
 
 myst_enable_extensions = ['colon_fence']
