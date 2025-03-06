@@ -11,6 +11,7 @@ copyright = '2025, Tomasz Sterna'
 author = 'Tomasz Sterna'
 
 html_title = "X65.docs"
+html_logo = "_static/paw_logo_32.png"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -54,6 +55,9 @@ html_theme_options = {
     },
 }
 html_baseurl = 'docs.x65.zone' # sphinx-sitemap
+html_css_files = [
+    'custom.css',
+]
 
 # Breathe Configuration
 breathe_projects = {
