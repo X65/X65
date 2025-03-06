@@ -3,6 +3,8 @@
 The second half of the book is dedicated to **writing software for the X65** using **65816 assembly language**. This section provides a structured learning path, covering everything from the basics of the instruction set to advanced optimization techniques. Topics include:
 
 ```{toctree}
+2/8_assembly.md
+2/9_dev_env.md
 2/10_memory.md
 2/11_graphics.md
 2/12_sound.md
@@ -11,8 +13,6 @@ The second half of the book is dedicated to **writing software for the X65** usi
 2/15_advanced.md
 2/16_examples.md
 2/17_afterword.md
-2/8_assembly.md
-2/9_dev_env.md
 ```
 
 ## Key Topics Covered
