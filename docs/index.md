@@ -1,4 +1,4 @@
-# Preface
+# X65 Book: Preface
 
 The **X65 Microcomputer** is a modern interpretation of classic 8-bit computing, blending the simplicity and hands-on nature of vintage systems with modern enhancements. This book serves as a **comprehensive guide** to both the **hardware architecture** and **software development** of the X65, ensuring that readers gain a deep understanding of its capabilities and how to program it efficiently.
 
