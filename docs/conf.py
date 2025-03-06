@@ -42,7 +42,7 @@ html_theme_options = {
 }
 # html_logo = ''
 # github_url = ''
-# html_baseurl = '' # sphinx-sitemap
+html_baseurl = 'docs.x65.zone' # sphinx-sitemap
 
 # Breathe Configuration
 breathe_default_project = 'X65'
