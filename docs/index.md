@@ -9,6 +9,9 @@ The **X65 Microcomputer** is a modern interpretation of classic 8-bit computing,
 part_1.md
 part_2.md
 A/A_memory_map.md
+A/B_glossary.md
+A/C_65816_migration.md
+A/D_systems_comparison.md
 ```
 
 ## About This Book
