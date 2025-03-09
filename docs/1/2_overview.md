@@ -1,5 +1,9 @@
 # Chapter 2: System Architecture Overview
 
+```{note}
+This chapter is still under construction.
+```
+
 ## CPU: The 65C816 in Native Mode
 
 ## Memory Map and Addressing

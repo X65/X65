@@ -3,13 +3,8 @@
 This section covers the **hardware and design philosophy** behind the X65, detailing what makes it unique and how it builds upon the legacy of classic computing. Topics include:
 
 ```{toctree}
-1/1_introduction.md
-1/2_overview.md
-1/3_memory_storage.md
-1/4_graphics.md
-1/5_audio.md
-1/6_io.md
-1/7_devel.md
+:glob: true
+1/*
 ```
 
 ## Key Topics Covered

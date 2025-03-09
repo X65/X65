@@ -1,5 +1,9 @@
 # Chapter 11: Graphics Programming
 
+```{note}
+This chapter is still under construction.
+```
+
 ## Interfacing with CGIA
 
 ---

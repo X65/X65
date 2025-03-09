@@ -1,8 +1,7 @@
 # Chapter 16: Example Projects and Applications
 
-```{attention}
-
-This chapter is TBD.
+```{note}
+This chapter is still under construction.
 
 Please see <https://github.com/X65/examples> repository for code examples.
 ```

@@ -1,5 +1,9 @@
 # Chapter 6: Input and Output Interfaces
 
+```{note}
+This chapter is still under construction.
+```
+
 ## UART and Serial Communication
 
 ## RP816-RIA: USB Mass Storage and HID Support

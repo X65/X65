@@ -1,5 +1,9 @@
 # Chapter 8: Introduction to 65816 Assembly
 
+```{note}
+This chapter is still under construction.
+```
+
 ## Overview of the 65C816 CPU
 
 The **WDC 65C816** (commonly referred to as the 65816) is a versatile 16-bit microprocessor developed by the Western Design Center (WDC). Building upon the foundation of the 8-bit 6502 and its CMOS variant, the 65C02, the 65816 introduces several enhancements that make it suitable for more advanced computing applications. citeturn0search23

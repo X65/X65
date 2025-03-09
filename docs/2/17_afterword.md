@@ -1,5 +1,9 @@
 # Chapter 17: Future Development and Community Contributions
 
+```{note}
+This chapter is still under construction.
+```
+
 ## Potential Hardware and Software Enhancements
 
 ## Open-Source Contributions
