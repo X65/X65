@@ -2,9 +2,9 @@
 
 ## The Vision Behind the X65
 
-The modern computing landscape has become increasingly complex, often overwhelming both new learners and experienced developers alike. The X65 microcomputer was created as a response to this trend—a return to an era when computers were understandable and accessible.
+The modern computing landscape has become increasingly complex, often overwhelming both new learners and experienced developers alike. The X65 microcomputer was created as a response to this trend - a return to an era when computers were understandable and accessible.
 
-The **X65** microcomputer is a modern reimagining of classic 8-bit computing, designed to blend the simplicity and charm of vintage home computers with the power and flexibility of contemporary hardware. Unlike traditional retro-inspired projects that focus on strict authenticity, the X65 embraces modern design choices while retaining the essence of classic computing—direct hardware control, assembly programming, and a practical approach to understanding low-level system architecture.
+The **X65** microcomputer is a modern reimagining of classic 8-bit computing, designed to blend the simplicity and charm of vintage home computers with the power and flexibility of contemporary hardware. Unlike traditional retro-inspired projects that focus on strict authenticity, the X65 embraces modern design choices while retaining the essence of classic computing: direct hardware control, assembly programming, and a practical approach to understanding low-level system architecture.
 
 The core philosophy behind the X65 is to **create an 8-bit-style computer with a clean, modern implementation**, prioritizing ease of expansion, real-time operation, and developer accessibility. With a **65C816 CPU running in native mode**, a **flat 16MB RAM architecture**, and a suite of powerful peripherals including a **Yamaha SD-1 FM synthesizer** and a **DVI-D output capable of 256-color graphics**, the X65 is both an educational platform and a fully capable development machine for 65816 assembly programming.
 

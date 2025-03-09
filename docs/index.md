@@ -48,6 +48,6 @@ This book is for **retro computing enthusiasts, assembly programmers, and hardwa
 
 ## A Journey into Understandable Computing
 
-In an era of ever-increasing complexity, the X65 is a reminder of a time when **computers were simple, understandable, and empowering**. This book is not just about using the X65—it's about **rediscovering** the joy of low-level programming, hardware hacking, and direct control over a computer's operation.
+In an era of ever-increasing complexity, the X65 is a reminder of a time when **computers were simple, understandable, and empowering**. This book is not just about using the X65 - it's about **rediscovering** the joy of low-level programming, hardware hacking, and direct control over a computer's operation.
 
 With that, let's dive in and explore the world of the X65!
