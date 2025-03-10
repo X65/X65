@@ -54,7 +54,7 @@ html_theme_options = {
         "color-brand-visited": "#4586A0",
     },
 }
-html_baseurl = 'docs.x65.zone' # sphinx-sitemap
+html_baseurl = 'https://docs.x65.zone' # sphinx-sitemap
 html_css_files = [
     'custom.css',
 ]
@@ -68,7 +68,7 @@ breathe_default_members = ('members', 'undoc-members')
 
 myst_enable_extensions = ['colon_fence']
 
-ogp_site_url = 'http://docs.x65.zone'
+ogp_site_url = 'https://docs.x65.zone'
 
 pygments_style = "sphinx"
 pygments_dark_style = "monokai"
