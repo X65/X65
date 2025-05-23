@@ -61,6 +61,8 @@ html_css_files = [
     'custom.css',
 ]
 
+sitemap_url_scheme = "{link}"
+
 # Breathe Configuration
 breathe_projects = {
     "firmware": "../build/docs/doxygen/xml/",
