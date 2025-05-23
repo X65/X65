@@ -12,6 +12,7 @@ author = 'Tomasz Sterna'
 
 html_title = "X65.docs"
 html_logo = "_static/paw_logo_32.png"
+html_favicon = '_static/paw_logo_32.png'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -32,6 +33,7 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 todo_include_todos = True
+
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
@@ -54,7 +56,7 @@ html_theme_options = {
         "color-brand-visited": "#4586A0",
     },
 }
-html_baseurl = 'https://docs.x65.zone' # sphinx-sitemap
+html_baseurl = 'https://docs.x65.zone/' # sphinx-sitemap
 html_css_files = [
     'custom.css',
 ]
