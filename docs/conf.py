@@ -12,7 +12,7 @@ author = 'Tomasz Sterna'
 
 html_title = "X65.docs"
 html_logo = "_static/paw_logo_32.png"
-html_favicon = '_static/paw_logo_32.png'
+html_favicon = '_static/paw_logo_32_gray.png'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
