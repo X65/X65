@@ -35,7 +35,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 todo_include_todos = True
 
 html_js_files = [
-    'https://scripts.simpleanalyticscdn.com/latest.js',
+    'https://plausible.io/js/script.js',
 ]
 
 # -- Options for HTML output -------------------------------------------------
