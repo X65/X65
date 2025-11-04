@@ -160,3 +160,34 @@ HAM mode is particularly useful for **high-color images, gradients, and advanced
 By integrating **HAM Mode (MODE6) into the X65 graphics pipeline**, developers can achieve **highly detailed visuals** with **minimal additional memory overhead**, making it a powerful tool for static images.
 
 ## Creating Mixed-Mode Display Lists
+
+## Plane ordering
+
+The CGIA supports up to **four graphics planes**, which can be layered to create complex visual effects. The order in which these planes are rendered is crucial for achieving the desired appearance, especially when combining different graphics modes.
+
+It is beneficial to be able to change the order of planes without reconfiguring the entire plane settings. The CGIA allows for dynamic plane ordering through the use of a **Plane Order Register**.
+
+### Plane Order Register
+
+With four planes, there are 24 possible permutations for their rendering order. The Plane Order Register is a register that picks the order in which the planes are drawn.
+
+The order uses the Steinhaus–Johnson–Trotter (adjacent-swap “revolving door”) order. Each step swaps one adjacent pair, so “next” and “previous” are obvious.
+
+Starting at 1234, the 24 permutations:
+
+```
+1234 1243 1423 4123 4132 1432
+1342 1324 3124 3142 3412 4312
+4321 3421 3241 3214 2314 2341
+2431 4231 4213 2413 2143 2134
+```
+
+Rule to get the next permutation from the current one:
+
+1. Give every element a direction (initially all point left).
+2. Find the largest “mobile” element: one whose arrow points to a smaller neighbor.
+3. Swap it with that neighbor in its arrow direction.
+4. Reverse the arrows of all elements larger than the moved one.
+5. Repeat until no mobile element exists.
+
+To go backward, reverse the rule. This is a Gray-code analogue for permutations on the permutohedron using adjacent transpositions.
