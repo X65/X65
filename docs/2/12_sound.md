@@ -8,6 +8,6 @@ This chapter is still under construction.
 
 ## FM Synthesis Basics
 
-## Programming the Yamaha SD-1 Synthesizer
+## Programming the SGU-1 Synthesizer
 
 ## Managing Audio Output through the Mixer

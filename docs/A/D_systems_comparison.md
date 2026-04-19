@@ -44,9 +44,9 @@ This chapter provides detailed comparisons between the X65 microcomputer and sev
 
 | Feature         | X65                         | Commodore 64               | Apple IIe               | Atari 800XL      | SNES                     |
 | --------------- | --------------------------- | -------------------------- | ----------------------- | ---------------- | ------------------------ |
-| Primary Sound   | Yamaha SD-1 FM              | SID                        | Speaker                 | POKEY            | SPC700                   |
-| Channels        | 16 FM channels + EQ         | 3 voices + filters         | 1 speaker               | 4 channels       | 8 channels               |
-| Secondary Sound | 2 PWM channels              | -                          | Mockingboard (optional) | -                | -                        |
+| Primary Sound   | SGU-1 FM + SID-style filter | SID                        | Speaker                 | POKEY            | SPC700                   |
+| Channels        | 9 stereo channels × 4 ops   | 3 voices + filters         | 1 speaker               | 4 channels       | 8 channels               |
+| Secondary Sound | PWM system buzzer + PCM RAM | -                          | Mockingboard (optional) | -                | -                        |
 | Sound Synthesis | FM, 4-operator              | Subtractive, 3 oscillators | Square wave             | Filtered digital | ADPCM samples            |
 | Volume Control  | Per-channel + master, Mixer | Per-channel + master       | Single level            | Per-channel      | Per-channel + master     |
 | Effects         | Built-in EQ, vibrato        | Filters, ring mod          | None built-in           | Distortion       | Echo, reverb, FIR filter |

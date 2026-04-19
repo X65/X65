@@ -18,19 +18,25 @@
 
 **VAB (Valid Address Bus)** - A signal derived from the 65C816's VDA and VPA signals, used to optimize memory cycles when the CPU is performing internal operations.
 
+**XSTACK** - A 512-byte auxiliary buffer maintained by the RIA firmware. Used by the OS fastcall API to pass call arguments and return data between 65816 software and the NORTH chip without touching the 6502 hardware stack.
+
 ## Graphics Terms
 
 **CGIA (Color Graphics Interface Adaptor)** - The X65's graphics subsystem, combining features from Atari ANTIC and Commodore VIC-II/TED architectures.
 
 **Display List** - A structured set of instructions in memory that dictates how each scanline is rendered by the CGIA.
 
-**HAM Mode (Hold-And-Modify)** - A special graphics mode inspired by the Amiga that allows modifying only part of a pixel color per scan, enabling more colors per screen.
+**Affine Mode (MODE7)** - The CGIA's mode 7: a chunky-pixel graphics mode with hardware-assisted affine transformations, similar to the SNES MODE7.
+
+**HAM6 (Hold-And-Modify, mode 6)** - A CGIA graphics mode inspired by the Amiga HAM mode. Uses 6-bit commands packing four screen pixels into three bytes; commands either select a base color or modify a single R/G/B channel of the previous pixel by a signed delta, enabling many more on-screen colors at the cost of per-pixel precision.
 
 **LMS (Load Memory Scan)** - A display list instruction that defines the offset of display memory, holding character or tile data.
 
-**MODE7** - A chunky-pixel graphics mode with hardware-assisted affine transformations, similar to the SNES MODE7.
+**MODE7** - Common name for the CGIA's affine mode (mode 7). See *Affine Mode*.
 
-**Multicolor Mode** - A graphics mode that uses a 4-color-per-cell representation, where each byte encodes four pixels.
+**Multicolor Mode** - A per-instruction flag bit on CGIA text and bitmap modes that switches to a 4-color-per-cell representation, where each byte encodes four pixels.
+
+**Plane Order Register** - A single CGIA register whose value selects one of 24 Z-order permutations of the four planes (using Steinhaus-Johnson-Trotter ordering). Lets a program shuffle which plane is on top — typically from a raster interrupt — without rebuilding any plane.
 
 **Sprite Multiplexing** - A technique where sprite hardware is reused to display more sprites than hardware natively supports.
 
@@ -38,11 +44,11 @@
 
 ## Audio Terms
 
-**FM Synthesis** - Frequency Modulation synthesis, the audio generation method used by the Yamaha SD-1 in the X65.
+**FM Synthesis** - Frequency Modulation synthesis, the per-operator sound generation method at the heart of the X65's SGU-1 chip.
 
-**PWM (Pulse-Width Modulation)** - A technique for generating analog signals from digital devices, used for audio generation in the X65's dual PWM channels.
+**PWM (Pulse-Width Modulation)** - A technique for generating analog signals from digital devices. Used by the X65 system buzzer to produce simple tones.
 
-**SD-1 (YMF825)** - The Yamaha FM synthesizer chip used in the X65 for high-quality music synthesis.
+**SGU-1 (Sound Generator Unit 1)** - The X65's custom synthesis chip. Nine stereo channels of four-operator FM with per-operator waveform selection (including PCM as a wavetable), per-operator ADSR envelopes, a SID-style multimode filter, three independent hardware sweeps per channel, and a shared 64 KB PCM bank. Implemented in firmware on a dedicated RP2350 audio chip that is attached to the SOUTH chip over an SPI link; reached from the CPU as the `SPU` device on the PIX bus, which SOUTH forwards over SPI to the audio chip.
 
 ## I/O and System Terms
 
@@ -54,9 +60,15 @@
 
 **MMIO (Memory-Mapped I/O)** - A technique where hardware devices are accessed through memory addresses, used extensively in the X65.
 
-**RP2040** - The microcontroller used in the X65 to implement various peripherals and interfaces.
+**NORTH chip** - The RP2350 microcontroller in the X65 that owns the CPU bus, the PSRAM interface, and system services (RIA). Communicates with the SOUTH chip over the PIX bus.
 
-**RP816-RIA (Retro Interface Adaptor)** - The subsystem that provides USB, storage, and other modern I/O capabilities for the X65.
+**PIX (Pico Information eXchange) bus** - The dedicated serial-with-handshake bus connecting the NORTH and SOUTH chips. Carries memory writes, DMA transfers, and per-device commands to the VPU (CGIA), SPU (SGU-1), and other south-side peripherals.
+
+**RIA (Retro Interface Adaptor)** - The subsystem inside the NORTH chip that exposes the fastcall API at `$FFF0–$FFF3`, aggregates IRQ sources into a single CPU interrupt, and provides USB, storage, and other modern I/O capabilities to 65816 software.
+
+**RP2350** - The Raspberry Pi microcontroller used in the X65 to implement the NORTH and SOUTH chips. Its Programmable I/O (PIO) blocks are how the X65 handles the CPU bus, the PIX bus, and several peripheral protocols in software.
+
+**SOUTH chip** - The RP2350 microcontroller in the X65 that hosts the CGIA (graphics) implementation together with the terminal and font systems. Also bridges the separate SGU-1 audio chip via an SPI link, presenting it as the `SPU` device on the PIX bus. Reached from the CPU via the PIX bus.
 
 **SPI (Serial Peripheral Interface)** - A synchronous serial communication interface used for connecting various components in the X65.
 

@@ -13,7 +13,7 @@ This section covers the **hardware and design philosophy** behind the X65, detai
 - The **65C816 CPU**, its advantages, and how it operates in **native mode from boot-up**
 - The **memory model**, including flat 16MB addressing and efficient direct page handling
 - The **graphics system**, which uses a **beam-chased display list** instead of a framebuffer
-- The **sound system**, leveraging a Yamaha SD-1 FM synthesizer for rich audio
+- The **sound system**, built around the custom SGU-1 synthesis chip for rich audio
 - **Peripheral support**, expansion options, and system input/output design
 
 By the end of Part 1, readers will have a complete understanding of the **X65’s architecture** and what makes it a powerful yet accessible computing platform.

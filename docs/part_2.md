@@ -13,7 +13,7 @@ The second half of the book is dedicated to **writing software for the X65** usi
 - Working with **registers, addressing modes, and stack operations**
 - Handling **memory efficiently** in a flat 16MB address space
 - Programming the **graphics system** using the display list
-- Generating **sound with the Yamaha SD-1 FM synthesizer**
+- Generating **sound with the SGU-1 synthesis chip**
 - Interfacing with **peripherals and expansion hardware**
 - **Optimizing code** for performance and efficiency
 

@@ -1,8 +1,12 @@
 find_package(Doxygen REQUIRED)
 find_package(Sphinx REQUIRED)
 
-# Find all the public headers
-set(SOURCE_HEADERS_DIR ${PROJECT_SOURCE_DIR}/firmware/src/ria)
+# Find all the public headers.
+# Firmware is split into NORTH (CPU bus, system services) and SOUTH (CGIA, SGU,
+# terminal); the root also contains the shared PIX bus header. We feed Doxygen
+# the whole src tree and rely on EXCLUDE_PATTERNS in Doxyfile.in to filter out
+# vendored subtrees (tinyusb, fatfs, littlefs, pico_hdmi).
+set(SOURCE_HEADERS_DIR ${PROJECT_SOURCE_DIR}/firmware/src)
 file(GLOB_RECURSE SOURCE_HEADERS ${SOURCE_HEADERS_DIR}/*.h)
 
 set(DOXYGEN_INPUT_DIR ${SOURCE_HEADERS_DIR})

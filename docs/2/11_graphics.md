@@ -1,7 +1,9 @@
 # Chapter 11: Graphics Programming
 
 ```{note}
-This chapter is still under construction.
+This chapter is still under construction. The display-list, plane-register, and
+sprite reference sections below are aligned with the current CGIA firmware; the
+worked examples and tutorial sections are ongoing work.
 ```
 
 ## Interfacing with CGIA
@@ -33,29 +35,33 @@ For instructions requiring additional data, these follow the instruction code.
 - **1** – Duplicate the last raster line multiple times.
 - **2** – Jump to another location in the display list.
   - If DLI bit is set, execution waits for Vertical Blank before jumping.
-- **3** – Load new memory pointers.
-  - Bits 4-7 determine which offsets will be updated:
-    - 4: Load Memory Scan (LMS) – Points to screen data.
-    - 5: Load Foreground Scan (LFS) – Points to foreground color data.
-    - 6: Load Background Scan (LBS) – Points to background color data.
-    - 7: Load Character Generator (LCG) – Points to character shape definitions.
-- **4** – Load an 8-bit value into a register. Each plane has 16 multipurpose registers, indexed 0 - 15.
+- **3** – Load new memory pointers. **Bits 4-7** are flag bits selecting which scan pointers will be updated; the matching 16-bit values follow the instruction byte in the order listed.
+  - Bit 4: Load Memory Scan (LMS) – Points to screen data.
+  - Bit 5: Load Foreground Scan (LFS) – Points to foreground color data.
+  - Bit 6: Load Background Scan (LBS) – Points to background color data.
+  - Bit 7: Load Character Generator (LCG) – Points to character shape definitions.
+- **4** – Load an 8-bit value into a plane register. Each plane has 16 multipurpose registers, indexed 0 - 15.
   - Bits 7-4: Register index.
-- **5** – Load a 16-bit value into a register. Plane registers are treated line 8 x 16-bit values, indexed 0 - 7.
+- **5** – Load a 16-bit value into a plane register. Plane registers can also be addressed as eight 16-bit values, indexed 0 - 7.
   - Bits 6-4: Register index.
+- **6**, **7** – Reserved (TBD).
 
 #### Mode Row Instructions (8-F)
 
-Mode row instructions define the type of graphics displayed on a scanline. The **lower three bits (0-2)** determine the mode, while **bit 3** differentiates them from control instructions.
+Mode row instructions define the type of graphics displayed on a scanline. The **lower three bits (0-2)** select the mode, while **bit 3** (always set in this group) differentiates them from control instructions.
 
-- **8** – Reserved (TBD)
-- **9** – Reserved (TBD)
-- **A** – **Text/Tile Mode** – Uses character-based graphics with a foreground and background color map.
-- **B** – **Bitmap Mode** – Direct pixel-based graphics.
-- **C** – **Multicolor Text/Tile Mode** – Character-based graphics with **4-color cells**.
-- **D** – **Multicolor Bitmap Mode** – Direct pixel graphics using **4-color cells**.
-- **E** – **Hold-and-Modify (HAM) Mode** – Similar to **Amiga HAM**, where pixel colors can be modified based on previous pixels, enabling a larger color range.
+- **8** – **Palette Text/Tile Mode** – Character-based graphics where each cell picks colors from the active palette.
+- **9** – **Palette Bitmap Mode** – Direct pixel-based graphics drawn through the active palette.
+- **A** – **Attribute Text/Tile Mode** – Character-based graphics with per-cell foreground and background color attributes (VIC-II style).
+- **B** – **Attribute Bitmap Mode** – Direct pixel-based graphics with per-cell color attributes.
+- **C**, **D** – Reserved (TBD).
+- **E** – **HAM6 (Hold-and-Modify) Mode** – Similar to **Amiga HAM**, where pixel colors can be modified based on previous pixels, enabling a larger color range. See [HAM Encoding Format](#ham-encoding-format) below.
 - **F** – **Affine Transform Chunky Pixel Mode (MODE7)** – Inspired by **SNES MODE7**, allowing **rotation and scaling of graphics** for pseudo-3D effects.
+
+Mode row instructions also carry two flag bits that modify how the mode is rendered:
+
+- **Bit 4** (`DOUBLE_WIDTH`) – Each logical pixel covers two physical screen pixels horizontally.
+- **Bit 5** (`MULTICOLOR`) – Switches text and bitmap modes to a **4-color-per-cell** representation, where each byte encodes four pixels (similar to C64 multicolor mode).
 
 Additionally, **bit 7** in any mode row instruction triggers a **Display List Interrupt (DLI)**, allowing for **scanline-specific effects, color changes, or sprite updates**.
 
@@ -71,26 +77,29 @@ Each **CGIA plane** has **16 associated registers**, but their interpretation de
 
 ### Background Plane Registers
 
-- **flags** _(8-bit)_ – Configuration flags.
-- **border_columns** _(8-bit)_ – Number of border columns.
-- **row_height** _(8-bit, unsigned)_ – Height of each row.
+- **flags** _(8-bit)_ – Configuration flags (see below).
+- **border_columns** _(8-bit)_ – Number of border columns on each side.
+- **row_height** _(8-bit, unsigned)_ – Height of each row in raster lines.
 - **stride** _(8-bit, unsigned)_ – Memory stride for addressing screen data.
 - **scroll_x, scroll_y** _(8-bit, signed)_ – Fine scrolling values.
 - **offset_x, offset_y** _(8-bit, signed)_ – Base offsets for plane positioning.
-- **shared_color** ×2 _(8-bit each)_ – Two shared colors.
+- **color[8]** _(8-bit each)_ – Eight plane-wide colors, used for borders, multicolor cells, and shared palette entries depending on the active mode and flags.
 
 #### Background Plane Flags
 
 - **Bit 0** – Color 0 is transparent.
-- **Bits 1-3** – Reserved.
+- **Bits 1-2** – Reserved.
 - **Bit 3** – Border is transparent.
 - **Bit 4** – Double-width pixel mode.
-- **Bits 5-7** – Reserved.
+- **Bit 5** – Multicolor pixel mode.
+- **Bits 6-7** – Pixel bit-depth: `00` = 1 bpp / 2 colors, `01` = 2 bpp / 4 colors, `10` = 3 bpp / 8 colors, `11` = 4 bpp / 8 colors + half-bright.
 
-```csv
+```text
 PLANE_MASK_TRANSPARENT        %00000001
 PLANE_MASK_BORDER_TRANSPARENT %00001000
 PLANE_MASK_DOUBLE_WIDTH       %00010000
+PLANE_MASK_MULTICOLOR         %00100000
+PLANE_MASK_PIXEL_BITS         %11000000
 ```
 
 ### HAM Mode Registers
@@ -108,11 +117,106 @@ PLANE_MASK_DOUBLE_WIDTH       %00010000
 
 ### Sprite Plane Type Registers
 
-- **active** _(8-bit)_ – Bitmask indicating which sprites are active.
+When a plane is configured as a **sprite plane**, its 16 plane registers carry these fields (the remaining bytes are reserved):
+
+- **active** _(8-bit)_ – Bitmask indicating which of the eight sprites are active.
 - **border_columns** _(8-bit, unsigned)_ – Number of border columns.
-- **start_y, stop_y** _(8-bit, unsigned)_ – Vertical range where sprites are visible.
+- **start_y, stop_y** _(8-bit, unsigned)_ – Vertical range where sprites are visible (clipping window).
+
+The sprite plane does **not** consume a display list. Instead, the plane's `offsetN` register points at a **sprite descriptor table** in memory.
+
+#### Sprite Descriptor (16 bytes)
+
+Each entry in the sprite descriptor table is exactly 16 bytes, laid out as follows:
+
+| Offset | Field             | Size | Notes                                                                                       |
+| ------ | ----------------- | ---- | ------------------------------------------------------------------------------------------- |
+| 0      | `pos_x`           | i16  | Signed X position (can be negative for off-screen entry).                                   |
+| 2      | `pos_y`           | i16  | Signed Y position.                                                                          |
+| 4      | `lines_y`         | u16  | Sprite height in raster lines.                                                              |
+| 6      | `flags`           | u8   | Width / mode bits (see below).                                                              |
+| 7      | _reserved_        | u8   | —                                                                                           |
+| 8      | `color[3]`        | 3×u8 | Colors for indices 1, 2, 3 (index 0 is always transparent).                                 |
+| 11     | _reserved_        | u8   | —                                                                                           |
+| 12     | `data_offset`     | u16  | 16-bit pointer (within the sprite bank) to the sprite pixels.                               |
+| 14     | `next_dsc_offset` | u16  | Pointer to the next descriptor after `lines_y` rows; built-in **sprite multiplexer** entry. |
+
+The **flags** byte:
+
+- **Bits 0-2** – Width minus one, in bytes (1–8 bytes = 8–64 pixels).
+- **Bit 3** – Reserved.
+- **Bit 4** – Double-width.
+- **Bit 5** – Multicolor.
+- **Bit 6** – Mirror X.
+- **Bit 7** – Mirror Y.
+
+```text
+SPRITE_MASK_WIDTH        %00000111
+SPRITE_MASK_DOUBLE_WIDTH %00010000
+SPRITE_MASK_MULTICOLOR   %00100000
+SPRITE_MASK_MIRROR_X     %01000000
+SPRITE_MASK_MIRROR_Y     %10000000
+```
 
 By utilizing **dynamic plane register interpretation**, the CGIA enables **highly versatile graphics rendering**, allowing the X65 to seamlessly mix **background layers, sprites, advanced color manipulation, and affine transformations** in real time.
+
+### Worked Example: Eight Multicolor Sprites
+
+The following adapted snippet (from the `sprites` example program) sets up plane 0 as a sprite plane with all eight sprites enabled, then fills a descriptor table by stepping through it 16 bytes at a time. Each sprite is `SPRITE_WIDTH` bytes wide (so `SPRITE_WIDTH * 8` pixels), `SPRITE_HEIGHT` lines tall, and uses three shared colors plus transparency on color index 0:
+
+```asm
+.define SPRITE_WIDTH   4
+.define SPRITE_HEIGHT  26
+
+reset:
+    sei                     ; disable IRQs while we reconfigure CGIA
+
+    lda #0                  ; disable all planes during setup
+    sta CGIA::planes
+
+    lda #145                ; pick a border/background color
+    sta CGIA::back_color
+
+    ; point plane 0 at the sprite descriptor table
+    lda #<sprite_descriptors
+    sta CGIA::offset0
+    lda #>sprite_descriptors
+    sta CGIA::offset0 + 1
+
+    ; sprite-plane-specific registers
+    lda #%11111111          ; activate all 8 sprites
+    sta CGIA::plane0 + CGIA_SPRITE_REGS::active
+    lda #0                  ; no border, sprites visible across the whole screen
+    sta CGIA::plane0 + CGIA_SPRITE_REGS::border_columns
+    sta CGIA::plane0 + CGIA_SPRITE_REGS::start_y
+    sta CGIA::plane0 + CGIA_SPRITE_REGS::stop_y
+
+    ; ... fill 8 × 16-byte descriptors at sprite_descriptors ...
+
+    lda #%10000000          ; enable Vertical Blank NMI
+    sta CGIA::int_enable
+
+    lda #%00010001          ; plane0 = enabled, type = sprite
+    sta CGIA::planes
+```
+
+Per-descriptor flags can mix the modifier bits freely. For example:
+
+```asm
+    ; multicolor + mirror X, sprite is SPRITE_WIDTH bytes wide
+    lda #(SPRITE_MASK_MULTICOLOR | SPRITE_MASK_MIRROR_X | (SPRITE_WIDTH-1))
+    sta sprite_descriptors + 4*CGIA_SPRITE_DESC_LEN + CGIA_SPRITE::flags
+
+    ; multicolor + mirror Y
+    lda #(SPRITE_MASK_MULTICOLOR | SPRITE_MASK_MIRROR_Y | (SPRITE_WIDTH-1))
+    sta sprite_descriptors + 5*CGIA_SPRITE_DESC_LEN + CGIA_SPRITE::flags
+
+    ; multicolor + double-width pixels
+    lda #(SPRITE_MASK_MULTICOLOR | SPRITE_MASK_DOUBLE_WIDTH | (SPRITE_WIDTH-1))
+    sta sprite_descriptors + 3*CGIA_SPRITE_DESC_LEN + CGIA_SPRITE::flags
+```
+
+A VBL NMI handler can then animate sprites by writing fresh `pos_x` / `pos_y` values into individual descriptors — no per-frame display-list rebuild required.
 
 ---
 

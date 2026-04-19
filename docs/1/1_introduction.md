@@ -6,7 +6,7 @@ The modern computing landscape has become increasingly complex, often overwhelmi
 
 The **X65** microcomputer is a modern reimagining of classic 8-bit computing, designed to blend the simplicity and charm of vintage home computers with the power and flexibility of contemporary hardware. Unlike traditional retro-inspired projects that focus on strict authenticity, the X65 embraces modern design choices while retaining the essence of classic computing: direct hardware control, assembly programming, and a practical approach to understanding low-level system architecture.
 
-The core philosophy behind the X65 is to **create an 8-bit-style computer with a clean, modern implementation**, prioritizing ease of expansion, real-time operation, and developer accessibility. With a **65C816 CPU running in native mode**, a **flat 16MB RAM architecture**, and a suite of powerful peripherals including a **Yamaha SD-1 FM synthesizer** and a **DVI-D output capable of 256-color graphics**, the X65 is both an educational platform and a fully capable development machine for 65816 assembly programming.
+The core philosophy behind the X65 is to **create an 8-bit-style computer with a clean, modern implementation**, prioritizing ease of expansion, real-time operation, and developer accessibility. With a **65C816 CPU running in native mode**, a **flat 16MB RAM architecture**, and a suite of powerful peripherals including the custom **SGU-1 synthesis chip** and a **DVI-D output capable of 256-color graphics**, the X65 is both an educational platform and a fully capable development machine for 65816 assembly programming.
 
 ## Why the 65816?
 
@@ -26,7 +26,7 @@ The X65 is **not** a direct clone of any vintage system. Instead, it builds upon
 
 - **Direct hardware access:** Minimal operating system overhead; programs interact directly with hardware.
 - **Rich I/O options:** Supporting classic peripherals (DE-9 joysticks) and modern devices (USB, Wi-Fi, and SD cards).
-- **Advanced graphics and sound:** A beam-chased display system driven by a dedicated display list in CGIA hardware, along with Yamaha FM synthesis for rich audio.
+- **Advanced graphics and sound:** A beam-chased display system driven by a dedicated display list in CGIA hardware, along with the custom SGU-1 chip for FM synthesis, PCM playback, and SID-style filtering.
 - **Open and expandable:** A full CPU bus expansion connector allows custom hardware to interface seamlessly.
 
 ## Who Is This Computer For?

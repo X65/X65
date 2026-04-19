@@ -99,16 +99,39 @@ STA $123456   ; Store to long address
     SEP #$20                ; 8-bit A for I/O operations
 ```
 
-### Playing a Sound Effect
+### Playing a Note on the SGU-1
+
+The SGU-1 register window lives at `$FEC0–$FEFF`. The bottom of the window holds the currently-selected channel's per-channel registers (frequency, volume, gate, etc.); a channel-select register picks which of the nine channels is mapped in. See [Chapter 12](../2/12_sound.md) for the channel-select sequence.
 
 ```assembly
-    ; Set frequency for PWM channel 0
-    LDA #<440               ; A note (440 Hz) - low byte
-    STA $FF20
-    LDA #>440               ; A note (440 Hz) - high byte
-    STA $FF21
+    ; With channel 0 selected in the SGU window:
+    LDA #<7256              ; phase increment for ~A4 (≈440 Hz at 48 kHz)
+    STA $FEC0               ; SGU CHN_FREQ_L
+    LDA #>7256
+    STA $FEC1               ; SGU CHN_FREQ_H
 
-    ; Set duty cycle (50%)
-    LDA #$7F
-    STA $FF22
+    LDA #64                 ; volume
+    STA $FEC2               ; SGU CHN_VOL
+
+    LDA #$01                ; FLAGS0 bit 0 = GATE (key-on)
+    STA $FEC4               ; SGU CHN_FLAGS0
 ```
+
+## CGIA Register Reference
+
+The CGIA register window lives at `$FF00–$FF7F`. Frequently-touched registers:
+
+| Address       | Register      | Notes                                                                                          |
+| ------------- | ------------- | ---------------------------------------------------------------------------------------------- |
+| `$FF00`       | `mode`        | Bit 0 = HIRES (768 px horizontal), bit 1 = INTERLACE (480 vert).                               |
+| `$FF01`       | `bckgnd_bank` | High 8 bits of address for background-plane fetches.                                           |
+| `$FF02`       | `sprite_bank` | High 8 bits of address for sprite fetches.                                                     |
+| `$FF10–$FF11` | `raster`      | Current raster line (read-only).                                                               |
+| `$FF12–$FF13` | `int_raster`  | Line at which to fire a raster interrupt.                                                      |
+| `$FF14`       | `int_enable`  | `[VBI DLI RSI x x x x x]`                                                                      |
+| `$FF15`       | `int_status`  | Same layout; write to acknowledge.                                                             |
+| `$FF30`       | `planes`      | High nibble = plane type (0 background, 1 sprite); low nibble = enable bits per plane.         |
+| `$FF31`       | `order`       | Plane Z-order permutation (one byte selects one of 24 SJT-encoded orderings).                  |
+| `$FF34`       | `back_color`  | Border / fill color.                                                                           |
+| `$FF38–$FF3F` | `offset[4]`   | 16-bit per-plane pointers to the display list or sprite descriptor table.                      |
+| `$FF40–$FF7F` | `plane[0..3]` | Four blocks of 16 plane registers each (interpretation depends on plane type and active mode). |
