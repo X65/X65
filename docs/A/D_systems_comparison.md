@@ -50,20 +50,20 @@ This chapter provides detailed comparisons between the X65 microcomputer and sev
 | Sound Synthesis | FM, 4-operator              | Subtractive, 3 oscillators | Square wave             | Filtered digital | ADPCM samples            |
 | Volume Control  | Per-channel + master, Mixer | Per-channel + master       | Single level            | Per-channel      | Per-channel + master     |
 | Effects         | Built-in EQ, vibrato        | Filters, ring mod          | None built-in           | Distortion       | Echo, reverb, FIR filter |
-| Note Range      | Full MIDI range             | 8 octaves                  | Limited                 | 3.5 octaves      | Full MIDI range          |
+| Note Range      | 8 octaves                   | 8 octaves                  | Limited                 | 3.5 octaves      | Full MIDI range          |
 
 ## Input/Output Capabilities
 
-| Feature      | X65               | Commodore 64             | Apple IIe        | Atari 800XL          | SNES               |
-| ------------ | ----------------- | ------------------------ | ---------------- | -------------------- | ------------------ |
-| Keyboard     | USB, Built-in     | Built-in                 | Built-in         | Built-in             | Controllers only   |
-| Joystick     | 2 DE-9 ports      | 2 DE-9 ports             | 16-pin ports     | 2 DE-9 ports         | 2 controller ports |
-| Storage      | USB Pen Drive     | Datasette, Disk Drive    | Disk Drive       | Cassette, Disk Drive | Game Pak           |
-| Serial       | USB-UART          | Serial IEC               | Serial           | SIO                  | -                  |
-| Networking   | Wi-Fi, Bluetooth  | Cartridges/adapters      | Optional cards   | -                    | -                  |
-| Expansion    | CPU bus expansion | Cartridge/Expansion port | Expansion slots  | Cartridge port, ECI  | -                  |
-| Video Output | DVI-D             | Composite/RF             | Composite        | Composite/RF         | Composite/RGB      |
-| Audio Output | Stereo RCA        | Mono                     | Built-in speaker | Mono                 | Stereo             |
+| Feature      | X65                 | Commodore 64             | Apple IIe        | Atari 800XL          | SNES               |
+| ------------ | ------------------- | ------------------------ | ---------------- | -------------------- | ------------------ |
+| Keyboard     | USB, Built-in       | Built-in                 | Built-in         | Built-in             | Controllers only   |
+| Joystick     | 4 USB, 2 DE-9 ports | 2 DE-9 ports             | 16-pin ports     | 2 DE-9 ports         | 2 controller ports |
+| Storage      | USB Pen Drive       | Datasette, Disk Drive    | Disk Drive       | Cassette, Disk Drive | Game Pak           |
+| Serial       | USB-UART            | Serial IEC               | Serial           | SIO                  | -                  |
+| Networking   | Wi-Fi, Bluetooth    | Cartridges/adapters      | Optional cards   | -                    | -                  |
+| Expansion    | CPU bus expansion   | Cartridge/Expansion port | Expansion slots  | Cartridge port, ECI  | -                  |
+| Video Output | DVI-D               | Composite/RF             | Composite        | Composite/RF         | Composite/RGB      |
+| Audio Output | Stereo RCA          | Mono                     | Built-in speaker | Mono                 | Stereo             |
 
 ## Programming Environment
 
@@ -74,4 +74,4 @@ This chapter provides detailed comparisons between the X65 microcomputer and sev
 | Development Tools   | Modern assemblers, emulator | BASIC, ML monitors       | BASIC, monitors        | BASIC, Assembler Editor | Custom dev kits       |
 | Debugging           | Monitor, emulator tools     | Machine language monitor | Monitor program        | DEBUG cartridge         | Special hardware      |
 | Cross-development   | Full modern toolchain       | Modern cross-dev tools   | Modern cross-dev tools | Modern cross-dev tools  | Emulators, assemblers |
-| Community Resources | GitHub, Discord             | Massive legacy + active  | Active community       | Active community        | ROM hacking community |
+| Community Resources | GitHub, Matrix              | Massive legacy + active  | Active community       | Active community        | ROM hacking community |
