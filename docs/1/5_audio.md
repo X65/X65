@@ -2,9 +2,9 @@
 
 ## The SGU-1 Synthesizer
 
-The X65’s primary sound source is the **SGU-1 (Sound Generator Unit 1)** — a custom hybrid synthesis chip designed for the X65 rather than an off-the-shelf part. In one line: each voice does **Yamaha-style FM for additive sound creation**, then runs the result through a **SID-style filter for subtractive sculpting**. Each of its **nine channels** therefore behaves like a small modular synth: build the timbre with FM, shape it with a multimode filter, animate it with sweeps, and optionally swap any operator’s waveform for a PCM sample.
+The X65's primary sound source is the **SGU-1 (Sound Generator Unit 1)** — a custom hybrid synthesis chip designed for the X65 rather than an off-the-shelf part. Contemporary advanced synth chips are no longer manufactured; rather than constrain the project to whatever vintage silicon is still sourceable, the X65 builds its own. In one line: each voice does **Yamaha-style FM for additive sound creation**, then runs the result through a **SID-style filter for subtractive sculpting**. Each of its **nine channels** therefore behaves like a small modular synth: build the timbre with FM, shape it with a multimode filter, animate it with sweeps, and optionally swap any operator's waveform for a PCM sample.
 
-Conceptually the SGU-1 sits closer to ESFM and OPZ than to plain OPL3, but it is its own design with its own register layout. Concrete specs:
+Conceptually the SGU-1 sits closer to ESFM and OPZ than to plain OPL3, and it takes its operator model from **tildearrow's Sound Unit (tSU)** — the fantasy synth chip from the Furnace tracker — scaled up and wrapped in a memory-mapped register interface. It is its own design with its own register layout. Concrete specs:
 
 * **9 channels**, each producing **stereo** output via a per-channel pan setting.
 * **4 operators per channel**, freely routed (any operator can be a modulator, a carrier, or both).
@@ -64,14 +64,18 @@ PCM samples are signed 8-bit. The same PCM region is also reachable from the ope
 
 ## Audio Plumbing on the X65
 
-The SGU-1 runs on its own **dedicated audio chip** — a separate RP2350 attached to the SOUTH chip over an **SPI** link. From the CPU, writes to the SGU register window at **`$FEC0–$FEFF`** are picked up by the NORTH chip and sent over the [PIX bus](../A/B_glossary.md) as `SPU`-device messages; SOUTH receives them and forwards the traffic over SPI to the audio chip, where the SGU-1 firmware actually handles the write. The audio chip renders the mix at 48 kHz and pushes it out over **I²S** to the on-board DAC. A small **I²C-controlled mixer/codec** on the same bus handles analog gain, output muting, and routing between the digital mix and any external audio.
+The SGU-1 runs on its own **dedicated audio chip** — a separate RP2350 attached to the SOUTH chip over an **SPI** link. From the CPU, writes to the SGU register window at **`$FEC0–$FEFF`** are picked up by the NORTH chip and sent over the [PIX bus](../A/B_glossary.md) as `SPU`-device messages; SOUTH receives them and forwards the traffic over SPI to the audio chip, where the SGU-1 firmware actually handles the write. The audio chip renders the mix at **48 kHz** stereo and pushes it out over **I²S** to an on-board audio CODEC, which converts to analog stereo line-out. The same CODEC is driven by firmware over I²C for gain, mute, and routing.
 
-The CPU window exposes **all registers of a single channel at once**. The last register in the window acts as a **channel-index switch**: writing a channel number there remaps the rest of the window to that channel's registers. A reserved channel index `0xFF` swaps in service registers — chip identification, version, and mixer/DSP controls — instead of a sound channel.
+The CPU window exposes **all registers of a single channel at once**. The last register in the window (`$FEFF`) acts as a **channel-index switch**: writing a channel number there remaps the rest of the window to that channel's registers. A reserved channel index `0xFF` swaps in service registers — chip identification, version, and mixer/DSP controls — instead of a sound channel.
 
 ## System Buzzer
 
 Alongside the SGU-1 the X65 carries a simple **PWM-driven buzzer** intended for system beeps, attention tones, and the kind of click feedback an OS likes to make. It is reached not through the SGU window but as a `MISC` device on the PIX bus, with two commands (set frequency, set duty cycle). It is intentionally minimal — for music, samples, and sound effects, use the SGU-1.
 
+## Composing for SGU-1
+
+A **Furnace Tracker** port maintained at `github.com/X65/furnace` adds SGU-1 as a first-class supported chip. Songs can therefore be authored in a modern tracker workflow, previewed against the actual hardware model, and exported into formats usable from 65816 code. For programmers working directly in assembly, [Chapter 12: Sound Programming](../2/12_sound.md) covers the idiomatic register sequences for key-on, envelope, filter, sweep, and PCM playback.
+
 ## Summary
 
-The X65’s sound system centres on the custom **SGU-1**: nine stereo voices that combine four-operator FM with a SID-style multimode filter, eight per-operator waveforms (including PCM-as-wavetable and configurable periodic noise), per-operator ADSR envelopes, and three independent hardware sweeps per channel. A 64 KB shared PCM bank lets any channel switch from synthesis to sample playback at will. The whole engine runs on a dedicated audio co-processor and is reached from the CPU through the PIX bus and a windowed register file. A small system buzzer handles the housekeeping tones the SGU-1 should not have to bother with.
+The X65's sound system centres on the custom **SGU-1**: nine stereo voices that combine four-operator FM with a SID-style multimode filter, eight per-operator waveforms (including PCM-as-wavetable and configurable periodic noise), per-operator ADSR envelopes, and three independent hardware sweeps per channel. A 64 KB shared PCM bank lets any channel switch from synthesis to sample playback at will. The whole engine runs on a dedicated audio co-processor, reaches the CPU through the PIX bus and a windowed register file, and is supported end-to-end by a Furnace Tracker port. A small system buzzer handles the housekeeping tones the SGU-1 should not have to bother with.

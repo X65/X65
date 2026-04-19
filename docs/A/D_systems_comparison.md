@@ -36,7 +36,7 @@ This chapter provides detailed comparisons between the X65 microcomputer and sev
 | Colors           | 256 colors                                     | 16 colors              | 16 colors (Lo-Res), 6 colors (Hi-Res) | 256 colors (GTIA modes)       | 32,768 colors (256 on-screen) |
 | Sprites          | 8 sprites (up to 64px width) with multiplexing | 8 sprites (24×21)      | Software only                         | 4 missiles, 4 players         | 128 sprites (32×32)           |
 | Text Modes       | 48×30, 96×30 characters                        | 40×25 characters       | 40×24, 80×24 characters               | Multiple ANTIC modes          | 32×28 characters              |
-| Special Effects  | HAM mode, MODE7, Raster/DL interrupts          | Raster interrupts, FLI | Double hi-res                         | Display list, GTIA modes      | Mode 7, scaling, rotation     |
+| Special Effects  | HAM6, MODE7, paletted MODE0/1, 80-col, raster/DL interrupts | Raster interrupts, FLI | Double hi-res                         | Display list, GTIA modes      | Mode 7, scaling, rotation     |
 | Rendering System | Display list                                   | Raster-based           | Memory-mapped                         | Display list                  | Tile-based + sprites          |
 | Graphics Memory  | Any two banks of 16MB RAM available            | Fixed VIC layout       | Fixed memory pages                    | ANTIC memory map              | VRAM with DMA                 |
 
@@ -57,7 +57,7 @@ This chapter provides detailed comparisons between the X65 microcomputer and sev
 | Feature      | X65                 | Commodore 64             | Apple IIe        | Atari 800XL          | SNES               |
 | ------------ | ------------------- | ------------------------ | ---------------- | -------------------- | ------------------ |
 | Keyboard     | USB, Built-in       | Built-in                 | Built-in         | Built-in             | Controllers only   |
-| Joystick     | 4 USB, 2 DE-9 ports | 2 DE-9 ports             | 16-pin ports     | 2 DE-9 ports         | 2 controller ports |
+| Joystick     | USB HID gamepads + 2 DE-9 ports (4 buttons) | 2 DE-9 ports             | 16-pin ports     | 2 DE-9 ports         | 2 controller ports |
 | Storage      | USB Pen Drive       | Datasette, Disk Drive    | Disk Drive       | Cassette, Disk Drive | Game Pak           |
 | Serial       | USB-UART            | Serial IEC               | Serial           | SIO                  | -                  |
 | Networking   | Wi-Fi, Bluetooth    | Cartridges/adapters      | Optional cards   | -                    | -                  |
@@ -69,9 +69,9 @@ This chapter provides detailed comparisons between the X65 microcomputer and sev
 
 | Feature             | X65                         | Commodore 64             | Apple IIe              | Atari 800XL             | SNES                  |
 | ------------------- | --------------------------- | ------------------------ | ---------------------- | ----------------------- | --------------------- |
-| Native Language     | 65816 Assembly              | 6510 Assembly            | 6502 Assembly          | 6502 Assembly           | 65816 Assembly        |
-| High-level          | NeoBASIC, C                 | BASIC                    | BASIC, Pascal          | BASIC                   | C                     |
-| Development Tools   | Modern assemblers, emulator | BASIC, ML monitors       | BASIC, monitors        | BASIC, Assembler Editor | Custom dev kits       |
+| Native Language     | 65816 Assembly (cc65/ca65, K816) | 6510 Assembly            | 6502 Assembly          | 6502 Assembly           | 65816 Assembly        |
+| High-level          | NeoBASIC, C, MAD-Pascal     | BASIC                    | BASIC, Pascal          | BASIC                   | C                     |
+| Development Tools   | cc65, K816, Emu, cc65-dbg (VS Code) | BASIC, ML monitors       | BASIC, monitors        | BASIC, Assembler Editor | Custom dev kits       |
 | Debugging           | Monitor, emulator tools     | Machine language monitor | Monitor program        | DEBUG cartridge         | Special hardware      |
 | Cross-development   | Full modern toolchain       | Modern cross-dev tools   | Modern cross-dev tools | Modern cross-dev tools  | Emulators, assemblers |
 | Community Resources | GitHub, Matrix              | Massive legacy + active  | Active community       | Active community        | ROM hacking community |

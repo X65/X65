@@ -16,7 +16,7 @@ For many programmers familiar with the classic 6502 architecture, the transition
 
 **Code Example: 16-bit Addition**
 
-```assembly
+```asm
 ; 6502: Adding 16-bit values
 LDA low_byte1    ; Load low byte
 CLC             ; Clear carry
@@ -45,7 +45,7 @@ SEP #$20        ; Return to 8-bit accumulator mode if needed
 
 **Code Example: Copying Memory Blocks**
 
-```assembly
+```asm
 ; 6502: Copy 256 bytes (limited by 8-bit Y register)
 LDY #0          ; Initialize counter
 .loop
@@ -78,7 +78,7 @@ The Direct Page register is a new concept for 6502 programmers, replacing the fi
 
 **Code Example: Setting up and Using Direct Page**
 
-```assembly
+```asm
 ; 65816: Setting up a custom Direct Page
 LDA #$2000      ; Low byte of desired Direct Page address
 TCD             ; Transfer to Direct Page register (D)
@@ -96,7 +96,7 @@ While the 6502 was limited to 64KB of addressable memory, the 65816 can access u
 
 **Code Example: Accessing Memory Beyond 64KB**
 
-```assembly
+```asm
 ; 65816: Accessing memory in different banks
 SEP #$20        ; 8-bit accumulator mode
 LDA #$01        ; Load bank number
@@ -111,7 +111,7 @@ The 65816 introduces long addressing modes that explicitly specify all 24 bits o
 
 **Code Example: Long Addressing**
 
-```assembly
+```asm
 ; 65816: Long addressing example
 LDA $01:8000    ; Load from absolute address $018000
 JSL $02:4000    ; Jump to subroutine at $024000
@@ -125,7 +125,7 @@ The 65816 adds powerful block move instructions that can efficiently copy or mov
 
 **Code Example: Block Move**
 
-```assembly
+```asm
 ; 65816: Block move with MVP (move positive)
 REP #$10        ; 16-bit index registers
 LDX #$0000      ; Source offset
@@ -140,7 +140,7 @@ The 65816 introduces stack-relative addressing modes, making it easier to implem
 
 **Code Example: Stack-Relative Addressing**
 
-```assembly
+```asm
 ; 65816: Using stack for local variables
 TSC             ; Transfer stack pointer to C
 TCD             ; Use stack as direct page

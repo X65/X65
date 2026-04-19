@@ -118,7 +118,7 @@ The 65816 significantly extends the addressing modes available to programmers:
 
 #### Accumulator Management
 
-```assembly
+```asm
 ; Toggle accumulator size
 REP #$20      ; Reset m bit - 16-bit accumulator mode
 SEP #$20      ; Set m bit - 8-bit accumulator mode
@@ -134,7 +134,7 @@ XBA           ; Exchange B and A accumulators
 
 #### Index Register Techniques
 
-```assembly
+```asm
 ; Toggle index register size
 REP #$10      ; Reset x bit - 16-bit index mode
 SEP #$10      ; Set x bit - 8-bit index mode
@@ -152,7 +152,7 @@ LOOP
 
 #### Direct Page Utilization
 
-```assembly
+```asm
 ; Set up direct page for efficient access
 LDA #$1000
 TCD           ; Transfer 16-bit A to direct page register
@@ -164,7 +164,7 @@ STA $20       ; Store to memory at $1020
 
 #### Bank Register Management
 
-```assembly
+```asm
 ; Set data bank register
 LDA #$01      ; Bank 1
 PHA           ; Push to stack
@@ -193,7 +193,7 @@ The 65816 maintains backwards compatibility with the 6502 while introducing sign
 
 Unlike the 6502, the 65816 requires explicit management of register sizes:
 
-```assembly
+```asm
 ; Standard startup sequence for 65816 native mode
 CLC           ; Clear carry flag
 XCE           ; Exchange carry with emulation flag (enter native mode)
@@ -204,7 +204,7 @@ REP #$30      ; Set 16-bit accumulator and index registers (clear m and x bits)
 
 When operating with mixed register widths, be mindful of memory access patterns:
 
-```assembly
+```asm
 ; Mixed width operations
 REP #$20      ; 16-bit accumulator
 SEP #$10      ; 8-bit index registers
@@ -220,7 +220,7 @@ LDA $00,X     ; 16-bit load from direct page + X
 
 The 65816's 16-bit stack pointer enables more sophisticated stack operations:
 
-```assembly
+```asm
 ; Save current frame pointer
 PHD           ; Push direct page register
 TCS           ; Transfer current stack pointer to C (16-bit A)
@@ -240,7 +240,7 @@ PLA           ; Adjust stack pointer (discard saved DP)
 
 While zero page on the 6502 is fixed at memory locations $0000-$00FF, the 65816's direct page can be relocated:
 
-```assembly
+```asm
 ; Set up direct page for a specific routine
 LDA #$2000
 TCD           ; Direct page now at $2000
@@ -258,7 +258,7 @@ TCD
 
 The 65816's full address space requires 24-bit addressing for cross-bank access:
 
-```assembly
+```asm
 ; Jump to routine in another bank
 JML ROUTINE   ; Long jump (sets Program Bank Register)
 
@@ -276,7 +276,7 @@ RTL           ; Return from long call
 
 One of the most common errors is forgetting the current register width state:
 
-```assembly
+```asm
 ; Problematic code
 REP #$20      ; 16-bit accumulator
 ; ... other code ...
@@ -293,7 +293,7 @@ LDA #$FF      ; Loads $FF as expected
 
 The expanded stack requires careful management:
 
-```assembly
+```asm
 ; 6502 approach (problematic on 65816)
 LDX #$FF
 TXS           ; Only sets low byte of S in native mode!
@@ -308,7 +308,7 @@ TXS           ; Set stack pointer correctly
 
 Crossing bank boundaries requires explicit handling:
 
-```assembly
+```asm
 ; Problem: This may not work if the table crosses a bank boundary
 LDX #$FFFC
 LDA $2000,X   ; Might attempt to read across bank boundary
@@ -321,7 +321,7 @@ LDA $01:2000,X  ; Explicitly specify bank
 
 Non-aligned direct page addresses incur a performance penalty:
 
-```assembly
+```asm
 ; Inefficient (cycle penalty)
 LDA #$1001    ; Not page-aligned
 TCD
@@ -337,7 +337,7 @@ TCD
 
 The 65816 introduces powerful block move instructions:
 
-```assembly
+```asm
 ; Move up to 64KB between banks
 REP #$30      ; 16-bit registers
 LDX #$0000    ; Source offset
@@ -350,7 +350,7 @@ MVN #$01,#$02 ; Move ascending from bank 1 to bank 2
 
 Take advantage of 16-bit operations for more efficient math:
 
-```assembly
+```asm
 ; 16-bit addition and subtraction
 REP #$20
 LDA #$1234
@@ -365,7 +365,7 @@ CMP #$FFFF    ; Compare with 16-bit value
 
 Implement more sophisticated function call patterns:
 
-```assembly
+```asm
 ; Function with stack frame
 MyFunction:
     PHD           ; Save caller's direct page

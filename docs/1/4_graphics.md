@@ -26,7 +26,20 @@ When a plane is set to background graphics, it uses a **Display List** to contro
 
 These are 16-bit pointers into memory, offset by a shared **background\_bank**, an 8-bit register that works similarly to the CPU’s `data_bank` and `program_bank` registers.
 
-At the beginning of each display frame, CGIA loads the first display list instruction and begins rendering. The instruction selects one of **8 display-mode slots**, of which the current implementation populates six: **palette text/tile**, **palette bitmap**, **attribute text/tile**, **attribute bitmap**, **HAM6** (Hold-and-Modify), and **affine** (a chunky-pixel mode with hardware affine transformations). Two slots are reserved for future use. CGIA then draws **8 pixels at a time** using fetched character, bitmap, or color data, and repeats this process to fill the raster line.
+At the beginning of each display frame, CGIA loads the first display list instruction and begins rendering. The instruction selects one of **8 display-mode slots**, currently assigned as follows:
+
+| Slot | Name   | Family              | Description                                       |
+| ---- | ------ | ------------------- | ------------------------------------------------- |
+| 0    | MODE0  | Paletted text/tile  | Per-plane palette; no attribute memory needed     |
+| 1    | MODE1  | Paletted bitmap     | Per-plane palette; direct pixel indexing          |
+| 2    | MODE2  | Attribute text/tile | Per-cell foreground/background from scan pointers |
+| 3    | MODE3  | Attribute bitmap    | Per-cell foreground/background from scan pointers |
+| 4    | —      | Reserved            | —                                                 |
+| 5    | —      | Reserved            | —                                                 |
+| 6    | MODE6  | HAM6                | Hold-and-Modify, 4 pixels per 3 bytes             |
+| 7    | MODE7  | Affine              | Chunky pixels with hardware affine transforms     |
+
+CGIA then draws **8 pixels at a time** using fetched character, bitmap, or colour data, and repeats this process to fill the raster line.
 
 This is done **separately for each of the 4 planes**, which are **composited** in one line color buffer.
 
@@ -42,7 +55,7 @@ Once the sprite finishes drawing (the raster line reaches its bottom), the sprit
 
 ### Real-Time, Non-Persistent Raster Line Rendering
 
-This rendering process occurs **in real time**, **60 times per second**, for every line of the active picture. Importantly, there is **no persistent framebuffer**; every line is generated and transmitted immediately and is not stored in memory. A full framebuffer at the output resolution would consume hundreds of kilobytes, which is impractical for the X65's architecture.
+This rendering process occurs **in real time**, at a **perfect 60 Hz**, for every line of the active picture. The DVI-D output is driven by the RP2350's HSTX block, clocked from the chip's second PLL rather than divided off the system clock — so the framerate stays at exactly 60 Hz regardless of CPU-side tuning, and VBI-synchronous software can rely on it. Importantly, there is **no persistent framebuffer**; every line is generated and transmitted immediately and is not stored in memory. A full framebuffer at the output resolution would consume hundreds of kilobytes, which is impractical for the X65's architecture.
 
 The different display list screen modes essentially serve as graphics **data compression formats**, enabling display of complex visuals using minimal memory. For example, a **single byte write can affect an 8x8 pixel matrix** in text mode. This allows the X65 to render rich graphics with efficient CPU and RAM usage.
 
@@ -63,11 +76,36 @@ Display list instructions also support **interrupt triggering**. A special flag 
 
 The CGIA graphics are rendered in **four overlaying planes**, each of which can be configured to display background graphics using a **display list** or sprite graphics using a **sprite descriptor table**. This allows for complex layering effects and efficient memory usage. The CGIA supports multiple graphics modes, which can be defined on a per-line basis through the display list system. These include:
 
-* **Text and tile-based modes:** Character-based rendering similar to early home computers, available in both *palette* (per-character color from a fixed palette) and *attribute* (per-cell foreground/background) variants.
-* **Bitmap modes:** Direct pixel-addressable graphics, again in palette and attribute variants.
+* **Paletted text/tile (MODE0) and bitmap (MODE1):** No attribute memory; up to eight colours sit in the plane's registers and each pixel indexes that palette.
+* **Attribute text/tile (MODE2) and bitmap (MODE3):** Per-cell foreground/background colours fetched via separate scan pointers — the classic VIC-II layout.
 * **Multicolor mode flag:** A per-instruction bit on text and bitmap modes that switches to a **4-color-per-cell representation**, where each byte encodes four pixels. An optional **pixel-doubling flag** allows each logical pixel to cover 8 physical screen pixels, similar to C64 multicolor mode.
 
-The X65 features a **256-color palette**, composed of 32 distinct hues, each available in 8 different brightness levels. Each mode can define **foreground and background colors per character/tile**, much like the VIC-II, but with additional flexibility due to CGIA’s three separate scan pointers.
+The X65 features a **256-color palette**, composed of 32 distinct hues, each available in 8 different brightness levels. Each mode can define **foreground and background colors per character/tile**, much like the VIC-II, but with additional flexibility due to CGIA's three separate scan pointers.
+
+#### MODE0 and MODE1 — Paletted Modes
+
+MODE0 (paletted text/tile) and MODE1 (paletted bitmap) share a single mechanism: instead of fetching per-cell colours through the scan pointers, they take their colours from an **8-entry palette** stored directly in the plane's own registers — specifically, the upper half of the sixteen plane registers (`shared_colors[0..7]`), where each byte is an index into the global 256-colour CGIA palette.
+
+Both modes let software choose one of four **colour depths** via the plane's `PIXEL_BITS` field:
+
+| bpp | Colours per pixel | Bit layout                                  |
+| --- | ----------------- | ------------------------------------------- |
+| 1   | 2                 | 1 pixel per bit (8 pixels per byte)         |
+| 2   | 4                 | 2 pixels per bit-pair (4 pixels per byte)   |
+| 3   | 8                 | 4 pixels packed into 3 bytes (HAM-style)    |
+| 4   | 8 + half-bright   | 2 pixels per nibble, high bit = half-bright |
+
+In MODE1 (bitmap) the raw bits index the palette directly. In MODE0 (text/tile) the character-generator bit for the current pixel is only one input — additional bits are "stolen" from the high end of the character code to complete the colour index. That saves memory (no separate attribute fetch) but restricts how many distinct glyphs the font can contain: at 1 bpp you keep the full 256 glyphs, at 2 bpp 128, at 3 bpp 64, at 4 bpp the usable glyph range drops further still. The trade is per-mode and per-scene: text-heavy screens stay at 1 bpp, decorated tilemaps move up to 2 or 3 bpp, splash screens with rich colour can afford 4 bpp at the cost of a small glyph set.
+
+**Half-bright (4 bpp).** In 4 bpp the high bit of the 4-bit colour index is *not* part of the palette selection. It flips bit 2 of the remaining 3-bit index, which in the CGIA palette happens to swap the "dark" half of a hue row with the "bright" half. Visually this produces the half-bright-or-extra-bright effect familiar from Amiga Extra-Half-Brite, but done in a way that follows the palette row: the colour you get with the high bit set is the brighter twin (or darker, depending on which side of the row you started on) of the one you get with it clear. The net effect is 16 visible colours from 8 palette entries, with a built-in pairing that is much more useful than arbitrary "just dim it" schemes.
+
+**MODE0 multi-color.** The multi-color flag is available on MODE0 at 2 bpp and 3 bpp. It takes two bits of the character-generator output per screen pixel (rather than one), so cells are 4 pixels wide instead of 8 and the character set encodes two-bit patterns instead of on/off. 1 bpp multi-color is impossible (there is already only one bit to work with) and 4 bpp multi-color would conflict with the half-bright transform, so those combinations are not supported.
+
+#### Double-width text and 80-column mode
+
+Every text mode supports a per-plane **double-width** flag (`PLANE_MASK_DOUBLE_WIDTH`, bit 4 of the plane's flag register). Setting it doubles the horizontal pixel size of every cell, producing the chunky "wide character" look familiar from Atari and C64 text modes. In the display list this is commonly set and cleared by the `CGIA_DL_DOUBLE_WIDTH_BIT` in the mode-row instruction, so software can switch mid-screen.
+
+The multi-color flag interacts with it cleanly: without double-width, multi-color text narrows the cell to 4×8 pixels, giving **80 columns** on the 320-pixel-wide screen. With a font that uses only the 00 and 11 multi-color codes (background and background-2), the result reads as a crisp monochrome 80-column mode — perfect for terminal-style UI, code listings, and long-text rendering — while staying fully byte-per-character compatible with the rest of the text-mode machinery.
 
 #### Plane Order Register
 

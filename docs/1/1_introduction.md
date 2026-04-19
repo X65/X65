@@ -25,9 +25,15 @@ The X65 is built on the idea that computing should not be a struggle against unn
 The X65 is **not** a direct clone of any vintage system. Instead, it builds upon the **best ideas from past home computers**, integrating modern features while maintaining a low-level programming experience. Some of the key design principles include:
 
 - **Direct hardware access:** Minimal operating system overhead; programs interact directly with hardware.
-- **Rich I/O options:** Supporting classic peripherals (DE-9 joysticks) and modern devices (USB, Wi-Fi, and SD cards).
+- **Rich I/O options:** Supporting classic peripherals (DE-9 joysticks) and modern devices (USB HID keyboards/gamepads, Wi-Fi, and USB mass storage).
 - **Advanced graphics and sound:** A beam-chased display system driven by a dedicated display list in CGIA hardware, along with the custom SGU-1 chip for FM synthesis, PCM playback, and SID-style filtering.
 - **Open and expandable:** A full CPU bus expansion connector allows custom hardware to interface seamlessly.
+
+### DEV-board and the Full Machine
+
+The X65 ships first as a **DEV-board** — a development platform that validates the hardware and gives programmers, game authors, and OS/816 contributors a working target to write against. The DEV-board is intentionally positioned as **Milestone 1**: it is the complete computer architecturally, but physically it is a bare PCB meant for the lab bench, not the living room.
+
+The long-term direction is a **full-machine, all-in-one keyboard computer**: a custom 70% keyboard, rear/side I/O ports arranged in the familiar DEV-board layout plus additional USB ports, and internal bays for storage in the tradition of the Amiga and MSX. Everything in this book applies to both form factors — the hardware is the same — but the full machine should be understood as the eventual public-facing home of the project rather than its current shape.
 
 ## Who Is This Computer For?
 

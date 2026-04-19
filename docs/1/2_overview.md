@@ -20,6 +20,12 @@ The 65C816 exposes two signals — **VDA** (Valid Data Address) and **VPA** (Val
 
 On those cycles the X65 can advance `PHI2` immediately, without waiting for a memory round-trip. This shortens internal CPU cycles to the minimum the 65C816 can sustain and meaningfully raises effective throughput compared with a naive bus interface that pays full memory latency on every cycle.
 
+### L2 Cache
+
+PSRAM is fast, but the serial QPI link to it still costs tens of nanoseconds per access. NORTH mitigates this with a **64 KB direct-mapped L2 cache** kept entirely in the RP2350's internal SRAM, which runs at full MCU speed with no wait states. The cache is organised as 2048 lines of 32 bytes; a line's index is taken from middle address bits and its tag from the remaining high bits. A hit services the CPU read or write directly from SRAM; a miss performs a single PSRAM line fetch.
+
+64 KB is enough to hold the working set of a typical task — a BASIC program, a game level, an OS component — which is enough to keep hit rates high during normal execution. The firmware exposes a compile-time switch between this software L2 and the RP2350's hardware QSPI XIP cache (16 KB but slightly faster per hit) so the two approaches can be compared on real workloads.
+
 ## Memory Map and Addressing
 
 The X65’s main memory is **16 MB of QSPI PSRAM** organised as two 8 MB banks, switched on the fly by the NORTH chip when the CPU crosses the bank boundary at address `$800000`. From the CPU’s perspective this is a single flat 24-bit address space.
@@ -47,12 +53,34 @@ The X65 has two interrupt lines visible to the 65C816 — the maskable `IRQ` and
 
 Rather than wiring every device directly to the CPU, all maskable sources are funnelled through an **interrupt controller** inside the **RIA**. The RIA aggregates interrupts from peripherals such as the GPIO expander (joystick edges), system timers, the HID subsystem, and external expansion slots, and asserts a single `IRQ` line to the CPU. Software reads RIA status registers in the `$FFC0–$FFFF` window to discover which source fired.
 
+The joystick GPIO expander is an NXP **PCAL6416A** on the I²C bus; its defining feature for X65 is **interrupt-mask registers**, so software only ever sees IRQs for the input transitions it has explicitly requested.
+
 The graphics chip (CGIA) is wired to **NMI**, where it raises raster-line and vertical-blank interrupts (configured per display-list entry — see [Chapter 4: Graphics](4_graphics.md)). Because NMI bypasses the IRQ mask, raster effects remain responsive even while ordinary IRQ handling is disabled.
 
 In-depth coverage of writing interrupt handlers in 65816 assembly is reserved for [Chapter 15: Advanced Topics](../2/15_advanced.md).
 
 ## System Clock and Performance
 
-`PHI2` is generated in software by the RP2350 PIO rather than by a fixed crystal divider, which means the X65’s headline clock is configurable and tracks whatever the firmware programs the PIO state machine to produce. The CPU throughput bottleneck is the memory round-trip latency, thus bumping the `PHI2` clock above certain thresholds yields diminishing returns — the CPU simply spends most time waiting for memory.
+`PHI2` is generated in software by the RP2350 PIO rather than by a fixed crystal divider, which means the X65's headline clock is configurable and tracks whatever the firmware programs the PIO state machine to produce. The CPU throughput bottleneck is the memory round-trip latency, thus bumping the `PHI2` clock above certain thresholds yields diminishing returns — the CPU simply spends most time waiting for memory.
 
-Combined with the VAB optimisation described above — which lets the CPU skip the memory round-trip on internal-only cycles — the X65 sustains noticeably more useful work per second than a hardwired-`PHI2` design at the same nominal clock.
+Combined with the VAB optimisation and the L2 cache described above — which together let the CPU skip the PSRAM round-trip on internal-only cycles *and* on cache hits — the X65 sustains noticeably more useful work per second than a hardwired-`PHI2` design at the same nominal clock.
+
+### Clock Tree
+
+The NORTH chip runs at **336 MHz** — a multiple of 48, chosen so that the USB clock can be derived cleanly from the system PLL. This frees the RP2350's second PLL to drive the HSTX (DVI) output, which must produce a pixel-perfect 60 Hz frame. If video timing were still divided from the system clock, overclocking NORTH would drag the framerate with it; decoupling the two means VBI-synchronous software can rely on a clean 60 Hz regardless of CPU-side tuning.
+
+PSRAM runs at a convenient integer division of the same 336 MHz — **112 MHz** — which happens to be the sweet spot for the APS6404L-3SQR-ZR parts at 3.3 V.
+
+A quick status dump from the monitor shows the whole tree:
+
+```text
+]status
+X65 microcomputer
+
+CPU : ~4.2MHz
+CORE: 336.0MHz
+DVI : 768x480@60.0Hz/24bpp
+RAM : 16MB, 2 banks, 112.0MHz
+```
+
+The `CPU` line is the effective `PHI2` the 65C816 is clocked at — an estimation based on memory access speed and cache performance.

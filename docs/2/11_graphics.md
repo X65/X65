@@ -263,6 +263,116 @@ HAM mode is particularly useful for **high-color images, gradients, and advanced
 
 By integrating **HAM Mode (MODE6) into the X65 graphics pipeline**, developers can achieve **highly detailed visuals** with **minimal additional memory overhead**, making it a powerful tool for static images.
 
+## Implementing Paletted Modes (MODE0 / MODE1)
+
+MODE0 and MODE1 are the CGIA's **paletted** modes: the colour palette for the plane lives in the upper half of the plane's 16 registers (`color[0..7]`), giving eight palette entries per plane. No separate foreground/background scan pointers are needed — the savings in both memory traffic and plane-register programming are the whole point of these modes.
+
+Both modes pick pixel bit depth through the two high bits of the plane `flags` register (`PLANE_MASK_PIXEL_BITS`):
+
+| `PIXEL_BITS` | bpp | Colours per pixel | MODE0 glyph budget | MODE1 bitmap layout      |
+| ------------ | --- | ----------------- | ------------------ | ------------------------ |
+| `%00`        | 1   | 2                 | Full 256 glyphs    | 1 byte = 8 pixels        |
+| `%01`        | 2   | 4                 | 128 glyphs         | 1 byte = 4 pixels        |
+| `%10`        | 3   | 8                 | 64 glyphs          | 4 pixels packed in 3 B   |
+| `%11`        | 4   | 8 + half-bright   | 32 glyphs          | 2 pixels per nibble      |
+
+### MODE1 — Paletted Bitmap
+
+In MODE1, the bitmap bytes **index the palette directly**:
+
+- **1 bpp**: each bit picks palette entry 0 or 1. Eight pixels per byte.
+- **2 bpp**: each pair of bits picks one of palette entries 0–3. Four pixels per byte.
+- **3 bpp**: pixels are bitpacked HAM-style — four pixels in three bytes. CGIA decodes 24 bits as `4 × 6 bits` and each 6-bit group's low three bits index the palette (the high three are reserved for mode-specific work; for pure bitmap use they default to zero).
+- **4 bpp**: high bit of each nibble is the **half-bright flag**, bits 2:0 select palette entry 0–7.
+
+Typical setup: pick the palette, set bit depth, point the LMS scan pointer at a packed bitmap, pick a MODE1 mode-row instruction, and let the beam do the rest.
+
+```asm
+    ; Palette: eight entries in plane 0's color[0..7]
+    lda #$10            ; dark blue
+    sta CGIA::plane0 + CGIA_BG_REGS::color + 0
+    lda #$15            ; bright blue
+    sta CGIA::plane0 + CGIA_BG_REGS::color + 1
+    lda #$22
+    sta CGIA::plane0 + CGIA_BG_REGS::color + 2
+    ; ... populate color[3..7] ...
+
+    ; 2 bpp paletted bitmap, solid cells
+    lda #PLANE_BITS_2BPP
+    sta CGIA::plane0 + CGIA_BG_REGS::flags
+
+    ; LMS at the bitmap
+    lda #<pic_pixels
+    sta dl_lms_lo
+    lda #>pic_pixels
+    sta dl_lms_hi
+```
+
+The mode-row instruction itself uses nibble `9` (MODE1 = slot 9 in the display list mode-row group).
+
+### MODE0 — Paletted Text/Tile
+
+MODE0 borrows MODE1's palette-in-registers mechanism but keeps the character-generator indirection from the attribute text modes. Every screen cell is still one byte of character code plus a row-by-row fetch from the character generator, exactly as in MODE2. What is different is how colour is assigned per pixel:
+
+- At **1 bpp**, the character-generator bit is the palette index. Palette entry 0 is "off", entry 1 is "on". Full 256-glyph fonts fit.
+- At **higher bpp**, the character-generator bit is only the low bit of the palette index. The additional bits come from the **high bits of the character code** — the font "pays" for colour by giving up glyph-code space.
+
+For **2 bpp** the top bit of the character code becomes the second colour-index bit; the font is limited to codes `$00..$7F` (128 glyphs). For **3 bpp** the top two bits become colour bits and the font gets `$00..$3F` (64 glyphs). At **4 bpp** the top three bits participate: the very top bit is the half-bright flag, the next two bits join the colour index alongside the char-gen bit, and the remaining five bits (`$00..$1F`) identify the glyph — 32 glyphs total.
+
+In practice MODE0 is almost always used at 1 bpp (a crisp two-colour font over a fixed palette entry) or 2 bpp (four-colour decorative text), with higher bpps reserved for tilemap/backdrop work where glyph count is not the limiting factor.
+
+### The half-bright transform (4 bpp)
+
+At 4 bpp, the high bit of the colour index does _not_ pick between eight palette entries (there are only eight). It XORs bit 2 of the palette index, which swaps the "dark" and "bright" halves of the palette row in the 256-colour CGIA palette. Visually this produces brighter/darker twins without needing 16 explicit palette slots:
+
+```text
+base palette bits 2:0 → 0 1 2 3 4 5 6 7
+half-bright flag OFF → pick color[idx]
+half-bright flag ON  → pick color[idx XOR 4]   ; flips to the other half
+```
+
+If the programmer has loaded the palette so that entries 0–3 are the dark variants of entries 4–7 (a common convention), the result is 16 visible shades with a free up/down "brighter / darker" control per pixel. If the palette is loaded arbitrarily, the high bit just becomes a second palette selector — still useful, but less convenient.
+
+### MODE0 multi-color text
+
+MODE0 supports the same `MULTICOLOR` flag as the attribute text modes, and with the same effect: two character-generator bits feed the colour decision per screen pixel, so cells are **4 pixels wide** instead of 8. Multi-color MODE0 is restricted to 2 bpp and 3 bpp:
+
+- 1 bpp multi-color is impossible (there is already only one bit to work with).
+- 4 bpp multi-color would conflict with the half-bright transform (two bits of char-gen plus two bits of stolen code leaves no room for the half-bright high bit), so firmware does not support it.
+
+### 80-column mode
+
+A particularly useful side effect of 4-pixel-wide multi-color cells is the 80-column mode. On the standard 320-pixel logical screen, 320 ÷ 4 = 80 cells across. Any multi-color text mode without the double-width flag therefore yields 80 columns out of the box:
+
+```asm
+    ; MODE0 in multi-color, 2 bpp, no double-width
+    lda #(PLANE_BITS_2BPP | PLANE_MASK_MULTICOLOR)
+    sta CGIA::plane0 + CGIA_BG_REGS::flags
+
+    ; Pick palette entries so that "ink" is a clear colour pair
+    lda #$00                ; background (color[0])
+    sta CGIA::plane0 + CGIA_BG_REGS::color + 0
+    lda #$00                ; unused in a two-tone 80-col font
+    sta CGIA::plane0 + CGIA_BG_REGS::color + 1
+    lda #$00                ; unused
+    sta CGIA::plane0 + CGIA_BG_REGS::color + 2
+    lda #$FE                ; ink  (color[3])
+    sta CGIA::plane0 + CGIA_BG_REGS::color + 3
+
+    ; Use a 4×8 font whose glyphs only fire pixels with multi-color
+    ; patterns `00` (background) and `11` (ink)
+    lda #<font_4x8
+    sta dl_lcg_lo
+    lda #>font_4x8
+    sta dl_lcg_hi
+```
+
+A 4×8 font designed for this purpose uses only the `00` and `11` multi-color codes, producing a clean, readable two-tone 80-column display — suitable for code listings, terminal UI, and long-text screens — while keeping the full one-byte-per-character storage of normal text modes. All the usual display-list mechanics (scrolling, DLI, mid-frame mode switches) still apply.
+
+### Double-width text across all modes
+
+The `PLANE_MASK_DOUBLE_WIDTH` flag (bit 4 of the plane flag byte, also encoded as `CGIA_DL_DOUBLE_WIDTH_BIT` in the mode-row instruction) doubles the horizontal pixel size of any text mode. It pairs naturally with multi-color for the chunky "rectangle-pixel" look (C64 multi-color text style), and stands on its own with non-multi-color text for the Atari "wide character" modes. Because the flag lives in both the plane register _and_ the display-list mode-row instruction, switching double-width on or off mid-screen is as easy as writing the right opcode on the target row.
+
 ## Creating Mixed-Mode Display Lists
 
 ## Plane ordering
