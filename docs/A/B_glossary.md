@@ -80,6 +80,8 @@
 
 **cc65-dbg** - A VS Code extension that adds a Debug Adapter Protocol (DAP) front end for cc65/ca65 workflows on the X65. Parses `ld65 --dbgfile` output and drives any DAP-capable emulator or adapter — including X65 Emu — to provide breakpoints, register and memory views, disassembly, watch expressions, and module-scoped globals.
 
+**Raspberry Pi Radio Module 2** - The surface-mount Wi-Fi + Bluetooth module used by the X65. Based on CYW43-series silicon (the same wireless core as on the Raspberry Pi Pico W) and driven directly by the NORTH RP2350 over a PIO-bit-banged SPI link. The 65C816 reaches the networking stack through an AT-command interface carried on the main UART.
+
 **DE-9** - The 9-pin connector used for joystick ports in the X65, compatible with Atari-style joysticks, supporting four-button input.
 
 **DVI-D** - Digital Visual Interface, the video output standard used by the X65. Physically connected via an HDMI-shaped socket; only DVI-D TMDS is transmitted, so standard HDMI cables work without the X65 needing HDMI certification.

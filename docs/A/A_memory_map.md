@@ -195,7 +195,7 @@ This covers roughly 20 Hz to 20 kHz across the 16-bit range. Writing either byte
 
 ## `$FFB0–$FFBF` — USB HID
 
-USB keyboards, mice, and gamepads attached to the on-board ESP32-C3 USB host are exposed as a 16-byte window whose contents depend on which device is currently selected.
+USB keyboards, mice, and gamepads attached to the NORTH chip's USB host stack are exposed as a 16-byte window whose contents depend on which device is currently selected.
 
 | Offset    | Register      | R/W | Notes                                                              |
 | --------- | ------------- | --- | ------------------------------------------------------------------ |

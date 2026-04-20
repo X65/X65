@@ -12,4 +12,4 @@ Please see <https://github.com/X65/examples> repository for code examples.
 
 ## Creating Music with the SGU-1
 
-## Networking Applications using ESP32-C3
+## Networking Applications over Raspberry Pi Radio Module 2
