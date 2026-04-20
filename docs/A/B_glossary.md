@@ -12,15 +12,13 @@
 
 **Emulation Mode** - A compatibility mode of the 65C816 where it behaves like a 65C02 with an 8-bit accumulator and 16-bit address space.
 
-**L2 Cache** - A 64 KB direct-mapped cache implemented in the NORTH chip's internal SRAM, sitting between the 65C816 bus bridge and the external PSRAM. Lines are 32 bytes; there are 2048 lines indexed by address bits and tagged with the remaining high bits. Cache hits run at full MCU speed with no wait states; cache misses pay one PSRAM round-trip. Sized to hold the working set of a typical task.
+**L2 Cache** - A 64 KB cache in the NORTH chip's internal SRAM, sitting between the 65C816 bus bridge and the external PSRAM. Its sole purpose is to amortise the QPI PSRAM protocol delays so that typical 65C816 access patterns do not pay full PSRAM latency. Transparent to application code.
 
 **Native Mode** - The full 16-bit operating mode of the 65C816, which the X65 uses exclusively from boot-up.
 
 **PSRAM** - Pseudo Static Random-Access Memory, the type of memory used in the X65 to provide 16MB of RAM with low power consumption. Organised as two 8 MB banks switched at address `$800000`.
 
 **VAB (Valid Address Bus)** - A signal derived from the 65C816's VDA and VPA signals, used to optimize memory cycles when the CPU is performing internal operations.
-
-**XIP Cache** - The RP2350's hardware QSPI execute-in-place cache, 16 KB in size. Used as a compile-time alternative to the L2 software cache — slightly faster per hit but with a smaller working set.
 
 **XSTACK** - A 512-byte auxiliary buffer maintained by the RIA firmware. Used by the OS fastcall API to pass call arguments and return data between 65816 software and the NORTH chip without touching the 6502 hardware stack.
 
@@ -67,6 +65,8 @@
 **Furnace Tracker** - An open-source multi-chip tracker composition tool. X65 maintains a port (`github.com/X65/furnace`) that adds SGU-1 as a supported chip, so songs can be written and exported directly against the real hardware's capabilities.
 
 **I²S** - The three-wire digital audio link (bit clock, word clock, data) between the audio MCU and the CODEC. The X65 runs it at 48 kHz, 32-bit, master-mode from the audio MCU side.
+
+**Paw key (🐾)** - The X65 keyboard's dedicated command-modifier key, equivalent in position to the Windows / Meta / ⌘ key on other platforms. Used for OS-level chord shortcuts — for example `🐾`+digit to switch virtual terminals.
 
 **PWM (Pulse-Width Modulation)** - A technique for generating analog signals from digital devices. Used by the X65 system buzzer to produce simple tones.
 

@@ -23,27 +23,11 @@ Everything else is RAM.
 
 ## L2 Cache
 
-PSRAM is not slow in absolute terms, but a serial QPI link still costs tens of nanoseconds per access compared to a few nanoseconds for internal SRAM. NORTH closes that gap with a **64 KB direct-mapped L2 cache** held entirely in the RP2350's internal SRAM.
+PSRAM is not slow in absolute terms, but a serial QPI link still costs tens of nanoseconds per access compared to a few nanoseconds for internal SRAM. NORTH closes that gap with a **64 KB L2 cache** held in the RP2350's internal SRAM. Its sole purpose is to amortise the QPI PSRAM protocol delays so that typical 65C816 access patterns do not pay full PSRAM latency on every access.
 
-Organisation:
+From the 65C816's perspective there is nothing to do: the cache is fully transparent. Neither reads nor writes need any special instructions or flags — the CPU just issues normal accesses and NORTH handles the rest. Application code should never need to reason about the cache; it is an implementation detail of the PSRAM path, mentioned here for completeness.
 
-| Parameter          | Value                               |
-| ------------------ | ----------------------------------- |
-| Total size         | 64 KB                               |
-| Line size          | 32 bytes                            |
-| Number of lines    | 2048                                |
-| Associativity      | Direct-mapped                       |
-| Index              | Middle address bits (11 bits)       |
-| Tag                | Remaining high address bits (8 bits) |
-| Residency          | NORTH internal SRAM (no wait states) |
-
-On a load, NORTH computes the index from the CPU address, checks the tag in that line, and either services the byte from cache SRAM (a hit) or issues a 32-byte burst read from PSRAM to fill the line (a miss). Stores go through to PSRAM immediately *and* update the cached line if it is present, so the cache never holds stale data against the PSRAM backing store.
-
-Because 64 KB is large enough to hold the full working set of a typical task — a running program's code and its most-touched data — the common case is cache hits, which run at full MCU speed with no wait states. Cache pressure only becomes visible when software sweeps across many megabytes (a memset, a DMA, a sample stream) — and even those paths are fast because NORTH batches the refills.
-
-The firmware also offers a compile-time switch to the RP2350's hardware **QSPI XIP cache** (16 KB). XIP is slightly faster per hit but only holds a quarter as much. Both options are available to test on real workloads.
-
-From the 65C816's perspective there is nothing to do: the cache is transparent. Neither reads nor writes need any special instructions or flags — the CPU just issues normal accesses and NORTH does the right thing. The one subtlety is timing: in code that deliberately burns cycles (software delays, tight timing loops for bit-banged external hardware), the measured delay will depend on whether the loop code fits in cache. Where determinism matters, prefer the system timers at `$FF98–$FF9F` over counting cycles. See [Chapter 15: Advanced Programming Techniques](../2/15_advanced.md) for cache-aware optimisation techniques.
+A useful by-product of routing every PSRAM access through the cache is that the two physical 8 MB banks present themselves to the CPU as a single flat 16 MB space without any bank-switching logic visible to software. Chip-select between the two PSRAM parts is decided when a cache line is fetched or flushed — entirely inside the cache-line code path — so bank selection is naturally contained there and the rest of the system does not see it.
 
 ## Direct Page
 
@@ -65,7 +49,7 @@ How much of that 16-bit range a program actually gets depends on the execution c
 
 **Bare-metal (software takes over the machine).** When a program takes exclusive control of the X65 — a classic demo, a game that bypasses the OS, a bring-up test — it is free to place the stack wherever in bank 0 makes sense (typically high, growing down) and to use as much of it as the bank can spare. With 64 KB of bank 0 at its disposal and no other tasks to worry about, deep recursion, long interrupt chains, and stack-heavy calling conventions are all comfortably supported.
 
-**OS/816 tasks.** Under OS/816 each task is given a **single dedicated 256-byte page** in bank 0 that holds **both** the task's direct page and its stack. The direct page sits at the bottom and grows upward; the stack sits at the top and grows downward; they meet in the middle:
+**OS/816 tasks.** Under OS/816 each task is effectively a small **virtual machine**: a dedicated 64 KB memory bank for the task's own code and data, plus a 256-byte page in bank 0 that holds **both** the task's direct page and its hardware stack. The direct page sits at the bottom of that page and grows upward; the stack sits at the top and grows downward; they meet in the middle:
 
 ```text
 +------------------+ ← page top:   stack base (S grows down)
@@ -77,9 +61,9 @@ How much of that 16-bit range a program actually gets depends on the execution c
 +------------------+ ← page bottom: direct page (D points here)
 ```
 
-This co-location keeps per-task state tightly packed — one page per task, one pointer swap at context-switch time — and is the reason OS/816 can keep task switches cheap. The trade is tightness: applications running under the OS must keep their direct-page footprint and their deepest stack depth, added together, comfortably below 256 bytes, or extend into additional private memory explicitly. For most per-task workloads that is not a real constraint; for stack-heavy computation an application is expected to allocate its own working area in PSRAM rather than push the shared page into overflow.
+The dedicated 64 KB bank is where the task's code, constants, and data live — no different from a bare-metal program's bank 0, just relocated into the task's own slot. The co-located DP-plus-stack page in bank 0 is what makes context switches cheap: one pointer swap and the next task's direct page and stack are in place, with no further memory to walk. The only tight budget is inside that 256-byte page — direct-page footprint and deepest stack depth, added together, must stay comfortably below 256 bytes. Code and data are not part of that budget.
 
-The contrast is worth remembering: the 16-bit stack pointer is a hardware capability of the CPU, but whether a given program has the whole bank 0 or a single co-located page is a question of execution context, not of silicon.
+The contrast is worth remembering: the 16-bit stack pointer is a hardware capability of the CPU, but whether a given program has the whole bank 0 to itself or a 64 KB dedicated bank plus a co-located 256-byte page is a question of execution context, not of silicon.
 
 ## XSTACK
 
@@ -103,7 +87,7 @@ All the custom chips live in a small window at the top of bank 0:
 | `$FFB0–$FFBF` | USB HID                            |
 | `$FFC0–$FFFF` | RIA (including fastcall + vectors) |
 
-Reads and writes to these ranges are diverted by NORTH to the relevant chip or PIX device rather than going to PSRAM. This is **not** cacheable memory — every access is a real transaction — so tight polling loops on MMIO will not "heat up" in L2 the way a loop over RAM does.
+Reads and writes to these ranges are diverted by NORTH to the relevant chip or PIX device rather than going to PSRAM. Every MMIO access is a real transaction against the target device.
 
 Because MMIO shares the same address space as RAM, the usual 65C816 idioms apply: `lda $FFB1` reads the HID data byte, `sta $FFA0` lights up LED 0. The byte-level layout of each window is documented in [Appendix A: Memory Map](../A/A_memory_map.md); detailed programming sequences for each subsystem are covered in Part 2.
 

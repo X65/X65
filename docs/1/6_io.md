@@ -54,14 +54,16 @@ The currently-implemented commands are:
 | `unlink`           | Delete a file                                       |
 | `binary`           | Switch the console into a binary transfer mode      |
 
-### Programs
+### Boot ROM catalogue
+
+These commands manage the `.xex` images that the NORTH firmware loads at power-on — the machine's built-in-ROM layer. On a stock X65, the shipped boot ROM is OS/816; normal user applications live *under* OS/816 and are not deployed here. See [Chapter 9](../2/09_dev_env.md) for the two deployment paths.
 
 | Command    | Purpose                                                                    |
 | ---------- | -------------------------------------------------------------------------- |
-| `load`     | Load a program into PSRAM and jump to its entry point                      |
-| `info`     | Show the INFO-segment metadata of a program without running it             |
-| `install`  | Install a program into the flash-resident boot catalogue                   |
-| `remove`   | Remove a program from the boot catalogue                                   |
+| `load`     | Load a `.xex` into PSRAM and jump to its entry point (bare-metal; single session) |
+| `info`     | Show the INFO-segment metadata of a `.xex` without running it              |
+| `install`  | Install a `.xex` into the LittleFS boot catalogue                          |
+| `remove`   | Remove a `.xex` from the boot catalogue                                    |
 
 ### Diagnostics
 
@@ -157,7 +159,7 @@ The X65's main expansion connector is physically a **PCIe x4 slot** (chosen for 
 
 Each of the four I/O slots on the connector gets its own enable and interrupt line, meaning up to four cards can be installed at once with independent address decoding and IRQ routing. CPU-bus expansion boards see the same 8-bit data and low-address signalling as the on-board chips, so a custom peripheral can map itself into the `$FC00–$FCFF` expansion window using its own `IO_EN` line.
 
-For a working reference: the board KiCad project and schematic PDF live in the `schematic/` submodule at the repo root.
+For a working reference: the board KiCad project and schematic PDF are published in the [X65 schematic repository](https://github.com/X65/schematic).
 
 ## On-Board I²C Header (Clockport)
 

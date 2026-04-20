@@ -22,9 +22,7 @@ On those cycles the X65 can advance `PHI2` immediately, without waiting for a me
 
 ### L2 Cache
 
-PSRAM is fast, but the serial QPI link to it still costs tens of nanoseconds per access. NORTH mitigates this with a **64 KB direct-mapped L2 cache** kept entirely in the RP2350's internal SRAM, which runs at full MCU speed with no wait states. The cache is organised as 2048 lines of 32 bytes; a line's index is taken from middle address bits and its tag from the remaining high bits. A hit services the CPU read or write directly from SRAM; a miss performs a single PSRAM line fetch.
-
-64 KB is enough to hold the working set of a typical task — a BASIC program, a game level, an OS component — which is enough to keep hit rates high during normal execution. The firmware exposes a compile-time switch between this software L2 and the RP2350's hardware QSPI XIP cache (16 KB but slightly faster per hit) so the two approaches can be compared on real workloads.
+PSRAM is fast, but the serial QPI link to it still costs tens of nanoseconds per access. NORTH mitigates this with a **64 KB L2 cache** kept in the RP2350's internal SRAM, which runs at full MCU speed with no wait states. The cache is transparent to the 65C816 and exists purely to amortise the PSRAM protocol delays for typical access patterns.
 
 ## Memory Map and Addressing
 
@@ -63,7 +61,7 @@ In-depth coverage of writing interrupt handlers in 65816 assembly is reserved fo
 
 `PHI2` is generated in software by the RP2350 PIO rather than by a fixed crystal divider, which means the X65's headline clock is configurable and tracks whatever the firmware programs the PIO state machine to produce. The CPU throughput bottleneck is the memory round-trip latency, thus bumping the `PHI2` clock above certain thresholds yields diminishing returns — the CPU simply spends most time waiting for memory.
 
-Combined with the VAB optimisation and the L2 cache described above — which together let the CPU skip the PSRAM round-trip on internal-only cycles *and* on cache hits — the X65 sustains noticeably more useful work per second than a hardwired-`PHI2` design at the same nominal clock.
+Combined with the VAB optimisation described above, the X65 sustains noticeably more useful work per second than a hardwired-`PHI2` design at the same nominal clock.
 
 ### Clock Tree
 
@@ -83,4 +81,4 @@ DVI : 768x480@60.0Hz/24bpp
 RAM : 16MB, 2 banks, 112.0MHz
 ```
 
-The `CPU` line is the effective `PHI2` the 65C816 is clocked at — an estimation based on memory access speed and cache performance.
+The `CPU` line is the effective `PHI2` the 65C816 is clocked at — an estimation rather than a fixed number, since actual throughput depends on the mix of instructions and memory access patterns.
