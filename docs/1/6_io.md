@@ -58,12 +58,12 @@ The currently-implemented commands are:
 
 These commands manage the `.xex` images that the NORTH firmware loads at power-on — the machine's built-in-ROM layer. On a stock X65, the shipped boot ROM is OS/816; normal user applications live *under* OS/816 and are not deployed here. See [Chapter 9](../2/09_dev_env.md) for the two deployment paths.
 
-| Command    | Purpose                                                                    |
-| ---------- | -------------------------------------------------------------------------- |
-| `load`     | Load a `.xex` into PSRAM and jump to its entry point (bare-metal; single session) |
-| `info`     | Show the INFO-segment metadata of a `.xex` without running it              |
-| `install`  | Install a `.xex` into the LittleFS boot catalogue                          |
-| `remove`   | Remove a `.xex` from the boot catalogue                                    |
+| Command    | Purpose                                                                                                |
+| ---------- | ------------------------------------------------------------------------------------------------------ |
+| `load`     | Load a `.xex` into PSRAM and jump to its entry point (bare-metal; single session)                      |
+| `info`     | Show the INFO-segment metadata of a `.xex` without running it (see [Appendix F](../A/F_xex_format.md)) |
+| `install`  | Install a `.xex` into the LittleFS boot catalogue                                                      |
+| `remove`   | Remove a `.xex` from the boot catalogue                                                                |
 
 ### Diagnostics
 
