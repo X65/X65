@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Requirements
-        run: sudo apt install doxygen sphinx-doc cmake
+        run: sudo apt-get install -y doxygen cmake
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
