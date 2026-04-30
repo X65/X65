@@ -36,11 +36,11 @@
 
 **HAM6 (Hold-And-Modify, mode 6)** - A CGIA graphics mode inspired by the Amiga HAM mode. Uses 6-bit commands packing four screen pixels into three bytes; commands either select a base color or modify a single R/G/B channel of the previous pixel by a signed delta, enabling many more on-screen colors at the cost of per-pixel precision.
 
-**Half-bright flag** - In CGIA 4 bpp paletted modes (MODE0 and MODE1), the highest bit of each pixel's colour index is not part of the palette selection: it XORs bit 2 of the 3-bit palette index, flipping between the dark and bright halves of the palette row. Effectively, a 4 bpp pixel picks one of eight palette entries plus a half-bright transform, giving a 16-colour feel at the cost of a fixed up/down pairing.
+**Half-bright flag** - In CGIA 4 bpp paletted modes (MODE0 and MODE1), the highest bit of each cell's 4-bit colour code is not part of palette selection. It acts after the `shared_colors[]` lookup, XORing bit 2 of the resulting 8-bit CGIA palette index — a brightness bit in the 32 hue × 8 brightness layout — so the cell's colours flip to their bright/dark twin in the same hue row. Effectively, a 4 bpp cell picks one of eight `shared_colors[]` entries plus a half-bright transform, giving a 16-colour feel regardless of how `shared_colors[]` was loaded.
 
 **LMS (Load Memory Scan)** - A display list instruction that defines the offset of display memory, holding character or tile data.
 
-**MODE0** - The CGIA's paletted text/tile mode (mode slot 0). Uses eight palette entries stored in the upper half of the plane's 16 registers; selectable 1 / 2 / 3 / 4 bpp; character-generator bits combine with "stolen" high bits of the character code to form the palette index (so higher bpp means fewer usable glyphs). Supports a **multi-color** variant restricted to 2 and 3 bpp.
+**MODE0** - The CGIA's paletted text/tile mode (mode slot 0). Uses eight palette entries stored in the upper half of the plane's 16 registers; selectable 1 / 2 / 3 / 4 bpp; character-generator bits supply the low bit(s) of the palette index while "stolen" high bits of the character code supply the high bits — so higher bpp means fewer usable glyphs, and consecutive char-code ranges paint with successive palette pairs (or quads, in the multi-color variant). Supports a **multi-color** variant restricted to 2 and 3 bpp. See [Chapter 4](../1/4_graphics.md#mode0-and-mode1-paletted-modes) for the per-bpp char-code layouts.
 
 **MODE1** - The CGIA's paletted bitmap mode (mode slot 1). Same palette + bpp mechanics as MODE0, but bitmap bits directly index the palette — no character generator. 3 bpp uses HAM-style bitpacking (4 pixels per 3 bytes).
 

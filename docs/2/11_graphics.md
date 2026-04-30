@@ -50,18 +50,18 @@ For instructions requiring additional data, these follow the instruction code.
 
 Mode row instructions define the type of graphics displayed on a scanline. The **lower three bits (0-2)** select the mode, while **bit 3** (always set in this group) differentiates them from control instructions.
 
-- **8** – **Palette Text/Tile Mode** – Character-based graphics where each cell picks colors from the active palette.
-- **9** – **Palette Bitmap Mode** – Direct pixel-based graphics drawn through the active palette.
-- **A** – **Attribute Text/Tile Mode** – Character-based graphics with per-cell foreground and background color attributes (VIC-II style).
-- **B** – **Attribute Bitmap Mode** – Direct pixel-based graphics with per-cell color attributes.
+- **8** – **Palette Text/Tile Mode (MODE0)** – Character-based graphics where each cell picks colors from the plane's 8-entry palette; no attribute memory needed. See [Implementing Paletted Modes](#implementing-paletted-modes-mode0--mode1) below.
+- **9** – **Palette Bitmap Mode (MODE1)** – Direct pixel-based graphics drawn through the plane's 8-entry palette; no attribute memory needed. See [Implementing Paletted Modes](#implementing-paletted-modes-mode0--mode1) below.
+- **A** – **Attribute Text/Tile Mode (MODE2)** – Character-based graphics with per-cell foreground and background color attributes (VIC-II style).
+- **B** – **Attribute Bitmap Mode (MODE3)** – Direct pixel-based graphics with per-cell color attributes.
 - **C**, **D** – Reserved (TBD).
-- **E** – **HAM6 (Hold-and-Modify) Mode** – Similar to **Amiga HAM**, where pixel colors can be modified based on previous pixels, enabling a larger color range. See [HAM Encoding Format](#ham-encoding-format) below.
+- **E** – **HAM6 (MODE6, Hold-and-Modify)** – Similar to **Amiga HAM**, where pixel colors can be modified based on previous pixels, enabling a larger color range. See [HAM Encoding Format](#ham-encoding-format) below.
 - **F** – **Affine Transform Chunky Pixel Mode (MODE7)** – Inspired by **SNES MODE7**, allowing **rotation and scaling of graphics** for pseudo-3D effects.
 
 Mode row instructions also carry two flag bits that modify how the mode is rendered:
 
-- **Bit 4** (`DOUBLE_WIDTH`) – Each logical pixel covers two physical screen pixels horizontally.
-- **Bit 5** (`MULTICOLOR`) – Switches text and bitmap modes to a **4-color-per-cell** representation, where each byte encodes four pixels (similar to C64 multicolor mode).
+- **Bit 4** (`DOUBLE_WIDTH`) – Doubles the horizontal pixel size of every cell. Available on every text mode; pairs naturally with multi-color for the chunky C64-style rectangle pixels, and on its own gives the Atari 8-bit "wide character" look.
+- **Bit 5** (`MULTICOLOR`) – Switches text and bitmap modes to a **4-color-per-cell** representation, where each byte encodes four pixels (similar to C64 multicolor mode). On text modes this also narrows the cell to 4 pixels wide — yielding **80 columns** on the standard 320-pixel screen when double-width is off.
 
 Additionally, **bit 7** in any mode row instruction triggers a **Display List Interrupt (DLI)**, allowing for **scanline-specific effects, color changes, or sprite updates**.
 
@@ -314,31 +314,50 @@ The mode-row instruction itself uses nibble `9` (MODE1 = slot 9 in the display l
 
 MODE0 borrows MODE1's palette-in-registers mechanism but keeps the character-generator indirection from the attribute text modes. Every screen cell is still one byte of character code plus a row-by-row fetch from the character generator, exactly as in MODE2. What is different is how colour is assigned per pixel:
 
-- At **1 bpp**, the character-generator bit is the palette index. Palette entry 0 is "off", entry 1 is "on". Full 256-glyph fonts fit.
-- At **higher bpp**, the character-generator bit is only the low bit of the palette index. The additional bits come from the **high bits of the character code** — the font "pays" for colour by giving up glyph-code space.
+- At **1 bpp**, the character-generator bit is the palette index. Palette entry 0 is "off", entry 1 is "on". Full 256-glyph fonts fit, every cell paints from `palette[0..1]`.
+- At **higher bpp**, the character-generator bit is only the **low** bit of the palette index. The additional **high** bits of the palette index come from the **high** bits of the character code — the font "pays" for colour by giving up glyph-code space, and the same byte that picks a glyph also picks which slice of the palette that glyph paints with.
 
-For **2 bpp** the top bit of the character code becomes the second colour-index bit; the font is limited to codes `$00..$7F` (128 glyphs). For **3 bpp** the top two bits become colour bits and the font gets `$00..$3F` (64 glyphs). At **4 bpp** the top three bits participate: the very top bit is the half-bright flag, the next two bits join the colour index alongside the char-gen bit, and the remaining five bits (`$00..$1F`) identify the glyph — 32 glyphs total.
+The character-code byte therefore splits like this (writing `g…` for glyph-index bits and `Pn` for palette-index bit `n` — char-gen bit always feeds palette bit 0):
+
+```text
+1 bpp non-multi : [ g7  g6  g5  g4  g3  g2  g1  g0 ]   palette[0..1] for every cell
+2 bpp non-multi : [ P1 |g6  g5  g4  g3  g2  g1  g0 ]   $00..$7F → palette[0..1], $80..$FF → [2..3]
+3 bpp non-multi : [ P2  P1 |g5  g4  g3  g2  g1  g0 ]   four palette pairs across $00..$3F / $40..$7F / $80..$BF / $C0..$FF
+4 bpp non-multi : [ HB  P2  P1 |g4  g3  g2  g1  g0 ]   bit 7 = half-bright flag (XORs bit 2 of the looked-up CGIA color)
+```
+
+So at **2 bpp** the top bit of the character code becomes palette bit 1 (128 glyphs `$00..$7F`): codes `$00..$7F` paint with `palette[0..1]`, codes `$80..$FF` paint with `palette[2..3]`. At **3 bpp** the top two bits become palette bits 2..1 (64 glyphs `$00..$3F`): four palette pairs walk across the four 64-byte char-code quarters — `$00..$3F` → `palette[0..1]`, `$40..$7F` → `[2..3]`, `$80..$BF` → `[4..5]`, `$C0..$FF` → `[6..7]`. At **4 bpp** the top three bits participate: the very top bit is the half-bright flag, the next two bits join the palette index alongside the char-gen bit, and the remaining five bits (`$00..$1F`) identify the glyph — 32 glyphs total.
 
 In practice MODE0 is almost always used at 1 bpp (a crisp two-colour font over a fixed palette entry) or 2 bpp (four-colour decorative text), with higher bpps reserved for tilemap/backdrop work where glyph count is not the limiting factor.
 
 ### The half-bright transform (4 bpp)
 
-At 4 bpp, the high bit of the colour index does _not_ pick between eight palette entries (there are only eight). It XORs bit 2 of the palette index, which swaps the "dark" and "bright" halves of the palette row in the 256-colour CGIA palette. Visually this produces brighter/darker twins without needing 16 explicit palette slots:
+At 4 bpp the high bit of the 4-bit colour code does _not_ pick between palette entries — there are only eight, and the other three bits already select among them. Instead it acts **after** the per-pixel `shared_colors[]` lookup, XORing bit 2 of the resulting **8-bit CGIA palette index**:
 
 ```text
-base palette bits 2:0 → 0 1 2 3 4 5 6 7
-half-bright flag OFF → pick color[idx]
-half-bright flag ON  → pick color[idx XOR 4]   ; flips to the other half
+palette_idx = (P2 P1) << 1 | char-gen-bit       ; 0..7 (3-bit shared_colors index)
+cgia_color  = shared_colors[palette_idx]        ; 0..255 (8-bit CGIA palette index)
+if HB: cgia_color ^= 4                          ; flip bit 2 → swap brightness half
+rgb         = cgia_rgb_palette[cgia_color]
 ```
 
-If the programmer has loaded the palette so that entries 0–3 are the dark variants of entries 4–7 (a common convention), the result is 16 visible shades with a free up/down "brighter / darker" control per pixel. If the palette is loaded arbitrarily, the high bit just becomes a second palette selector — still useful, but less convenient.
+The CGIA's 256-colour palette is laid out as 32 hue rows of 8 brightness levels; bit 2 of the index is a brightness bit, so flipping it always lands on the same hue's bright/dark twin. The flag is one bit per cell and applies to every pixel of the cell, so both colours used by a 4 bpp non-multi cell jump to their twins together. Because the swap happens in the 256-colour palette and not in `shared_colors[]`, **the effect does not depend on how `shared_colors[]` was loaded** — any palette layout gets a free up/down "brighter / darker" control per cell, lifting the visible-colour ceiling from 8 to 16.
 
 ### MODE0 multi-color text
 
-MODE0 supports the same `MULTICOLOR` flag as the attribute text modes, and with the same effect: two character-generator bits feed the colour decision per screen pixel, so cells are **4 pixels wide** instead of 8. Multi-color MODE0 is restricted to 2 bpp and 3 bpp:
+MODE0 supports the same `MULTICOLOR` flag as the attribute text modes, and with the same effect: **two** character-generator bits feed the colour decision per screen pixel, so cells are **4 pixels wide** instead of 8. The two char-gen bits become the **low two** bits of the palette index, and the high bit of the character code is treated as a "palette half" select rather than as another in-pixel index bit:
 
-- 1 bpp multi-color is impossible (there is already only one bit to work with).
-- 4 bpp multi-color would conflict with the half-bright transform (two bits of char-gen plus two bits of stolen code leaves no room for the half-bright high bit), so firmware does not support it.
+```text
+2 bpp multi : [ g7  g6  g5  g4  g3  g2  g1  g0 ]   no stolen bits — char-gen supplies P1,P0 → palette[0..3]
+3 bpp multi : [ P2 |g6  g5  g4  g3  g2  g1  g0 ]   $00..$7F → palette[0..3], $80..$FF → palette[4..7]
+```
+
+So at **2 bpp multi** no bit is stolen: the two char-gen bits _are_ the full 2-bit palette index, all 256 character codes are usable, and every cell paints from `palette[0..3]`. (This is the configuration that drives the 80-column mode below.) At **3 bpp multi** the top bit of the character code is stolen as palette bit 2 — 128 glyphs (`$00..$7F`), with codes `$00..$7F` painting from `palette[0..3]` and codes `$80..$FF` painting from `palette[4..7]`. Worked example: writing `$85` to a 3 bpp multi MODE0 screen draws glyph index 5 (the low 7 bits) using the multi-color two-bit pattern that addresses `palette[4..7]` (because bit 7 is set).
+
+Multi-color MODE0 is restricted to those two depths:
+
+- 1 bpp multi-color is impossible — multi-color already takes two bits per pixel by default, so there is no 1-bit-per-pixel configuration to fall back to.
+- 4 bpp multi-color makes no sense — the half-bright flag is a single per-cell toggle, but a multi-color cell already shows four different colours, so there is no way to indicate which of the four should be half-brightened.
 
 ### 80-column mode
 
