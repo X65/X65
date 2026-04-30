@@ -345,19 +345,21 @@ The CGIA's 256-colour palette is laid out as 32 hue rows of 8 brightness levels;
 
 ### MODE0 multi-color text
 
-MODE0 supports the same `MULTICOLOR` flag as the attribute text modes, and with the same effect: **two** character-generator bits feed the colour decision per screen pixel, so cells are **4 pixels wide** instead of 8. The two char-gen bits become the **low two** bits of the palette index, and the high bit of the character code is treated as a "palette half" select rather than as another in-pixel index bit:
+MODE0 supports the same `MULTICOLOR` flag as the attribute text modes, and with the same effect: **two** character-generator bits feed the colour decision per screen pixel, so cells are **4 pixels wide** instead of 8. The two char-gen bits become the **low two** bits of the palette index, and any remaining high bits (palette half select, half-bright) are stolen from the character code:
 
 ```text
 2 bpp multi : [ g7  g6  g5  g4  g3  g2  g1  g0 ]   no stolen bits — char-gen supplies P1,P0 → palette[0..3]
 3 bpp multi : [ P2 |g6  g5  g4  g3  g2  g1  g0 ]   $00..$7F → palette[0..3], $80..$FF → palette[4..7]
+4 bpp multi : [ HB  P2 |g5  g4  g3  g2  g1  g0 ]   bit 7 = half-bright (XORs bit 2 of the looked-up CGIA color)
 ```
 
 So at **2 bpp multi** no bit is stolen: the two char-gen bits _are_ the full 2-bit palette index, all 256 character codes are usable, and every cell paints from `palette[0..3]`. (This is the configuration that drives the 80-column mode below.) At **3 bpp multi** the top bit of the character code is stolen as palette bit 2 — 128 glyphs (`$00..$7F`), with codes `$00..$7F` painting from `palette[0..3]` and codes `$80..$FF` painting from `palette[4..7]`. Worked example: writing `$85` to a 3 bpp multi MODE0 screen draws glyph index 5 (the low 7 bits) using the multi-color two-bit pattern that addresses `palette[4..7]` (because bit 7 is set).
 
-Multi-color MODE0 is restricted to those two depths:
+At **4 bpp multi** bit 7 is the half-bright flag and bit 6 is stolen as palette bit 2; only the low six bits identify a glyph (64 glyphs, `$00..$3F`). The transform follows exactly the same pseudocode as 4 bpp non-multi — `palette_idx → shared_colors[] → XOR 4 if HB → cgia_rgb_palette[]` — so all four colours used by the cell jump to their bright/dark twin together, raising the visible-colour ceiling per cell to 16 (8 palette × 2 brightness halves). Char-code regions split as: `$00..$3F` → `palette[0..3]`, `$40..$7F` → `palette[4..7]`, `$80..$BF` → `palette[0..3]` half-brighted, `$C0..$FF` → `palette[4..7]` half-brighted.
+
+Multi-color MODE0 is therefore available at 2, 3, and 4 bpp — only 1 bpp is excluded:
 
 - 1 bpp multi-color is impossible — multi-color already takes two bits per pixel by default, so there is no 1-bit-per-pixel configuration to fall back to.
-- 4 bpp multi-color makes no sense — the half-bright flag is a single per-cell toggle, but a multi-color cell already shows four different colours, so there is no way to indicate which of the four should be half-brightened.
 
 ### 80-column mode
 

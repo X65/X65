@@ -40,7 +40,7 @@
 
 **LMS (Load Memory Scan)** - A display list instruction that defines the offset of display memory, holding character or tile data.
 
-**MODE0** - The CGIA's paletted text/tile mode (mode slot 0). Uses eight palette entries stored in the upper half of the plane's 16 registers; selectable 1 / 2 / 3 / 4 bpp; character-generator bits supply the low bit(s) of the palette index while "stolen" high bits of the character code supply the high bits — so higher bpp means fewer usable glyphs, and consecutive char-code ranges paint with successive palette pairs (or quads, in the multi-color variant). Supports a **multi-color** variant restricted to 2 and 3 bpp. See [Chapter 4](../1/4_graphics.md#mode0-and-mode1-paletted-modes) for the per-bpp char-code layouts.
+**MODE0** - The CGIA's paletted text/tile mode (mode slot 0). Uses eight palette entries stored in the upper half of the plane's 16 registers; selectable 1 / 2 / 3 / 4 bpp; character-generator bits supply the low bit(s) of the palette index while "stolen" high bits of the character code supply the high bits — so higher bpp means fewer usable glyphs, and consecutive char-code ranges paint with successive palette pairs (or quads, in the multi-color variant). Supports a **multi-color** variant at 2, 3, and 4 bpp; the 4 bpp variants (multi and non-multi) include a per-cell **half-bright** flag that XORs bit 2 of the looked-up CGIA color, giving 16 visible colours per cell. See [Chapter 4](../1/4_graphics.md#mode0-and-mode1-paletted-modes) for the per-bpp char-code layouts.
 
 **MODE1** - The CGIA's paletted bitmap mode (mode slot 1). Same palette + bpp mechanics as MODE0, but bitmap bits directly index the palette — no character generator. 3 bpp uses HAM-style bitpacking (4 pixels per 3 bytes).
 
