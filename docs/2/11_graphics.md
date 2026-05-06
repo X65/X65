@@ -276,6 +276,15 @@ Both modes pick pixel bit depth through the two high bits of the plane `flags` r
 | `%10`        | 3   | 8                 | 64 glyphs          | 4 pixels packed in 3 B   |
 | `%11`        | 4   | 8 + half-bright   | 32 glyphs          | 2 pixels per nibble      |
 
+With the `MULTICOLOR` flag set, MODE0 cells narrow to 4 pixels wide and the two char-gen bits feed the low palette index — high palette-index bits (and the half-bright flag at 4 bpp) come from stolen high bits of the character code. MODE1 has no multi-color encoding and ignores the flag:
+
+| `PIXEL_BITS` | bpp | Colours per pixel                                    | MODE0 glyph budget     |
+| ------------ | --- | ---------------------------------------------------- | ---------------------- |
+| `%00`        | 1   | 4                                                    | treated as 2 bpp below |
+| `%01`        | 2   | 4                                                    | Full 256 glyphs        |
+| `%10`        | 3   | 4 (one of two palette halves per cell)               | 128 glyphs             |
+| `%11`        | 4   | 4 + half-bright (one of two palette halves per cell) | 64 glyphs              |
+
 ### MODE1 — Paletted Bitmap
 
 In MODE1, the bitmap bytes **index the palette directly**:
@@ -357,9 +366,9 @@ So at **2 bpp multi** no bit is stolen: the two char-gen bits _are_ the full 2-b
 
 At **4 bpp multi** bit 7 is the half-bright flag and bit 6 is stolen as palette bit 2; only the low six bits identify a glyph (64 glyphs, `$00..$3F`). The transform follows exactly the same pseudocode as 4 bpp non-multi — `palette_idx → shared_colors[] → XOR 4 if HB → cgia_rgb_palette[]` — so all four colours used by the cell jump to their bright/dark twin together, raising the visible-colour ceiling per cell to 16 (8 palette × 2 brightness halves). Char-code regions split as: `$00..$3F` → `palette[0..3]`, `$40..$7F` → `palette[4..7]`, `$80..$BF` → `palette[0..3]` half-brighted, `$C0..$FF` → `palette[4..7]` half-brighted.
 
-Multi-color MODE0 is therefore available at 2, 3, and 4 bpp — only 1 bpp is excluded:
+Multi-color MODE0 is meaningfully distinct only at 2, 3, and 4 bpp:
 
-- 1 bpp multi-color is impossible — multi-color already takes two bits per pixel by default, so there is no 1-bit-per-pixel configuration to fall back to.
+- 1 bpp multi-color is impossible — multi-color already takes two bits per pixel by its nature, so if set, renders identically to 2 bpp multi — multi-color.
 
 ### 80-column mode
 
