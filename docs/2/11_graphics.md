@@ -48,12 +48,12 @@ For instructions requiring additional data, these follow the instruction code.
 
 #### Mode Row Instructions (8-F)
 
-Mode row instructions define the type of graphics displayed on a scanline. The **lower three bits (0-2)** select the mode, while **bit 3** (always set in this group) differentiates them from control instructions.
+Mode row instructions define the type of graphics displayed on a scanline. The **lower three bits (0-2)** select the mode (MODE0..MODE7 — one of the eight display-mode slots), while **bit 3** (always set in this group, mask `%1000`) differentiates them from control instructions. The nibble for any mode-row instruction is therefore `%1000 | mode_number` — so MODE0 is nibble `8`, MODE1 is `9`, MODE2 is `A`, MODE3 is `B`, MODE6 (HAM) is `E`, MODE7 (affine) is `F`, and the still-reserved slots 4 and 5 occupy nibbles `C` and `D`. Whenever a section below refers to "the mode-row instruction for MODE_N_", the same `%1000 | N` rule applies.
 
 - **8** – **Palette Text/Tile Mode (MODE0)** – Character-based graphics where each cell picks colors from the plane's 8-entry palette; no attribute memory needed. See [Implementing Paletted Modes](#implementing-paletted-modes-mode0--mode1) below.
 - **9** – **Palette Bitmap Mode (MODE1)** – Direct pixel-based graphics drawn through the plane's 8-entry palette; no attribute memory needed. See [Implementing Paletted Modes](#implementing-paletted-modes-mode0--mode1) below.
-- **A** – **Attribute Text/Tile Mode (MODE2)** – Character-based graphics with per-cell foreground and background color attributes (VIC-II style).
-- **B** – **Attribute Bitmap Mode (MODE3)** – Direct pixel-based graphics with per-cell color attributes.
+- **A** – **Attribute Text/Tile Mode (MODE2)** – Character-based graphics with per-cell foreground and background color attributes (VIC-II style). See [Implementing Attribute Modes](#implementing-attribute-modes-mode2--mode3) below.
+- **B** – **Attribute Bitmap Mode (MODE3)** – Direct pixel-based graphics with per-cell color attributes. See [Implementing Attribute Modes](#implementing-attribute-modes-mode2--mode3) below.
 - **C**, **D** – Reserved (TBD).
 - **E** – **HAM6 (MODE6, Hold-and-Modify)** – Similar to **Amiga HAM**, where pixel colors can be modified based on previous pixels, enabling a larger color range. See [HAM Encoding Format](#ham-encoding-format) below.
 - **F** – **Affine Transform Chunky Pixel Mode (MODE7)** – Inspired by **SNES MODE7**, allowing **rotation and scaling of graphics** for pseudo-3D effects.
@@ -402,6 +402,120 @@ A 4×8 font designed for this purpose uses only the `00` and `11` multi-color co
 ### Double-width text across all modes
 
 The `PLANE_MASK_DOUBLE_WIDTH` flag (bit 4 of the plane flag byte, also encoded as `CGIA_DL_DOUBLE_WIDTH_BIT` in the mode-row instruction) doubles the horizontal pixel size of any text mode. It pairs naturally with multi-color for the chunky "rectangle-pixel" look (C64 multi-color text style), and stands on its own with non-multi-color text for the Atari "wide character" modes. Because the flag lives in both the plane register _and_ the display-list mode-row instruction, switching double-width on or off mid-screen is as easy as writing the right opcode on the target row.
+
+## Implementing Attribute Modes (MODE2 / MODE3)
+
+MODE2 and MODE3 are the **attribute** counterparts to MODE0/1: instead of an 8-entry palette in the plane registers, every cell carries its own foreground and background colour bytes, fetched in parallel with the character or bitmap data. See [MODE2 and MODE3 — Attribute Modes](../1/4_graphics.md) in Chapter 4 for the conceptual picture; this section covers programming.
+
+### Scan-pointer setup
+
+The two attribute modes need **three or four scan pointers** loaded by a single `LOAD` (`$03`) display-list instruction (see [Control Instructions](#control-instructions-0-7)):
+
+| Pointer       | LOAD bit       | MODE2                              | MODE3                              |
+| ------------- | -------------- | ---------------------------------- | ---------------------------------- |
+| `memory_scan` | Bit 4 (LMS)    | Character codes, one byte per cell | Bitmap data, one byte per cell row |
+| `colour_scan` | Bit 5 (LFS)    | Per-cell foreground colour         | Per-cell foreground colour         |
+| `backgr_scan` | Bit 6 (LBS)    | Per-cell background colour         | Per-cell background colour         |
+| `char_gen`    | Bit 7 (LCG)    | Character generator (font) data    | _unused_                           |
+
+Both colour-scan streams are one byte per cell per row — exactly the size of one screen row in cells. Plan a colour map of `columns × rows` bytes for each of the foreground and background streams.
+
+Unlike MODE0/1, the attribute modes ignore the plane's `PLANE_MASK_PIXEL_BITS` field. Each cell is fixed at 8 pixels (1 bit per pixel) with `MULTICOLOR` cleared, or 4 pixels (2 bits per pixel) with `MULTICOLOR` set.
+
+### MODE3 — Attribute Bitmap
+
+In MODE3 the `memory_scan` byte for a cell is the bitmap data directly. Each scanline of the cell uses one fresh bitmap byte — `row_height + 1` bytes per cell column for one full row — while `colour_scan` and `backgr_scan` advance once per cell, giving each cell a single foreground/background pair across all of its scanlines.
+
+Per-pixel decoding:
+
+| Source bit / code  | Non-multi (`MULTICOLOR` clear)              | Multi (`MULTICOLOR` set)                   |
+| ------------------ | ------------------------------------------- | ------------------------------------------ |
+| `0`                | `backgr_scan` byte (or transparent)         | —                                          |
+| `1`                | `colour_scan` byte                          | —                                          |
+| `00`               | —                                           | `color[0]` (or transparent)                |
+| `01`               | —                                           | `backgr_scan` byte                         |
+| `10`               | —                                           | `colour_scan` byte                         |
+| `11`               | —                                           | `color[1]`                                 |
+
+"Transparent" applies whenever `PLANE_MASK_TRANSPARENT` is set on the plane flags — bit `0` (non-multi) or code `00` (multi) is skipped, letting the plane below show through.
+
+```asm
+    ; Display list snippet exercising all four MODE3 flag combinations
+    .byte   CGIA_DL_INS_LOAD_REG8 | (CGIA_BCKGND_REGS::row_height << 4), 7
+    .byte   CGIA_DL_INS_LOAD_REG8 | (CGIA_BCKGND_REGS::flags << 4), $00
+    .byte   CGIA_DL_MODE_ATTRIBUTE_BITMAP                                          ; 8×N cells
+    .byte   CGIA_DL_MODE_ATTRIBUTE_BITMAP | CGIA_DL_DOUBLE_WIDTH_BIT               ; 16×N cells
+    .byte   CGIA_DL_MODE_ATTRIBUTE_BITMAP | CGIA_DL_MULTICOLOR_BIT                 ; 4×N multi cells
+    .byte   CGIA_DL_MODE_ATTRIBUTE_BITMAP | CGIA_DL_DOUBLE_WIDTH_BIT | CGIA_DL_MULTICOLOR_BIT  ; 8×N multi cells
+```
+
+A typical full-screen MODE3 setup picks `row_height` (8 raster lines per row → `row_height = 7`), points the three scan pointers at the bitmap and two colour maps, then walks the rows with mode-`B` opcodes:
+
+```asm
+    lda #7
+    sta CGIA::plane0 + CGIA_BCKGND_REGS::row_height
+    lda #$00                ; PIXEL_BITS ignored, no transparency
+    sta CGIA::plane0 + CGIA_BCKGND_REGS::flags
+
+    .byte   CGIA_DL_INS_LOAD_MEMORY \
+            | CGIA_DL_INS_LM_MEMORY_SCAN \
+            | CGIA_DL_INS_LM_FOREGROUND_SCAN \
+            | CGIA_DL_INS_LM_BACKGROUND_SCAN
+    .word   bitmap          ; LMS — bitmap, columns × (row_height+1) × rows bytes
+    .word   fg_map          ; LFS — foreground colour, columns × rows bytes
+    .word   bg_map          ; LBS — background colour, columns × rows bytes
+
+    ; ... mode-B rows here ...
+```
+
+### MODE2 — Attribute Text/Tile
+
+MODE2 keeps the character-generator indirection of MODE0 but replaces the palette mechanism with the attribute layout: `memory_scan` carries a character code per cell, the character generator produces an 8-bit bitmap row for that code on the current scanline, and that bitmap drives the same per-pixel decoding as MODE3. Both `colour_scan` and `backgr_scan` advance once per cell, exactly as in MODE3.
+
+Because MODE2 needs the character generator, the `LOAD` instruction must include the `CGIA_DL_INS_LM_CHARACTER_GENERATOR` flag and the `char_gen` pointer. A typical setup mirrors MODE0 but adds the two colour-scan pointers:
+
+```asm
+    .byte   CGIA_DL_INS_LOAD_MEMORY \
+            | CGIA_DL_INS_LM_MEMORY_SCAN \
+            | CGIA_DL_INS_LM_FOREGROUND_SCAN \
+            | CGIA_DL_INS_LM_BACKGROUND_SCAN \
+            | CGIA_DL_INS_LM_CHARACTER_GENERATOR
+    .word   text_offset     ; LMS — character codes
+    .word   color_offset    ; LFS — foreground colour map
+    .word   bkgnd_offset    ; LBS — background colour map
+    .word   chgen_offset    ; LCG — character generator (font)
+
+    .byte   CGIA_DL_INS_LOAD_REG8 | (CGIA_BCKGND_REGS::flags << 4), $00
+
+    .byte   CGIA_DL_MODE_ATTRIBUTE_TEXT                                          ; 8×N cells
+    .byte   CGIA_DL_MODE_ATTRIBUTE_TEXT | CGIA_DL_DOUBLE_WIDTH_BIT               ; 16×N cells
+    .byte   CGIA_DL_MODE_ATTRIBUTE_TEXT | CGIA_DL_MULTICOLOR_BIT                 ; 4×N multi cells
+    .byte   CGIA_DL_MODE_ATTRIBUTE_TEXT | CGIA_DL_DOUBLE_WIDTH_BIT | CGIA_DL_MULTICOLOR_BIT
+```
+
+Per-pixel decoding follows the same table as MODE3 — the only difference is where the source bits come from (character generator output instead of `memory_scan` itself).
+
+### Multicolor, double-width, and transparency
+
+The three modifier flags work uniformly across MODE2 and MODE3:
+
+- **`PLANE_MASK_MULTICOLOR` (`%00100000`)** — switches the cell from 1-bit-per-pixel (8 pixels wide) to 2-bit-per-pixel (4 pixels wide). The two extra colour slots come from plane registers `color[0]` and `color[1]`; the per-cell colour bytes still come from `colour_scan` and `backgr_scan`. Because cells narrow to 4 pixels wide, MODE2 multi-color produces an 80-column screen on the standard 320-pixel logical width — the same trick described for MODE0 [above](#80-column-mode), now with per-cell foreground and background colours.
+- **`PLANE_MASK_DOUBLE_WIDTH` (`%00010000`)** — doubles the horizontal pixel size, giving 16-pixel non-multi or 8-pixel multi cells. The flag lives in both the plane flag byte and the mode-row instruction (`CGIA_DL_DOUBLE_WIDTH_BIT`), so it can be toggled mid-screen by writing the right opcode on a row.
+- **`PLANE_MASK_TRANSPARENT` (`%00000001`)** — turns the "background" code (bit `0` non-multi, code `00` multi) into transparent pixels, so the plane below shows through. Any other code still paints opaque colour from the scan pointers (or `color[1]`). Useful for layering an attribute plane on top of HAM, MODE7, or another tilemap.
+
+The flag constants are defined alongside the plane register layout — see [Background Plane Flags](#background-plane-flags).
+
+### Memory layout and `row_height`
+
+The one footgun specific to MODE3 is that `memory_scan` advances **once per raster line within a cell**, while `colour_scan` and `backgr_scan` advance **once per cell row**. Sizing the three buffers correctly:
+
+- **bitmap** (MODE3 `memory_scan`): `columns × (row_height + 1) × rows` bytes — one byte per cell per scanline.
+- **foreground map** (`colour_scan`): `columns × rows` bytes — one byte per cell.
+- **background map** (`backgr_scan`): `columns × rows` bytes — one byte per cell.
+
+In MODE2 the picture is simpler: `memory_scan` is one byte per cell (the character code stays the same across the cell's scanlines), so all three of the streams above are `columns × rows` bytes. The character generator carries the per-scanline shape data, and `char_gen + (char_code << char_shift) + line` indexes the right bitmap row for the current scanline.
+
+`row_height` is the same plane register documented for the paletted modes; `0` gives one raster line per row (chunky bitmap, no character-generator indirection makes sense at that height), `7` gives the C64-style 8-line cells, and intermediate values give the Atari "tall-character" or "narrow-character" variants. All three scan pointers respect the same `row_height` per mode row.
 
 ## Creating Mixed-Mode Display Lists
 

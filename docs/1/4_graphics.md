@@ -117,6 +117,46 @@ The trade is per-mode and per-scene: text-heavy screens stay at 1 bpp, decorated
 
 1 bpp multi-color is impossible — multi-color already takes two char-gen bits per pixel, so there is no 1-bit-per-pixel configuration to fall back to.
 
+#### MODE2 and MODE3 — Attribute Modes
+
+MODE2 (attribute text/tile) and MODE3 (attribute bitmap) are the **VIC-II-style** counterparts to MODE0/1. Where the paletted modes spend a lot of effort packing multiple bits per pixel against a tiny shared palette, the attribute modes spend memory instead: every cell on screen carries its **own foreground and background colour bytes**, fetched from two extra scan streams that run in parallel with the character/bitmap data. The result is the classic "one foreground colour and one background colour per 8×N cell" model that C64 programmers will recognize immediately — except that here the "colour bytes" are full 8-bit indices into the CGIA's 256-colour palette, not a 4-bit nibble.
+
+Both modes use **three scan pointers** instead of MODE0/1's single `LMS`:
+
+* **`memory_scan` (LMS)** — character codes (MODE2), one byte per cell per row or raw bitmap bytes (MODE3), N consecutive bytes per cell per row.
+* **`colour_scan` (LFS)** — per-cell **foreground** colour, one byte per cell per row.
+* **`backgr_scan` (LBS)** — per-cell **background** colour, one byte per cell per row.
+
+MODE2 also uses **`char_gen` (LCG)** to address the character-generator memory, exactly like MODE0. MODE3 has no character generator — `memory_scan` is the bitmap.
+
+Because per-cell colour comes from the scan pointers rather than from a palette indexed by pixel data, the attribute modes have **no `PIXEL_BITS` variants**: each cell is 8 pixels wide with one bit per pixel (non-multi) or 4 pixels wide with two bits per pixel (multi-color). The plane's `PLANE_MASK_PIXEL_BITS` field is ignored in MODE2/3.
+
+**Non-multi attribute cells (8 pixels wide).** Each pixel takes a single bit from the cell's source byte — the character-generator output for the current scanline (MODE2) or the bitmap byte itself (MODE3). The bit then picks between the two per-cell colours:
+
+* **bit = 0** → `backgr_scan` byte for this cell (or transparent when `PLANE_MASK_TRANSPARENT` is set, letting the plane below show through).
+* **bit = 1** → `colour_scan` byte for this cell.
+
+This is exactly the C64 hires text/bitmap colour model.
+
+**Multi-color attribute cells (4 pixels wide, two bits per pixel).** With the `MULTICOLOR` flag set, the cell narrows to 4 pixels and each two-bit code picks one of four colours. Two come from the scan pointers (per cell) and two come from the plane's own `color[]` registers (shared across the whole plane):
+
+| Code | Colour source                                                                          |
+| ---- | -------------------------------------------------------------------------------------- |
+| `00` | Plane register `color[0]` (or transparent when `PLANE_MASK_TRANSPARENT` is set)        |
+| `01` | `backgr_scan` byte for this cell (per-cell)                                            |
+| `10` | `colour_scan` byte for this cell (per-cell)                                            |
+| `11` | Plane register `color[1]` (always opaque)                                              |
+
+So an attribute multicolor cell carries up to **four colours**, two of which are different in every cell. The remaining six entries of the plane's `color[2..7]` array are unused in MODE2/3 — there is no equivalent of MODE0's palette-half stealing.
+
+**Modifier flags.** All three of the per-mode flags work in MODE2/3 with the same meanings as everywhere else:
+
+* `PLANE_MASK_TRANSPARENT` makes the "background" code (bit `0` non-multi, code `00` multi) transparent — useful when a MODE2/3 plane is layered on top of another plane.
+* `PLANE_MASK_DOUBLE_WIDTH` doubles the cell width (16 pixels non-multi, 8 pixels multi) for the chunky C64-style look.
+* `PLANE_MASK_MULTICOLOR` switches from 1-bit-per-pixel to 2-bit-per-pixel decoding as described above.
+
+**Memory cost vs. flexibility.** The attribute modes pay roughly **3× the scan bandwidth** of MODE0/1 — three scan streams instead of one — and need a pre-built per-cell colour map in RAM. In return they let every cell on screen carry independent colours, which the paletted modes can only approximate by stealing high bits of the character code (and only for MODE0). For VIC-II-style ports, hires-bitmap "FLI"-class effects, and tilemaps where each tile needs its own palette, the attribute modes are the right tool. For text-heavy screens, decorated UI, and anywhere a small shared palette is enough, MODE0/1 stay cheaper.
+
 #### Double-width text and 80-column mode
 
 Every text mode supports a per-plane **double-width** flag (`PLANE_MASK_DOUBLE_WIDTH`, bit 4 of the plane's flag register). Setting it doubles the horizontal pixel size of every cell, producing the chunky "wide character" look familiar from Atari and C64 text modes. In the display list this is commonly set and cleared by the `CGIA_DL_DOUBLE_WIDTH_BIT` in the mode-row instruction, so software can switch mid-screen.
