@@ -9,15 +9,9 @@
 # Add a row when a new example earns a place on the site. The published name is
 # what emu.yml refers to, so it does not have to match the target.
 
-# Not every example is a whole ROM. `four_byte_burger`, `mixed_modes` and `sotb`
-# assemble to code only - the image, layer and sprite data is merged in afterwards
-# with `xex-filter.pl` (their .asm header comments carry the exact commands), and
-# the blocks come from `examples/src/cgia/data/bins.c`, which is a `gcc bins.c &&
-# ./bins` hack rather than part of any build. Publishing the bare code gives a ROM
-# that loads and shows nothing, so they are deliberately absent below and the
-# committed ones on the site are left alone. `four_byte_burger` cannot be rebuilt
-# here at all: its image comes from a `converter.ts` and a `4BB.png` that are not
-# in this tree.
+# Not every example is a whole ROM. Ones that assemble to code only and have to
+# be merged with data blocks are in SITE_DATA_ROMS further down, not here -
+# copying the bare code would publish a ROM that loads and shows nothing.
 
 # <examples target>  <name published under emu/roms/>
 set(SITE_ROMS
@@ -51,3 +45,30 @@ set(SITE_TUNE_ROMS
     Mystery_Cannon.sid  Mystery_Cannon  src/sound/Mystery_Cannon.sid          $0F82
     Pokeymania.sid      Pokeymania      src/sound/Orbtraxx2-Pokeymania.sid    $1E82
 )
+
+# ROMs that are code plus a picture. `bins.c` writes the data blocks (see
+# ExampleData.cmake) and `xex-filter.pl` splices them onto the assembled code;
+# the .asm header comment of each demo is the reference for its recipe, and this
+# is the copy the build follows - keep the two in step.
+#
+# DATA names blocks in the example-data staging directory. RELOCATE, if set,
+# gives every block of the code (and of anything in WITH) a new load address in
+# a first pass, before the data is appended.
+#
+# `four_byte_burger` is missing on purpose: its picture is produced by a
+# `converter.ts` from a `4BB.png` that are not in this tree, so the ROM on the
+# site is hand-made and `site` leaves it alone.
+set(SITE_DATA_ROMS
+    sotb
+    mixed_modes
+)
+
+set(SITE_DATA_ROM_sotb_PUBLISHED SOTB)
+set(SITE_DATA_ROM_sotb_DATA      sotb_layers.xex sotb_sprite.xex)
+
+# The code and the shared 8px font are lifted out of the memory the picture
+# occupies, then the display list, the MODE7 texture and the HUD are appended.
+set(SITE_DATA_ROM_mixed_modes_PUBLISHED mixed_modes)
+set(SITE_DATA_ROM_mixed_modes_RELOCATE  "$B000,$FC00,$FFE0,$A000")
+set(SITE_DATA_ROM_mixed_modes_WITH      ${EMU_SOURCE_DIR}/roms/parts/font_8px.xex)
+set(SITE_DATA_ROM_mixed_modes_DATA      mixed_mode_dl.xex mascot_bg.xex hud_layer.xex)

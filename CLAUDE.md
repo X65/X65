@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `X65/X65` is the umbrella ("mono") repository for the **X65 microcomputer** — a modern 8-bit machine built around a WDC 65C816 with custom chips implemented in software on RP2350 microcontrollers.
 
-It builds one thing of its own: **the X65 Book** in `book/`, published to <https://docs.x65.zone>. Everything else is a git submodule pointing at an independent GitHub repo with its own build, CI and history. The root build also carries opt-in targets that *drive* those submodule builds (`emu`, `emu-wasm`, `examples`) and one that refreshes the web emulator and its ROMs inside the `x65.zone` checkout (`site`) - none of them is in `ALL`, so a plain `cmake --build build` still builds only the book, which is all CI does.
+It builds one thing of its own: **the X65 Book** in `book/`, published to <https://docs.x65.zone>. Everything else is a git submodule pointing at an independent GitHub repo with its own build, CI and history. The root build also carries opt-in targets that *drive* those submodule builds (`emu`, `emu-wasm`, `examples`, `example-data`) and one that refreshes the web emulator and its ROMs inside the `x65.zone` checkout (`site`) - none of them is in `ALL`, so a plain `cmake --build build` still builds only the book, which is all CI does.
 
 The reason this checkout exists is that each child repo builds and passes CI on its own, so **contradictions *between* them are invisible from inside any one of them**. Duplicated register maps, vendored headers that drifted, docs describing behavior no implementation has. Treat cross-repo agreement as part of the deliverable, not just per-repo correctness.
 
@@ -124,10 +124,11 @@ picocom -b 115200 /dev/ttyACM0
 Opt-in targets, none in `ALL` - CI builds and deploys the book and nothing else:
 
 ```sh
-cmake --build build --target emu        # native emulator  -> build/emulator/emu
-cmake --build build --target emu-wasm   # web emulator     -> build/emulator-wasm/emu.{html,js,wasm}
-cmake --build build --target examples   # .xex ROMs        -> build/examples/src/
-cmake --build build --target site       # both of the above, copied into x65.zone/emu/
+cmake --build build --target emu           # native emulator  -> build/emulator/emu
+cmake --build build --target emu-wasm      # web emulator     -> build/emulator-wasm/emu.{html,js,wasm}
+cmake --build build --target examples      # .xex ROMs        -> build/examples/src/
+cmake --build build --target example-data  # picture blocks   -> build/example-data/
+cmake --build build --target site          # all of the above, copied into x65.zone/emu/
 ```
 
 They shell out to each submodule's own CMake rather than `add_subdirectory` (different
@@ -136,8 +137,15 @@ so the submodule working trees stay clean. `site` copies and stops - x65.zone de
 `master` through GitHub Pages, so committing is left to a human. Which ROMs it publishes,
 and under what names, is the editable table in `cmake/SiteRoms.cmake`; it mirrors the
 entries in `x65.zone/_data/emu.yml` that come from `examples`, and everything else in
-`emu/roms/` is hand-made and must be left alone. The SID players are merged with their tune
-by `xex-filter.pl` (not vendored; `site` skips them when it is missing).
+`emu/roms/` is hand-made and must be left alone.
+
+Three of the tables there cover ROMs that are not whole on their own, all merged with
+`xex-filter.pl` (not vendored; `site` skips them when it is missing): `SITE_ROMS` is a
+plain copy, `SITE_TUNE_ROMS` splices a tune into its player, and `SITE_DATA_ROMS` splices
+a picture onto code-only demos (`sotb`, `mixed_modes`) from blocks the `example-data`
+target generates by compiling and running `examples/src/cgia/data/bins.c`. `4BB` is not
+in any of them - its picture needs a `converter.ts` and a `4BB.png` that are not in this
+tree, so the committed ROM stands.
 
 ## Architecture
 

@@ -49,8 +49,8 @@ if(SITE_ROMS)
 endif()
 
 if(NOT XEX_FILTER_EXECUTABLE)
-    message(STATUS "xex-filter.pl not found: 'site' will skip the tune-merged "
-                   "ROMs (Driller, Mystery_Cannon, Pokeymania)")
+    message(STATUS "xex-filter.pl not found: 'site' will skip the merged ROMs "
+                   "(Driller, Mystery_Cannon, Pokeymania, SOTB, mixed_modes)")
 elseif(SITE_TUNE_ROMS)
     list(LENGTH SITE_TUNE_ROMS _n)
     math(EXPR _last "${_n} / 4 - 1")
@@ -77,10 +77,43 @@ elseif(SITE_TUNE_ROMS)
     endforeach()
 endif()
 
+# Code-plus-picture ROMs. The data blocks come from the `example-data` target;
+# everything about which blocks and in what order is in SiteRoms.cmake.
+if(XEX_FILTER_EXECUTABLE AND SITE_DATA_ROMS)
+    foreach(_rom IN LISTS SITE_DATA_ROMS)
+        set(_published ${SITE_DATA_ROM_${_rom}_PUBLISHED})
+
+        # '|' rather than ';': a ';' inside a -D argument would be split back
+        # into separate arguments before the script ever saw it.
+        set(_data "")
+        foreach(_block IN LISTS SITE_DATA_ROM_${_rom}_DATA)
+            string(APPEND _data "${EXAMPLE_DATA_BINARY_DIR}/${_block}|")
+        endforeach()
+        set(_with "")
+        foreach(_extra IN LISTS SITE_DATA_ROM_${_rom}_WITH)
+            string(APPEND _with "${_extra}|")
+        endforeach()
+
+        list(APPEND _site_commands
+            COMMAND ${CMAKE_COMMAND}
+                    -DXEX_FILTER=${XEX_FILTER_EXECUTABLE}
+                    -DCODE=${EXAMPLES_BINARY_DIR}/src/${_rom}.xex
+                    -DRELOCATE=${SITE_DATA_ROM_${_rom}_RELOCATE}
+                    -DWITH=${_with}
+                    -DDATA=${_data}
+                    -DOUT=${SITE_STAGE_DIR}/${_published}.xex
+                    -P ${PROJECT_SOURCE_DIR}/cmake/MergeDataXex.cmake
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    ${SITE_STAGE_DIR}/${_published}.xex
+                    ${SITE_ROMS_DIR}/${_published}.xex)
+    endforeach()
+endif()
+
 # VERBATIM: without it the recipe shell eats the `$` in a hex load address
-# ($0F82 arrives as F82, and $0882 silently arrives as decimal 882).
+# ($0F82 arrives as F82, and $0882 silently arrives as decimal 882) and in the
+# relocation list the data ROMs pass through.
 add_custom_target(site
     ${_site_commands}
     USES_TERMINAL VERBATIM
     COMMENT "Refreshing the web emulator and ROMs in ${SITE_EMU_DIR}")
-add_dependencies(site emu-wasm examples)
+add_dependencies(site emu-wasm examples example-data)

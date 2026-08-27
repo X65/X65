@@ -35,21 +35,23 @@ from a `{toctree}` fails the build rather than shipping.
 
 ### The submodules
 
-Four further targets drive the submodules' own builds. They are **opt-in** — none
+Five further targets drive the submodules' own builds. They are **opt-in** — none
 of them is part of `all`, so plain `cmake --build build` still builds only the
 book, which is all CI does. Ask for them by name:
 
-    cmake --build build --target emu        # native emulator
-    cmake --build build --target emu-wasm   # emulator for the web
-    cmake --build build --target examples   # example .xex ROMs
-    cmake --build build --target site       # refresh x65.zone (see below)
+    cmake --build build --target emu           # native emulator
+    cmake --build build --target emu-wasm      # emulator for the web
+    cmake --build build --target examples      # example .xex ROMs
+    cmake --build build --target example-data  # picture data for the ROMs that need it
+    cmake --build build --target site          # refresh x65.zone (see below)
 
 | Target | Produces | Needs |
 | --- | --- | --- |
 | `emu` | `build/emulator/emu` | the emulator's [dependencies](https://github.com/X65/emu#dependencies) |
 | `emu-wasm` | `build/emulator-wasm/emu.{html,js,wasm}` | the [Emscripten SDK](https://emscripten.org/docs/getting_started/downloads.html) on `PATH` |
 | `examples` | `build/examples/src/*.xex` | the [cc65 toolchain](https://cc65.github.io/) on `PATH` |
-| `site` | files copied into `x65.zone/emu/` | both of the above, plus `xex-filter.pl` |
+| `example-data` | `build/example-data/*.xex` | a host C compiler |
+| `site` | files copied into `x65.zone/emu/` | all of the above, plus `xex-filter.pl` |
 
 Each one shells out to that project's own CMake rather than being absorbed into
 this build — they use different toolchains, and their own dependency tracking is
@@ -84,8 +86,21 @@ the entries in the site's own catalogue (`x65.zone/_data/emu.yml`) that come fro
 the examples repository; every other ROM under `emu/roms/` is hand-made or from
 elsewhere, and `site` never touches those.
 
-The SID and POKEY players are a special case: they assemble to a bare player, and
-the tune is a separate file that has to be loaded alongside it. `site` splices the
-two together with [`xex-filter.pl`](https://www.vitoco.cl/atari/xex-filter/), which
-is not vendored here — without it on `PATH` those ROMs are skipped, with a notice
-at configure time.
+Some examples do not assemble to a whole ROM and have to be merged with something
+before they are worth publishing, which `site` does with
+[`xex-filter.pl`](https://www.vitoco.cl/atari/xex-filter/). It is not vendored
+here — without it on `PATH` those ROMs are skipped, with a notice at configure
+time. There are two kinds:
+
+- **The SID and POKEY players** assemble to a bare player; the tune is a separate
+  file that has to be loaded alongside it, at the address the player was built
+  against. `SITE_TUNE_ROMS` in `cmake/SiteRoms.cmake` is that table.
+- **`sotb` and `mixed_modes`** assemble to code only. Their pictures live as C
+  arrays in the examples repository and are written out as loadable blocks by the
+  `example-data` target; `SITE_DATA_ROMS` says which blocks go with which demo,
+  and in what order. Each demo's `.asm` header comment carries the same recipe by
+  hand — keep the two in step, because nothing checks.
+
+`4BB` is the one ROM on the site that cannot be rebuilt here at all: its picture
+comes from a converter and a source image that are not in this tree, so `site`
+leaves the committed file alone.
