@@ -36,17 +36,32 @@ set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
 set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/sphinx)
 set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
 
+# Every book source, not just index.md. The chapters are pulled in by glob
+# `{toctree}` directives, so there is no explicit list anywhere to track; without
+# this, editing a chapter and re-running the build silently renders nothing.
+# CONFIGURE_DEPENDS re-globs at build time, so a newly added chapter triggers a
+# re-configure instead of being invisible until someone runs cmake by hand.
+file(GLOB_RECURSE SPHINX_SOURCES CONFIGURE_DEPENDS
+     ${SPHINX_SOURCE}/*.md
+     ${SPHINX_SOURCE}/_static/*
+     ${SPHINX_SOURCE}/_templates/*)
+# AGENTS.md is excluded from the build (see exclude_patterns in conf.py).
+list(REMOVE_ITEM SPHINX_SOURCES ${SPHINX_SOURCE}/AGENTS.md)
+
 # Only regenerate Sphinx when:
 # - Doxygen has rerun
-# - Our doc files have been updated
+# - Any book source has been updated
 # - The Sphinx config has been updated
 add_custom_command(OUTPUT ${SPHINX_INDEX_FILE}
                    COMMAND ${SPHINX_EXECUTABLE} -b dirhtml
                    ${SPHINX_SOURCE} ${SPHINX_BUILD}
+                   # Sphinx keeps its own doctree cache and leaves index.html
+                   # untouched when nothing changed, which would leave the OUTPUT
+                   # older than its dependencies and re-run this command forever.
+                   COMMAND ${CMAKE_COMMAND} -E touch ${SPHINX_INDEX_FILE}
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    DEPENDS
-                   # Other docs files you want to track should go here (or in some variable)
-                   ${CMAKE_CURRENT_SOURCE_DIR}/index.md
+                   ${SPHINX_SOURCES}
                    ${DOXYGEN_INDEX_FILE}
                    MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
                    COMMENT "Generating documentation with Sphinx")

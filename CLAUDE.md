@@ -39,11 +39,13 @@ cmake --build build
 
 Pipeline: Doxygen scrapes `firmware/src/**/*.h` → `build/book/doxygen/xml/` → Breathe (project name `firmware`) → Sphinx `-b dirhtml` → `build/book/sphinx/`. Requires `doxygen`, `sphinx-build`, and `pip install -r book/requirements.txt`.
 
-Two gotchas:
+Two things worth knowing:
 
-- **The Sphinx target does not depend on the chapter files.** `book/CMakeLists.txt` lists only `index.md`, `conf.py`
-  and the Doxygen index, so editing a chapter and re-running `cmake --build build` rebuilds *nothing*. To actually
-  re-render, `rm -rf build/book/sphinx` first, or just run `sphinx-build -b dirhtml book <outdir>` directly.
+- **Incremental rebuilds are dependency-tracked, so trust them.** `book/CMakeLists.txt` globs every `*.md` plus
+  `_static/` and `_templates/` (with `CONFIGURE_DEPENDS`, so a newly added chapter is picked up without re-running
+  `cmake`), and the Sphinx command touches `index.html` afterwards because Sphinx leaves it alone when its own
+  doctree cache says nothing changed. Deleting a chapter is the one case the build system cannot notice — file
+  removal never makes an output stale — so `rm -rf build/book/sphinx` after deleting a page.
 - **The book does not build warning-free.** There is a standing baseline of **23** warnings (mostly MyST heading
   anchors that don't exist because `myst_heading_anchors` is unset in `conf.py`, plus the Pygments `asm` lexer
   choking on cc65 syntax). `book/AGENTS.md` says to treat new warnings as failures, which is right — but that means
