@@ -30,7 +30,7 @@ extensions = [
 ]
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'AGENTS.md']
 
 todo_include_todos = True
 
@@ -46,7 +46,7 @@ html_static_path = ['_static']
 html_theme_options = {
     'source_repository': 'https://github.com/X65/X65/',
     'source_branch': 'main',
-    'source_directory': 'docs/',
+    'source_directory': 'book/',
     # "sidebar_hide_name": True,
     "light_css_variables": {
         "color-brand-primary": "#0E556F",
@@ -68,7 +68,7 @@ sitemap_url_scheme = "{link}"
 
 # Breathe Configuration
 breathe_projects = {
-    "firmware": "../build/docs/doxygen/xml/",
+    "firmware": "../build/book/doxygen/xml/",
 }
 breathe_default_project = 'firmware'
 breathe_default_members = ('members', 'undoc-members')

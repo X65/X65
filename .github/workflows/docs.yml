@@ -35,15 +35,15 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Build docs
-        run: pip install -r docs/requirements.txt
+        run: pip install -r book/requirements.txt
           && cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
           && cmake --build build
-          && cd build/docs/sphinx
+          && cd build/book/sphinx
           && touch .nojekyll
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build/docs/sphinx/
+          path: build/book/sphinx/
 
   # Deployment job
   deploy:
