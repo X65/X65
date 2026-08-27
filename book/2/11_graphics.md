@@ -8,8 +8,6 @@ worked examples and tutorial sections are ongoing work.
 
 ## Interfacing with CGIA
 
----
-
 ## Display List
 
 The **Color Graphic Interface Adaptor (CGIA)** of the X65 microcomputer utilizes a **display list system** for defining and controlling video output. This approach is inspired by **Atari's ANTIC processor**, with additional flexibility to support **text, bitmap, multicolor, and advanced graphical modes**.

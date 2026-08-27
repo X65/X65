@@ -20,7 +20,6 @@ html_favicon = '_static/paw_logo_32_gray.png'
 extensions = [
     'sphinx.ext.todo',     # To-do list support
     'sphinx.ext.mathjax',  # Math support
-    'breathe',
     'sphinx_sitemap',
     'myst_parser',
     'sphinx_design',
@@ -66,14 +65,18 @@ html_css_files = [
 
 sitemap_url_scheme = "{link}"
 
-# Breathe Configuration
-breathe_projects = {
-    "firmware": "../build/book/doxygen/xml/",
-}
-breathe_default_project = 'firmware'
-breathe_default_members = ('members', 'undoc-members')
-
 myst_enable_extensions = ['colon_fence']
+# Generate anchors for headings down to level 4 so `file.md#some-heading` links
+# between chapters resolve; without this every such cross-reference warns.
+myst_heading_anchors = 4
+
+# Every ```asm block in this book is ca65 (the cc65 assembler). Pygments' default
+# `asm` lexer is GNU as, which fails on ca65's `.struct`, `::` and `|` syntax and
+# makes Sphinx fall back to relaxed lexing with a warning. Point `asm` at ca65.
+from pygments.lexers import get_lexer_by_name  # noqa: E402
+from sphinx.highlighting import lexers  # noqa: E402
+
+lexers['asm'] = get_lexer_by_name('ca65')
 
 ogp_site_url = 'https://docs.x65.zone'
 

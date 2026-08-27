@@ -1,4 +1,4 @@
-### Part 1: The X65 Microcomputer
+# Part 1: The X65 Microcomputer
 
 This section covers the **hardware and design philosophy** behind the X65, detailing what makes it unique and how it builds upon the legacy of classic computing. Topics include:
 

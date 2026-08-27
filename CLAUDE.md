@@ -37,25 +37,31 @@ cmake -S . -B build
 cmake --build build
 ```
 
-Pipeline: Doxygen scrapes `firmware/src/**/*.h` → `build/book/doxygen/xml/` → Breathe (project name `firmware`) → Sphinx `-b dirhtml` → `build/book/sphinx/`. Requires `doxygen`, `sphinx-build`, and `pip install -r book/requirements.txt`.
+Pipeline: Sphinx `-b dirhtml` over `book/` → `build/book/sphinx/`. Requires `sphinx-build` and `pip install -r book/requirements.txt`. (A Doxygen→Breathe stage used to feed firmware headers into the book; it was removed because no chapter ever used a `{doxygen*}` directive — the book is prose, and register tables are maintained by hand against the canonical sheet.)
 
-Two things worth knowing:
+Worth knowing:
 
 - **Incremental rebuilds are dependency-tracked, so trust them.** `book/CMakeLists.txt` globs every `*.md` plus
   `_static/` and `_templates/` (with `CONFIGURE_DEPENDS`, so a newly added chapter is picked up without re-running
   `cmake`), and the Sphinx command touches `index.html` afterwards because Sphinx leaves it alone when its own
   doctree cache says nothing changed. Deleting a chapter is the one case the build system cannot notice — file
   removal never makes an output stale — so `rm -rf build/book/sphinx` after deleting a page.
-- **The book does not build warning-free.** There is a standing baseline of **23** warnings (mostly MyST heading
-  anchors that don't exist because `myst_heading_anchors` is unset in `conf.py`, plus the Pygments `asm` lexer
-  choking on cc65 syntax). `book/AGENTS.md` says to treat new warnings as failures, which is right — but that means
-  *diffing against the baseline*, not expecting zero. Line numbers shift when you add lines, so normalise them:
-
-```sh
-sphinx-build -q -b dirhtml book /tmp/after 2>&1 | grep WARNING | sed 's/:[0-9]\+:/:/' | sort > /tmp/after.txt
-# stash your edits, repeat into /tmp/before.txt, then:
-comm -13 /tmp/before.txt /tmp/after.txt      # empty == you added no warnings
-```
+- **Sphinx warnings are build errors.** The book builds warning-free and `book/CMakeLists.txt` passes `-W`, so any
+  warning fails the build outright — there is no baseline to diff against. It also passes `-E`, which is what makes
+  `-W` trustworthy: Sphinx only re-resolves documents it thinks are stale, so with a warm doctree cache a warning
+  gets reported once and then silently vanishes on the next run, leaving a broken build that "passes" on retry.
+  `-E` re-reads everything each time and costs nothing measurable (~3.5s for the whole book). If a Sphinx upgrade
+  starts warning about something unrelated, fix it or drop the flag — do not reintroduce a tolerated baseline.
+- The custom command's output is a `.sphinx-stamp` inside `build/book/sphinx/`, not `index.html`: under `-W` Sphinx
+  writes its output *and then* exits non-zero, so keying off `index.html` would let a failed build look up to date.
+  The stamp is only touched when `sphinx-build` returns 0, and lives in the output tree so `rm -rf build/book/sphinx`
+  still forces a rebuild.
+- **Heading anchors exist down to level 4** (`myst_heading_anchors = 4`), so `[text](../1/4_graphics.md#a-heading)`
+  works. Em dashes are a trap: MyST strips the `—` but keeps the surrounding spaces, so a heading like
+  `MODE0 and MODE1 — Paletted Modes` is `#mode0-and-mode1--paletted-modes` — **two** dashes, even though the id in
+  the emitted HTML has one.
+- **```asm fences are lexed as ca65**, not GNU as — `conf.py` rebinds the `asm` lexer, because the book's assembly
+  is all cc65 syntax and Pygments' default `asm` lexer fails on `.struct`, `::` and `|`.
 
 ### Emulator
 
@@ -182,7 +188,7 @@ When a fact about the machine is in question, resolve in this order (from `book/
 
 `book/AGENTS.md` is the full guide; the essentials:
 
-- MyST Markdown with `colon_fence`, `sphinx_design`, `sphinx_inline_tabs`, `sphinx_copybutton`, mathjax, and `breathe` (`{doxygenfunction}` etc. against the `firmware` project).
+- MyST Markdown with `colon_fence`, `sphinx_design`, `sphinx_inline_tabs`, `sphinx_copybutton` and mathjax.
 - Chapter files are globbed by `{toctree}`, so naming carries meaning: `book/1/N_topic.md` (single digit), `book/2/NN_topic.md` (zero-padded), `book/A/L_topic.md` (capital letter). Top heading is `# Chapter N: Title` / `# Appendix L: Title`.
 - Cross-reference chapters with relative Markdown links (`[Chapter 4](../1/4_graphics.md)`). **Never hyperlink into a submodule path** — the published site does not expose those trees.
 - New jargon goes into `book/A/B_glossary.md`, register/opcode summaries into `book/A/E_cheat_sheet.md`.

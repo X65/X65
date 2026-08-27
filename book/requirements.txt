@@ -1,4 +1,3 @@
-breathe
 furo
 myst-parser
 sphinx-sitemap

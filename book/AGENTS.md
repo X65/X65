@@ -19,7 +19,7 @@ This repository is **not** the place to modify firmware, emulator, schematic, or
   - [`book/A/`](A/) — Appendices (memory map, glossary, 65816 migration, systems comparison, cheat sheet)
   - [`book/conf.py`](conf.py) — Sphinx configuration
   - [`book/requirements.txt`](requirements.txt) — Python packages
-  - [`book/CMakeLists.txt`](CMakeLists.txt) + [`book/Doxyfile.in`](Doxyfile.in) — build glue (Doxygen → Breathe → Sphinx)
+  - [`book/CMakeLists.txt`](CMakeLists.txt) — build glue (Sphinx)
   - [`book/_static/`](_static/) — images, logo, custom CSS
 - [`CMakeLists.txt`](../CMakeLists.txt) — root project; delegates to `book/`
 - Submodules (listed in [`.gitmodules`](../.gitmodules)): [`firmware/`](../firmware/), [`schematic/`](../schematic/), [`emulator/`](../emulator/), [`examples/`](../examples/)
@@ -46,26 +46,26 @@ cmake -S . -B build
 cmake --build build
 ```
 
-Generated HTML lives at `build/book/sphinx/` (Sphinx is invoked with `-b dirhtml`). Doxygen XML is produced at `build/book/doxygen/xml/` and consumed by the `breathe` extension.
+Generated HTML lives at `build/book/sphinx/` (Sphinx is invoked with `-b dirhtml`).
 
-**Prerequisites:** Doxygen, Sphinx, and the Python packages in [`book/requirements.txt`](requirements.txt) (`myst-parser`, `furo`, `breathe`, `sphinx-sitemap`, `sphinx-design`, `sphinx-inline-tabs`, `sphinx-copybutton`, `sphinxext-opengraph`).
+**Prerequisites:** Sphinx and the Python packages in [`book/requirements.txt`](requirements.txt) (`myst-parser`, `furo`, `sphinx-sitemap`, `sphinx-design`, `sphinx-inline-tabs`, `sphinx-copybutton`, `sphinxext-opengraph`).
 
-After any edit, re-run the build and confirm **no new Sphinx warnings** (broken links, missing toctree entries, unknown directives, etc.). Warnings are how MyST surfaces real problems.
+The build runs Sphinx with `-W`, so **any warning is a build error** — there is nothing to triage and no baseline to compare against. If `cmake --build build` fails, read the warning: it is a broken link, a missing toctree entry or an unknown directive, and it is yours. Do not silence one with `suppress_warnings`; fix the cause, or say so if you believe the warning is wrong.
 
 ## Writing Style & Conventions
 
 - All content is **[MyST Markdown](https://myst-parser.readthedocs.io/)** (`.md`). Use standard Markdown plus MyST directives where helpful.
 - Enabled MyST/Sphinx extensions you may freely use:
   - `colon_fence` — `:::{note}` / `:::{warning}` admonition syntax
+  - heading anchors are generated down to level 4 (`myst_heading_anchors`), so you can link to a specific section as `[text](../1/4_graphics.md#some-heading)`
   - `sphinx_design` — grids, cards, tabs, dropdowns
   - `sphinx_inline_tabs` — language/platform tabs
   - `sphinx_copybutton` — automatic copy buttons on code blocks
   - `sphinx.ext.mathjax` — LaTeX-style math via `$...$` and `$$...$$`
-  - `breathe` — pull Doxygen content from firmware headers via `{doxygenfunction}`, `{doxygenstruct}`, etc. (Breathe project name: `firmware`.)
 - Prefer **prose with bolded key terms** for first-time concepts (e.g. `**CGIA**`, `**Display List**`). Follow the voice in [`book/1/1_introduction.md`](1/1_introduction.md) and [`book/1/4_graphics.md`](1/4_graphics.md) — declarative, educational, moderately formal.
 - Use tables for register maps, bit layouts, opcode listings (see [`book/A/E_cheat_sheet.md`](A/E_cheat_sheet.md)).
 - Fenced assembly code blocks use the language tag ```` ```asm ````; C code uses ```` ```c ````.
-- Cross-reference other chapters using **relative Markdown links**, e.g. `[Chapter 4](../1/4_graphics.md)`. Do **not** hyperlink into submodule content — the published site does not expose submodule source trees.
+- Cross-reference other chapters using **relative Markdown links**, e.g. `[Chapter 4](../1/4_graphics.md)`. To target a section, append the heading's slug. **Watch out for em dashes**: MyST drops the `—` but keeps the spaces on either side, so `#### MODE0 and MODE1 — Paletted Modes` is `#mode0-and-mode1--paletted-modes` — two dashes, even though the id in the rendered HTML has one. If a heading link warns, that is usually why. Do **not** hyperlink into submodule content — the published site does not expose submodule source trees.
 - Keep images in [`book/_static/`](_static/) and reference them with relative paths.
 - Glossary terms go in [`book/A/B_glossary.md`](A/B_glossary.md); add entries when introducing new jargon.
 
@@ -97,7 +97,7 @@ When two sources conflict, firmware wins. When firmware is silent, schematic win
 
 ## Validation Checklist (before reporting a change as done)
 
-- [ ] `cmake --build build` runs clean with no new Sphinx warnings.
+- [ ] `cmake --build build` succeeds — under `-W` that already means zero Sphinx warnings.
 - [ ] New/renamed chapters appear in the generated HTML under `build/book/sphinx/` and in the sidebar.
 - [ ] Any factual claim about hardware or registers was cross-checked against `firmware/` source.
 - [ ] No hyperlinks into submodule paths; examples are adapted, not linked.
@@ -108,5 +108,5 @@ When two sources conflict, firmware wins. When firmware is silent, schematic win
 
 - **MyST/Sphinx parse errors**: consult the [MyST reference](https://myst-parser.readthedocs.io/). Most errors are unknown directive names or mis-nested admonitions.
 - **Missing Python packages**: `pip install -r book/requirements.txt`.
-- **Doxygen failures**: inspect [`book/Doxyfile.in`](Doxyfile.in) and the `SOURCE_HEADERS_DIR` in [`book/CMakeLists.txt`](CMakeLists.txt). If the firmware tree has been restructured, the INPUT path may need updating — flag this to the maintainer rather than silently changing build infrastructure.
+- **Stale rendered pages after deleting a chapter**: removing a source file never makes a build output stale, so `rm -rf build/book/sphinx` and rebuild.
 - **Submodules empty**: run `git submodule update --init` from the repository root.

@@ -1,4 +1,4 @@
-### Part 2: Programming the X65 in 65816 Assembly
+# Part 2: Programming the X65 in 65816 Assembly
 
 The second half of the book is dedicated to **writing software for the X65** using **65816 assembly language**. This section provides a structured learning path, covering everything from the basics of the instruction set to advanced optimization techniques. Topics include:
 
