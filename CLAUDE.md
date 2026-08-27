@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `X65/X65` is the umbrella ("mono") repository for the **X65 microcomputer** — a modern 8-bit machine built around a WDC 65C816 with custom chips implemented in software on RP2350 microcontrollers.
 
-It builds exactly one thing of its own: **the X65 Book** in `book/`, published to <https://docs.x65.zone>. Everything else is a git submodule pointing at an independent GitHub repo with its own build, CI and history.
+It builds one thing of its own: **the X65 Book** in `book/`, published to <https://docs.x65.zone>. Everything else is a git submodule pointing at an independent GitHub repo with its own build, CI and history. The root build also carries opt-in targets that *drive* those submodule builds (`emu`, `emu-wasm`, `examples`) and one that refreshes the web emulator and its ROMs inside the `x65.zone` checkout (`site`) - none of them is in `ALL`, so a plain `cmake --build build` still builds only the book, which is all CI does.
 
 The reason this checkout exists is that each child repo builds and passes CI on its own, so **contradictions *between* them are invisible from inside any one of them**. Duplicated register maps, vendored headers that drifted, docs describing behavior no implementation has. Treat cross-repo agreement as part of the deliverable, not just per-repo correctness.
 
@@ -30,7 +30,7 @@ The reason this checkout exists is that each child repo builds and passes CI on 
 
 ## Build and test
 
-### The book (the only root-level build)
+### The book (the only thing the root build makes itself)
 
 ```sh
 cmake -S . -B build
@@ -118,6 +118,26 @@ picocom -b 115200 /dev/ttyACM0
 ### Website
 
 `cd x65.zone && bundle install && bundle exec jekyll serve`. Deploys from `master` via GitHub Pages.
+
+### Driving the submodule builds from the root
+
+Opt-in targets, none in `ALL` - CI builds and deploys the book and nothing else:
+
+```sh
+cmake --build build --target emu        # native emulator  -> build/emulator/emu
+cmake --build build --target emu-wasm   # web emulator     -> build/emulator-wasm/emu.{html,js,wasm}
+cmake --build build --target examples   # .xex ROMs        -> build/examples/src/
+cmake --build build --target site       # both of the above, copied into x65.zone/emu/
+```
+
+They shell out to each submodule's own CMake rather than `add_subdirectory` (different
+toolchains: cc65 for `examples`, Emscripten for `emu-wasm`) and build into this build tree,
+so the submodule working trees stay clean. `site` copies and stops - x65.zone deploys from
+`master` through GitHub Pages, so committing is left to a human. Which ROMs it publishes,
+and under what names, is the editable table in `cmake/SiteRoms.cmake`; it mirrors the
+entries in `x65.zone/_data/emu.yml` that come from `examples`, and everything else in
+`emu/roms/` is hand-made and must be left alone. The SID players are merged with their tune
+by `xex-filter.pl` (not vendored; `site` skips them when it is missing).
 
 ## Architecture
 
