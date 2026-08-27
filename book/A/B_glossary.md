@@ -58,21 +58,33 @@
 
 ## Audio Terms
 
-**CODEC** - The analog-mixed-signal chip that converts the audio MCU's 48 kHz stereo I²S bitstream into analog line-out, and accepts analog line-in.
+**CODEC** - The analog-mixed-signal chip that converts the audio MCU's 48 kHz stereo I²S bitstream into analog line-out, and accepts analog line-in. On the SGU-1 module this is a TI AIC3254, whose on-chip mixer also applies the master volume to the full-scale stream the MCU hands it.
+
+**ESFM** - The Enhanced FM synthesis mode of the ESS AudioDrive chips, and the model for SGU-1's operator routing: instead of choosing from a fixed table of algorithms, each operator carries its own output level and modulation-input level, so any topology in between is expressible. See [Appendix G](G_sgu1.md).
 
 **FM Synthesis** - Frequency Modulation synthesis, the per-operator sound generation method at the heart of the X65's SGU-1 chip.
 
-**Furnace Tracker** - An open-source multi-chip tracker composition tool. X65 maintains a port (`github.com/X65/furnace`) that adds SGU-1 as a supported chip, so songs can be written and exported directly against the real hardware's capabilities.
+**GATE / TRIG** - The two keying bits in an SGU-1 channel's `FLAGS0` register, with two distinct jobs. `GATE` is the key *level*: high while the key is held, low to release it. Raising it on a released or idle voice enters attack from the envelope's current attenuation (the SID's soft retrigger); writing it to a voice that is already sounding leaves the envelope alone, which is what makes ties and legato possible. `TRIG` is the one-shot, self-clearing bit that restarts the envelope from silence - the only way to retrigger a sounding note. Together they express key-down, note-on, note-off and note-cut as single writes.
 
 **I²S** - The three-wire digital audio link (bit clock, word clock, data) between the audio MCU and the CODEC. The X65 runs it at 48 kHz, 32-bit, master-mode from the audio MCU side.
+
+**Operator** - One of the four oscillator-plus-envelope units that make up an SGU-1 channel. Each has its own waveform, frequency multiplier, envelope and routing levels, and can act as a modulator, a carrier, or both at once.
 
 **Paw key (🐾)** - The X65 keyboard's dedicated command-modifier key, equivalent in position to the Windows / Meta / ⌘ key on other platforms. Used for OS-level chord shortcuts — for example `🐾`+digit to switch virtual terminals.
 
 **PWM (Pulse-Width Modulation)** - A technique for generating analog signals from digital devices. Used by the X65 system buzzer to produce simple tones.
 
-**SGU-1 (Sound Generator Unit 1)** - The X65's custom synthesis chip. Nine stereo channels of four-operator FM with per-operator waveform selection (including PCM as a wavetable), per-operator ADSR envelopes, a SID-style multimode filter, three independent hardware sweeps per channel, and a shared 64 KB PCM bank. Implemented in firmware on a dedicated RP2350 audio chip that is attached to the SOUTH chip over an SPI link; reached from the CPU as the `SPU` device on the PIX bus, which SOUTH forwards over SPI to the audio chip.
+**Service Bank** - The register page mapped into the SGU-1's window by writing `$FF` to the channel selector. It reaches past the synthesis engine: the sample-upload port addresses PCM memory, and the master volume and routing controls are a proxy for the CODEC/DSP that follows the waveform generator. See [Appendix G](G_sgu1.md).
+
+**SGM** - The SGU-1's native module format. A `.sgm` file is an `.xex` chunk stream carrying song data, a player image and any PCM sample image, with no reset vector - music as a library rather than a program.
+
+**SGU-1 (Sound Generator Unit 1)** - The X65's custom synthesis chip. Nine stereo channels of four-operator FM with per-operator waveform selection (including PCM as a wavetable), per-operator ADSR envelopes, a SID-style multimode filter, three independent hardware sweeps per channel, and a shared 64 KB PCM bank. A self-contained castellated module carrying its own RP2354 and CODEC; the X65 board hosts one, attached to the SOUTH chip over an SPI link and reached from the CPU as the `SPU` device on the PIX bus, which SOUTH forwards over SPI to the module.
+
+**SGU Tracker** - The SGU-1's own chiptune tracker, published at <https://tracker.x65.zone/> and derived from klystrack with the playback engine rewritten to drive the chip directly. Exports SGM modules that 65816 code loads and plays.
 
 **tSU (tildearrow Sound Unit)** - The fantasy synthesis chip from the Furnace tracker that the SGU-1 is conceptually based on. SGU-1 lifts the tSU operator model and wraps it in a memory-mapped register interface sized for X65 (9 channels, 4 operators).
+
+**WPAR (Waveform Parameter)** - A 4-bit per-operator field on the SGU-1 whose meaning depends on the selected waveform: wave-shape variants for sine/triangle/sawtooth, a fixed pulse width for pulse, and the LFSR tap configuration for periodic noise.
 
 ## I/O and System Terms
 
@@ -106,7 +118,7 @@
 
 **RIA (Retro Interface Adaptor)** - The subsystem inside the NORTH chip that exposes the fastcall API at `$FFF0–$FFF3`, aggregates IRQ sources into a single CPU interrupt, and provides USB, storage, and other modern I/O capabilities to 65816 software.
 
-**RP2350** - The Raspberry Pi microcontroller used in the X65 to implement the NORTH, SOUTH, and audio chips. Its Programmable I/O (PIO) blocks are how the X65 handles the CPU bus, the PIX bus, and several peripheral protocols in software.
+**RP2350** - The Raspberry Pi microcontroller used in the X65 to implement the NORTH and SOUTH chips. Its Programmable I/O (PIO) blocks are how the X65 handles the CPU bus, the PIX bus, and several peripheral protocols in software. The SGU-1 module runs on an RP2354, the same silicon with flash stacked in the package.
 
 **SOUTH chip** - The RP2350 microcontroller in the X65 that hosts the CGIA (graphics) implementation together with the terminal and font systems. Also bridges the separate SGU-1 audio chip via an SPI link, presenting it as the `SPU` device on the PIX bus. Reached from the CPU via the PIX bus.
 

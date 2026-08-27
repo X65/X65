@@ -61,11 +61,11 @@ The significant thing about K816 for the X65 project is that **OS/816 is written
 
 A short taste of K816 source (a `Hello, UART` program) is walked through in [Chapter 9](../2/09_dev_env.md).
 
-## Furnace Tracker Port
+## SGU Tracker
 
-Music for the SGU-1 is composed in a **fork of Furnace Tracker** maintained at <https://github.com/X65/furnace>. Upstream Furnace is a modern, multi-chip tracker with support for classic Yamaha, SID, POKEY, and many other vintage sound chips. The X65 port adds SGU-1 as one of those chips, so songs can be written, auditioned, and exported against the real register behavior of the X65's sound hardware.
+Music for the SGU-1 is composed in **SGU Tracker**, published at <https://tracker.x65.zone/>. It grew out of the klystrack tracker — the same pattern editor, keyboard workflow and module importers — with the playback engine rewritten to drive an SGU-1 directly, so songs are written, auditioned, and exported against the real register behavior of the X65's sound hardware. It runs directly in the browser at that address, and ready-made Linux and Windows builds are under <https://tracker.x65.zone/latest/>.
 
-From a development workflow perspective the tracker replaces the "write a lot of register-poking code by hand" step: a composer writes a song in Furnace, exports it to a compact data format, and the 65C816-side player consumes that data and poll-drives the SGU-1. Assembly-level programming patterns for consuming tracker output are in [Chapter 12: Sound Programming](../2/12_sound.md).
+From a development workflow perspective the tracker replaces the "write a lot of register-poking code by hand" step: a composer writes a song in SGU Tracker and exports it as a `.sgm` module, which carries both the song data and a player image the 65C816 side calls from its own interrupt handler. Assembly-level programming patterns for consuming tracker output are in [Chapter 12: Sound Programming](../2/12_sound.md).
 
 ## Monitor Console
 
@@ -77,4 +77,4 @@ The full monitor catalogue, grouped by purpose, is in [Chapter 6: Input and Outp
 
 ## Summary
 
-The X65 development environment is built from a small number of pieces designed to feel modern without erasing the low-level character of the machine: **Emu** for fast iteration on desktop or in the browser, **cc65-dbg** for source-level debugging in VS Code, **cc65/ca65** as the default assembler, **K816** as the structured, Rust-based alternative that the OS itself is written in, **Furnace** for composing music, and the on-target **monitor** for moving artifacts between host and board. Setup and invocation details for each of these are covered in the Part 2 chapters that follow.
+The X65 development environment is built from a small number of pieces designed to feel modern without erasing the low-level character of the machine: **Emu** for fast iteration on desktop or in the browser, **cc65-dbg** for source-level debugging in VS Code, **cc65/ca65** as the default assembler, **K816** as the structured, Rust-based alternative that the OS itself is written in, **SGU Tracker** for composing music, and the on-target **monitor** for moving artifacts between host and board. Setup and invocation details for each of these are covered in the Part 2 chapters that follow.

@@ -61,7 +61,9 @@ The build runs Sphinx with `-W`, so **any warning is a build error** — there i
   - `sphinx_design` — grids, cards, tabs, dropdowns
   - `sphinx_inline_tabs` — language/platform tabs
   - `sphinx_copybutton` — automatic copy buttons on code blocks
-  - `sphinx.ext.mathjax` — LaTeX-style math via `$...$` and `$$...$$`
+  - `sphinx.ext.mathjax` is loaded, but MyST's `dollarmath` is **not** enabled, so `$...$` / `$$...$$` are
+    plain text — deliberately, because the book writes hex addresses as `$FF00` everywhere. Use a
+    ```` ```text ```` block for formulas, or the `{math}` role/directive if you genuinely need typeset math
 - Prefer **prose with bolded key terms** for first-time concepts (e.g. `**CGIA**`, `**Display List**`). Follow the voice in [`book/1/1_introduction.md`](1/1_introduction.md) and [`book/1/4_graphics.md`](1/4_graphics.md) — declarative, educational, moderately formal.
 - Use tables for register maps, bit layouts, opcode listings (see [`book/A/E_cheat_sheet.md`](A/E_cheat_sheet.md)).
 - Fenced assembly code blocks use the language tag ```` ```asm ````; C code uses ```` ```c ````.
@@ -88,7 +90,10 @@ When researching facts about the machine, use these sources **in priority order*
    - [`firmware/src/audio/`](../firmware/src/audio/) — audio co-processor
 
    If the book and firmware disagree, **the book is wrong** — update the book. Paraphrase freely; do not hyperlink.
-2. **[`schematic/`](../schematic/)** (submodule) — KiCad + PDF for board-level details (pinouts, bus wiring, connectors). Cite behavior; do not embed copyrighted excerpts verbatim.
+2. **[`schematic/`](../schematic/)** (submodule) — KiCad + PDF for board-level details (pinouts, bus wiring, connectors)
+   of **released hardware only** (`protoA`/`protoB`/`protoC`). Current development boards are unpublished, so this tree
+   says nothing about them and its silence is not evidence of anything. Cite behavior; do not embed copyrighted
+   excerpts verbatim.
 3. **[`emulator/`](../emulator/)** (submodule) — C source for the X65 emulator; useful for overall architecture and CPU/bus interactions. **Generalize** — the emulator is a model, not the machine. Do not copy verbatim.
 4. **[`examples/`](../examples/)** (submodule) — reference 65816 programs for Part 2. Adapt snippets into the book with surrounding narrative and updated context; do not link out to the submodule.
 5. **[`reference/`](../reference/)** (local, **not** a submodule) — third-party datasheets and background articles (W65C816, YMF262, RP2350, HDMI/DVI, etc.). Distill; **never quote verbatim**. Datasheets in particular are background reading, not book content.

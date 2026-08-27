@@ -1,12 +1,44 @@
 # Chapter 12: Sound Programming
 
-The SGU-1 synthesis model and the audio plumbing are covered in [Chapter 5](../1/5_audio.md); the full register map lives in [Appendix A](../A/A_memory_map.md). This chapter is the programming-side counterpart — the idiomatic sequences for picking a channel, setting up a voice, running an envelope, sweeping a parameter, playing back PCM, and beeping the buzzer.
+The SGU-1 synthesis model and the audio plumbing are covered in [Chapter 5](../1/5_audio.md); the full register map lives in [Appendix A](../A/A_memory_map.md), and [Appendix G](../A/G_sgu1.md) documents what every field means numerically. This chapter is the programming-side counterpart — the idiomatic sequences for picking a channel, setting up a voice, running an envelope, sweeping a parameter, playing back PCM, and beeping the buzzer.
 
 ## The SGU-1 Register Window
 
-The whole of the SGU-1 is reached through a **64-byte window at `$FEC0–$FEFF`**. That window is **channel-switched**: the byte at offset `$3F` (i.e. `$FEFF`) is a selector that remaps the other 63 bytes to the registers of one specific channel. Writing a channel number `0..8` there switches the window; writes wrap modulo-9, so `STA $FEFF` with an invalid value simply lands on channel (value mod 9).
+The whole of the SGU-1 is reached through a **64-byte window at `$FEC0–$FEFF`**. That window is **channel-switched**: the byte at offset `$3F` (i.e. `$FEFF`) is a selector that remaps the other 63 bytes to the registers of one specific channel. Writing a channel number `$00`-`$08` there switches the window, and `$FF` selects the **service bank** instead — the sample port and the controls for the CODEC/DSP downstream. Values `$09`-`$FE` are reserved -- write only the defined ones.
 
-A minimal programming cycle therefore looks like: select channel, configure, key on. To configure a different channel, select it and configure again. Changes to one channel do not touch the others' state.
+## Bringing the Chip Up
+
+Two things have to happen before any note will sound, and both are easy to forget because neither produces an error — just silence.
+
+**Reset the chip.** A program that starts warm inherits whatever the previous one left running: held gates, armed sweeps, a looping PCM voice, a filter with its cutoff closed. The simplest reset is to wipe every channel's registers to zero, which is precisely what a hardware reset does to them.
+
+```asm
+    ; 8-bit A/X/Y (SEP #$30), data bank $00
+    ldy #8                  ; channels 8 down to 0
+reset_ch:
+    sty $FEFF               ; select the channel
+    ldx #$3E                ; window offsets $3E..$00
+    lda #$00
+reset_reg:
+    sta $FEC0,x             ; $FEFF, the selector itself, is left alone
+    dex
+    bpl reset_reg
+    dey
+    bpl reset_ch
+```
+
+**Unmute.** The chip comes up silent by design: the service bank's master volume gates the entire mix and resets to zero, so that a reset can never blast whatever the register file happened to be holding. Select the service bank with `$FF` and raise it.
+
+```asm
+    lda #$FF
+    sta $FEFF               ; select the service bank
+    lda #$FF
+    sta $FEE0               ; master volume -- unmute
+```
+
+The full cycle is therefore **reset, unmute, select a channel, configure it, set its volume, key on**. To configure a different channel, select it and configure again; changes to one channel do not touch the others' state.
+
+Channel volume deserves its own step in that list because it is zero after a reset, and a channel with `VOL = 0` is silent no matter how carefully its operators are programmed.
 
 ## Selecting a Channel
 
@@ -28,12 +60,12 @@ Per-operator registers (`R0..R7`) hold everything needed for one FM operator: wa
 
 ## Programming a Voice
 
-The order of operations matters less than you might expect — almost every register is latched and only evaluated when the channel's **GATE** bit is set. The canonical setup sequence:
+The order of operations matters less than you might expect: registers take effect as they are written, and the envelope only starts on the key-on. The canonical setup sequence, assuming the chip has already been reset and unmuted:
 
 1. Select the channel.
-2. Set per-operator fields: waveform, `MUL`, `TL`, envelope (`AR` / `DR` / `SL` / `RR` / `SR`), routing (`OUT` / `MOD`).
-3. Set channel fields: pitch (`FREQ`), volume (`VOL`), pan (`PAN`), filter mode (`FLAGS0`), any per-sweep enables (`FLAGS1`).
-4. Key on by setting the GATE bit in `FLAGS0`.
+2. Set per-operator fields: waveform, `MUL`, `TL`, envelope (`AR` / `DR` / `SL` / `RR` / `SR`), routing (`OUT` = this operator's level into the channel mix, `MOD` = how hard the *previous* operator modulates it -- feedback on operator 0).
+3. Set channel fields: pitch (`FREQ`), **volume (`VOL`)** — zero after a reset, so a channel left at the default is silent — pan (`PAN`), filter taps (`FLAGS0`), any sweep enables (`FLAGS1`).
+4. Key on: set `GATE` and `TRIG` together in `FLAGS0`.
 
 A simple two-operator FM setup — one carrier, one modulator — at middle A, with a pluck-like envelope:
 
@@ -54,7 +86,7 @@ A simple two-operator FM setup — one carrier, one modulator — at middle A, w
     lda #0
     sta $FEC4               ; R4: DT=0, SR=0
     sta $FEC5               ; R5: no delay / FIX / WPAR
-    lda #%00000010          ; R6: MOD routes to operator 1 (bit 1 of MOD=3-bit dest)
+    lda #%00000000          ; R6: no feedback (MOD on operator 0 is feedback gain)
     sta $FEC6
     lda #%00000000          ; R7: OUT=0 (internal only), WAVE=0 (SINE)
     sta $FEC7
@@ -69,27 +101,66 @@ A simple two-operator FM setup — one carrier, one modulator — at middle A, w
     lda #$07                ; R3: SL=0, RR=7
     sta $FECB
     lda #0
-    sta $FECC
-    sta $FECD
+    sta $FECC               ; R4: DT=0, SR=0
+    sta $FECD               ; R5: no delay / FIX / WPAR
+    lda #%00001110          ; R6: MOD=7 -- take full modulation from operator 0
     sta $FECE
     lda #%11100000          ; R7: OUT=7 (max), WAVE=0 (SINE)
     sta $FECF
 
     ; Channel: pitch, volume, gate
-    lda #<7256              ; ~A4 at 48 kHz
+    lda #<7382              ; A4 (440 Hz); FREQ = Hz * 2^24 / 1000000
     sta $FEE0
-    lda #>7256
+    lda #>7382
     sta $FEE1
     lda #$40                ; VOL = 64
     sta $FEE2
     lda #0                  ; PAN centre
     sta $FEE3
 
-    lda #%00000001          ; FLAGS0: GATE = 1 (key on)
+    lda #%00000011          ; FLAGS0: GATE + TRIG (note-on from silence)
     sta $FEE4
 ```
 
-Writing `FLAGS0` with bit 0 cleared releases the note; the envelope will run to its release stage and the channel goes idle. Key-on after release starts a fresh envelope.
+The two bits do different jobs. `GATE` (bit 0) is the key **level**, not an edge. Raising it on a released or idle voice starts the note — the envelope enters attack from whatever attenuation it currently sits at — but writing it to a voice that is *already sounding* leaves the envelope entirely alone, which is why a new `FREQ` under a held gate slurs instead of retriggering. `TRIG` (bit 1) is the one-shot, self-clearing bit that restarts the envelope from silence: it is the only way to retrigger a note that is still sounding, and leaving it clear is the only way to avoid restarting one. The two together spell out the four note events -- `%11` note-on, `%01` legato key-down, `%00` note-off, `%10` note-cut -- each a single write. [Appendix G](../A/G_sgu1.md) has the full table.
+
+## Changing a Voice While It Sounds
+
+The SGU-1 has no shadow registers and no double-buffering: the synthesis engine reads each register as it renders each sample, so a write takes effect on the next one, mid-note. Rewriting a sounding voice is therefore normal practice, and for legato, slides, swells and filter motion it is the only way to get the effect at all: the alternatives (a `TRIG`, or a `GATE` cycle) both disturb the envelope you are trying to keep.
+
+**Legato** is a pitch change with the gate left up. Nothing else changes; the envelope carries on from wherever it is:
+
+```asm
+    lda #0
+    sta $FEFF               ; select channel 0
+    lda #<8286              ; new pitch (B4, 493.9 Hz)
+    sta $FEE0
+    lda #>8286
+    sta $FEE1               ; FLAGS0 untouched -- the note slurs
+```
+
+**A slide** is the same write repeated, a step at a time, from the driver's per-frame tick:
+
+```asm
+    ; once per frame while the note is held; freq_lo/hi is the driver's shadow
+    lda #0
+    sta $FEFF
+    lda freq_lo
+    clc
+    adc #<SLIDE_STEP
+    sta freq_lo
+    sta $FEE0
+    lda freq_hi
+    adc #>SLIDE_STEP
+    sta freq_hi
+    sta $FEE1
+```
+
+Or hand the whole gesture to the hardware and let the frequency sweep run it, which costs one setup and no per-frame work at all (see [Sweeps](#sweeps) below). What you must not do is both: an armed sweep writes back into `FREQ` itself, so a CPU-driven slide and a hardware sweep on the same parameter will fight over the register.
+
+The same applies to every other channel and operator parameter. `VOL` under a held gate is a swell or a fade, `CUTOFF` is filter motion, `DUTY` is PWM, and operator `TL` / `MOD` / `OUT` morph the timbre the way a filter would on a subtractive synth.
+
+One register needs care: `FLAGS0` holds `TRIG` next to the filter taps and the PCM bit. `TRIG` self-clears, so reading the register back will not show it — but a shadow byte or an instrument image with the bit still set will re-fire the retrigger the next time anything writes that register, resetting the envelope. Keep `GATE` and `TRIG` out of stored patches and out of the driver's shadow, and add them explicitly at the note event: `ORA #$01` for a key-down, `ORA #$03` for a note-on.
 
 ## Envelope Shapes
 
@@ -108,7 +179,7 @@ These are starting points — FM's timbre depends heavily on per-operator `TL` a
 
 ## Filter
 
-Each channel has a **per-channel multimode filter** shared by all of its operators. Cutoff is 16 bits (`CUTOFF_L` / `CUTOFF_H`), resonance is 8 bits (`RESON`, `0` = no feedback, `255` = maximal resonance). Mode is selected by bits in `FLAGS0` (see Appendix A for the exact layout — typically low-pass, high-pass, band-pass, or a compound mode).
+Each channel has a **per-channel multimode filter** shared by all of its operators. Cutoff is 16 bits (`CUTOFF_L` / `CUTOFF_H`), resonance is 8 bits (`RESON`, `0` = no feedback, `255` = maximal resonance). The output taps are selected by `FLAGS0` bits 5 (low), 6 (high) and 7 (band); selected taps are summed, so a compound mode is just two bits set. With all three clear the filter is bypassed entirely.
 
 ```asm
     lda #<4000              ; cutoff value
@@ -117,7 +188,7 @@ Each channel has a **per-channel multimode filter** shared by all of its operato
     sta $FEE7
     lda #120                ; RESON: moderate resonance
     sta $FEE9
-    lda #%00010001          ; FLAGS0: low-pass mode + GATE
+    lda #%00100001          ; FLAGS0: low-pass tap (bit 5) + GATE
     sta $FEE4
 ```
 
@@ -140,7 +211,7 @@ Example — a slow upward cutoff sweep that opens the filter after key-on:
     sta $FEF8
     lda #>200
     sta $FEF9
-    lda #%01000080          ; SWCUT_AMOUNT: up, moderate
+    lda #%10001000          ; SWCUT_AMT: bit 7 = up, step = 8
     sta $FEFA
     lda #$E0                ; SWCUT_BOUND
     sta $FEFB

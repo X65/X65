@@ -101,21 +101,46 @@ STA $123456   ; Store to long address
 
 ### Playing a Note on the SGU-1
 
-The SGU-1 register window lives at `$FEC0–$FEFF`. The bottom of the window holds the currently-selected channel's per-channel registers (frequency, volume, gate, etc.); a channel-select register picks which of the nine channels is mapped in. See [Chapter 12](../2/12_sound.md) for the channel-select sequence.
+The SGU-1 register window lives at `$FEC0-$FEFF` and is channel-switched: `$FEFF` selects which channel the
+window exposes. Within the window, `$FEC0-$FEDF` are the four operators (8 bytes each) and `$FEE0-$FEFE` are
+the channel-wide controls. See [Chapter 12](../2/12_sound.md) for the full sequence and
+[Appendix G](G_sgu1.md) for what the fields mean.
 
 ```asm
-    ; With channel 0 selected in the SGU window:
-    LDA #<7256              ; phase increment for ~A4 (≈440 Hz at 48 kHz)
-    STA $FEC0               ; SGU CHN_FREQ_L
-    LDA #>7256
-    STA $FEC1               ; SGU CHN_FREQ_H
+    SEP #$30                ; 8-bit A *and* index registers
+    LDY #8                  ; reset: wipe all 9 channels to zero
+RESET_CH:
+    STY $FEFF               ; select the channel
+    LDX #$3E
+    LDA #$00
+RESET_REG:
+    STA $FEC0,X
+    DEX
+    BPL RESET_REG
+    DEY
+    BPL RESET_CH
+
+    LDA #$FF                ; the chip powers up muted
+    STA $FEFF               ; select the service bank
+    LDA #$FF
+    STA $FEE0               ; master volume: unmute
+
+    LDA #$00
+    STA $FEFF               ; select channel 0
+
+    LDA #<7382              ; phase increment for A4 (440 Hz)
+    STA $FEE0               ; SGU CHN_FREQ_L
+    LDA #>7382
+    STA $FEE1               ; SGU CHN_FREQ_H
 
     LDA #64                 ; volume
-    STA $FEC2               ; SGU CHN_VOL
+    STA $FEE2               ; SGU CHN_VOL
 
-    LDA #$01                ; FLAGS0 bit 0 = GATE (key-on)
-    STA $FEC4               ; SGU CHN_FLAGS0
+    LDA #$03                ; FLAGS0: GATE (bit 0) + TRIG (bit 1) = note-on
+    STA $FEE4               ; SGU CHN_FLAGS0
 ```
+
+`FREQ` is a phase increment, not a frequency: multiply hertz by 16.777 (`FREQ = Hz * 2^24 / 1000000`).
 
 ## CGIA Register Reference
 

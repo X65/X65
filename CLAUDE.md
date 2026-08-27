@@ -179,7 +179,9 @@ The same facts are written down in several places, and the copies are not genera
 When a fact about the machine is in question, resolve in this order (from `book/AGENTS.md`):
 
 1. `firmware/` — if the book and the firmware disagree, **the book is wrong**.
-2. `schematic/` — board-level wiring, pinouts, connectors.
+2. `schematic/` — board-level wiring, pinouts, connectors, but **only for released hardware**. The tree holds
+   `protoA`/`protoB`/`protoC`; current development boards are unpublished work and will never appear here. Its
+   silence about the Gen2 DEV-board is not a discrepancy to chase — ask, or take it from the firmware.
 3. `emulator/` — a model, not the machine; generalize from it.
 4. `examples/` — adapt snippets, don't link to them.
 5. `reference/` — third-party datasheets; distill, never quote verbatim.

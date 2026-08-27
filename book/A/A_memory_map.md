@@ -61,7 +61,7 @@ No register layout is imposed by the core system — each expansion board define
 
 ## `$FEC0–$FEFF` — SGU-1
 
-SGU-1 presents a **single 64-byte window** that is re-bound to a specific bank by writing a selector to the last byte. Values `$00`–`$08` select the nine synthesis channels. `$FF` selects the **service bank**, which is where PCM sample data is uploaded and the master volume lives — so the 65816 does see a small global register file, but only through that selector. Everything in between (`$09`–`$FE`) is reserved: writes are ignored and reads return `$FF`. The selector is stored verbatim; out-of-range values are **not** wrapped onto a channel.
+SGU-1 presents a **single 64-byte window** that is re-bound to a specific bank by writing a selector to the last byte. Values `$00`–`$08` select the nine synthesis channels. `$FF` selects the **service bank**, which reaches past the synthesis engine: PCM sample data is uploaded through it, and the master volume there is a proxy for the CODEC/DSP downstream of the waveform generator. Everything in between (`$09`–`$FE`) is reserved: writes are ignored and reads return `$FF`. The selector is stored verbatim; out-of-range values are **not** wrapped onto a channel.
 
 **SGU-1 comes up muted.** The service bank's master volume gates the entire mix and resets to `0`, so the chip is silent until software raises it. This is deliberate: a reset must never blast the user with whatever the channel register file happened to power up holding. Put the channels into a known state first, then unmute. Under OS/816 that is the system's job; a bare-metal program has to do it itself, or it will hear nothing.
 
@@ -98,7 +98,7 @@ The 5-bit envelope rates `AR` and `DR` are split across `R2` and `R7`. `TL` (Tot
 | `$21`  | `FREQ_H`         | Channel base frequency, high byte                                           |
 | `$22`  | `VOL`            | Channel volume (signed)                                                     |
 | `$23`  | `PAN`            | Stereo pan (signed; negative = left, positive = right)                      |
-| `$24`  | `FLAGS0`         | `[0] GATE` (level-driven envelope key), `[1] TRIG` (one-shot, self-clearing hard retrigger), `[3] PCM`, `[4] RING_MOD`, `[5] NSLOW` / `[6] NSHIGH` / `[7] NSBAND` filter output selects |
+| `$24`  | `FLAGS0`         | `[0] GATE` (key level: a rise out of release attacks from the current attenuation; a sounding envelope is left alone), `[1] TRIG` (one-shot, self-clearing: restarts the envelope from silence), `[3] PCM`, `[4] RING_MOD`, `[5] NSLOW` / `[6] NSHIGH` / `[7] NSBAND` filter output selects |
 | `$25`  | `FLAGS1`         | Phase reset, filter reset, PCM loop, per-sweep enables                      |
 | `$26`  | `CUTOFF_L`       | Filter cutoff, low byte                                                     |
 | `$27`  | `CUTOFF_H`       | Filter cutoff, high byte                                                    |
@@ -129,7 +129,7 @@ The 5-bit envelope rates `AR` and `DR` are split across `R2` and `R7`. `TL` (Tot
 
 PCM sample data itself lives in 64 KB of RAM internal to the audio chip, addressed via the `PCM_POS` / `PCM_END` / `PCM_RST` pointers; it is **not** visible in the 65816's address space.
 
-Writes to this window are intercepted by NORTH and forwarded to the audio chip via the `SPU` device on the PIX bus (see [Chapter 2: System Architecture Overview](../1/2_overview.md)). The audio chip is a dedicated RP2350 bridged from SOUTH over SPI; the SOUTH-side driver caches register values so repeat reads avoid a round-trip.
+Writes to this window are intercepted by NORTH and forwarded to the audio chip via the `SPU` device on the PIX bus (see [Chapter 2: System Architecture Overview](../1/2_overview.md)). The SGU-1 is a self-contained module hosted on the board and bridged from SOUTH over SPI; the SOUTH-side driver caches register values so repeat reads avoid a round-trip.
 
 ---
 
