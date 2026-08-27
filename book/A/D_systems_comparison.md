@@ -10,12 +10,16 @@ This chapter provides detailed comparisons between the X65 microcomputer and sev
 | -------------------- | ------------------------- | ------------------- | ------------------- | ------------------ | -------------------- |
 | Word Size            | 8/16-bit                  | 8-bit               | 8-bit               | 8-bit              | 8/16-bit             |
 | Address Space        | 16MB                      | 64KB                | 64KB                | 64KB               | 24-bit address bus   |
-| Clock Speed          | ~7MHz                     | ~1MHz               | 1MHz                | 1.79MHz            | 3.58MHz              |
+| Clock Speed          | ~3.1–4.2MHz[^phi2]        | ~1MHz               | 1MHz                | 1.79MHz            | 3.58MHz              |
 | Direct Page          | Relocatable               | Fixed Zero Page     | Fixed Zero Page     | Fixed Zero Page    | Relocatable          |
 | Index Registers      | 8/16-bit X, Y             | 8-bit X, Y          | 8-bit X, Y          | 8-bit X, Y         | 8/16-bit X, Y        |
 | CPU Modes            | Native Mode               | N/A                 | N/A                 | N/A                | Emulation/Native     |
 | Stack Size           | 64KB                      | 256 bytes           | 256 bytes           | 256 bytes          | 64KB                 |
 | Special Instructions | WAI, Block move (MVN/MVP) | None                | WAI, STP, BBR, etc. | None               | Block move (MVN/MVP) |
+
+[^phi2]: The X65 has no crystal-derived `PHI2`. The NORTH chip synthesises it in PIO, so the clock is a
+    firmware setting rather than a fixed rating, and useful throughput is bounded by PSRAM round-trip latency
+    rather than by `PHI2` alone. See the "System Clock and Performance" section of [Chapter 2: System Architecture Overview](../1/2_overview.md).
 
 ## Memory Architecture
 

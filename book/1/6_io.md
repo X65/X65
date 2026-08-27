@@ -96,7 +96,7 @@ The board carries two Atari-style **DE-9 joystick ports**, four-button-capable, 
 
 ## RGB LED Chain
 
-The DEV-board has three on-board RGB LEDs (intended for keyboard state on the full machine) plus a WS2812 data line on the expansion port, which together support a chain of up to 256 addressable LEDs. The CPU reaches them through two parallel interfaces at **`$FFA0–$FFA7`**:
+The DEV-board has three on-board RGB LEDs (intended for keyboard state on the full machine) plus a WS2812 data line on the expansion port, which together support a chain of up to 256 addressable LEDs. The RIA decodes and the firmware drives **four** direct LED registers; the fourth position is simply not populated on the DEV-board, so `$FFA3` addresses an LED you can solder onto the strip header yourself. The CPU reaches them through two parallel interfaces at **`$FFA0–$FFA7`**:
 
 ### Direct RGB332 for LEDs 0–3
 
@@ -107,16 +107,16 @@ The DEV-board has three on-board RGB LEDs (intended for keyboard state on the fu
 | `$FFA2` | 2   | same                   |
 | `$FFA3` | 3   | same                   |
 
-A single `STA` lights up one of the first four LEDs — no sequencing required.
+A single `STA` lights up one of the first four LEDs — no sequencing required. LED 3 is unpopulated on the DEV-board; the write still reaches the chain.
 
 ### Chain protocol (any LED 0–255, full 24-bit colour)
 
 | Address | Role                                                                   |
 | ------- | ---------------------------------------------------------------------- |
-| `$FFA4` | Red byte — **writing this commits the update**                         |
-| `$FFA5` | Green byte (latched)                                                   |
-| `$FFA6` | Blue byte (latched)                                                    |
-| `$FFA7` | LED index in the chain (latched)                                       |
+| `$FFA4` | LED index in the chain — **writing this commits the update**           |
+| `$FFA5` | Red byte (latched)                                                     |
+| `$FFA6` | Green byte (latched)                                                   |
+| `$FFA7` | Blue byte (latched)                                                    |
 
 Writing to `$FFA5`, `$FFA6`, or `$FFA7` only latches a value — no output is sent to the LED chain. Writing to `$FFA4` dispatches the PIX command to the SOUTH-side WS2812 driver with the current latched G / B / index and the freshly-written R.
 
@@ -157,7 +157,7 @@ The X65's main expansion connector is physically a **PCIe x4 slot** (chosen for 
 | Audio            | `MIX_OUT_L`, `MIX_OUT_R`, `EXT_IN_L`, `EXT_IN_R`, `AUDIO_EXT3`         |
 | LEDs             | `WS2812` data line                                                     |
 
-Each of the four I/O slots on the connector gets its own enable and interrupt line, meaning up to four cards can be installed at once with independent address decoding and IRQ routing. CPU-bus expansion boards see the same 8-bit data and low-address signalling as the on-board chips, so a custom peripheral can map itself into the `$FC00–$FCFF` expansion window using its own `IO_EN` line.
+Each of the four I/O slots on the connector gets its own enable and interrupt line, meaning up to four cards can be installed at once with independent address decoding and IRQ routing. CPU-bus expansion boards see the same 8-bit data and low-address signalling as the on-board chips, so a custom peripheral can map itself into the `$FC00–$FDFF` expansion window using its own `IO_EN` line — one 128-byte slot per card. See [Appendix A](../A/A_memory_map.md) for the slot ranges and the RIA chunk bitmap that decides which parts of the window reach the bus.
 
 For a working reference: the board KiCad project and schematic PDF are published in the [X65 schematic repository](https://github.com/X65/schematic).
 

@@ -14,38 +14,62 @@ Bank 0, pages `$FC`–`$FF`:
 
 | Range         | Owner                               | Notes                                                  |
 | ------------- | ----------------------------------- | ------------------------------------------------------ |
-| `$FC00–$FCFF` | Expansion slots                     | 16 slots × 16 bytes                                    |
+| `$FC00–$FDFF` | Expansion slots                     | 4 cards × 128 bytes                                    |
 | `$FEC0–$FEFF` | SGU-1 (sound)                       | 64-byte channel-switched window                        |
 | `$FF00–$FF7F` | CGIA (graphics)                     | 128 registers                                          |
-| `$FF80–$FF97` | GPIO expander / joystick            | Reserved (currently stubbed, reads return `$FF`)       |
+| `$FF80–$FF97` | GPIO expander / joystick            | PCAL6416A, 2× DE-9 (not decoded by firmware yet)       |
 | `$FF98–$FF9F` | System timers                       | Two CIA-compatible 16-bit counters, 1 µs resolution    |
 | `$FFA0–$FFA7` | RGB LED chain                       | 4 direct RGB332 + 4-byte chain protocol                |
 | `$FFA8–$FFAB` | System buzzer                       | 16-bit log frequency + 8-bit duty                      |
 | `$FFAC–$FFAF` | Reserved                            | Reads return `$FF`                                     |
 | `$FFB0–$FFBF` | USB HID (keyboard / mouse / gamepad)| Device-selector at `$FFB0`                             |
-| `$FFC0–$FFFF` | RIA                                 | Fastcall API window at `$FFF0–$FFF3` within this range |
+| `$FFC0–$FFFF` | RIA                                 | Math, TOD, DMA, files, UART, IRQ, fastcall API, CPU vectors |
 
-Everything outside the top half-page (`$FExx–$FFxx`) and the expansion slots at `$FCxx` is plain PSRAM and available to software. Bank crossing happens on the fly at `$800000`.
+Everything outside the top half-page (`$FExx–$FFxx`) and the expansion window at `$FCxx–$FDxx` is plain PSRAM and available to software; chunks of the expansion window can be reclaimed as PSRAM through `EXTIOCTL` (see below). Bank crossing happens on the fly at `$800000`.
 
 ---
 
-## `$FC00–$FCFF` — Expansion Slots
+## `$FC00–$FDFF` — Expansion Slots
 
-Sixteen 16-byte slots selected by address bits `$FC?0`–`$FC?F`. The expansion port routes four `IO_EN` signals and four `IO_INT` signals; which slot a given board responds to is board-specific. A typical OPL-3 card, for example, sits at `$FC00–$FC1F`.
+The expansion window is **512 bytes**, divided into **four 128-byte slots** — one per card. The expansion port routes four `IO_EN` signals and four `IO_INT` signals, and a card claims its slot through its own `IO_EN` line:
 
-No register layout is imposed by the core system — each expansion board defines its own map. See [Chapter 6: Input and Output Interfaces](../1/6_io.md) for the expansion port pinout.
+| Range         | Slot | Enable   |
+| ------------- | ---- | -------- |
+| `$FC00–$FC7F` | 0    | `IO0_EN` |
+| `$FC80–$FCFF` | 1    | `IO1_EN` |
+| `$FD00–$FD7F` | 2    | `IO2_EN` |
+| `$FD80–$FDFF` | 3    | `IO3_EN` |
+
+The whole window belongs to the expansion bus by default. Few peripherals have any use for 128 registers, though, so the RIA can hand parts of it back: **`EXTIOCTL` (`$FFF6`)** is a bitmap of **eight 64-byte chunks**, two per slot, and setting a bit maps that chunk back to **RAM**. A card that only needs 64 bytes therefore need not cost the program the other 64.
+
+| Bit | Chunk range   | Slot |
+| --- | ------------- | ---- |
+| 0   | `$FC00–$FC3F` | 0    |
+| 1   | `$FC40–$FC7F` | 0    |
+| 2   | `$FC80–$FCBF` | 1    |
+| 3   | `$FCC0–$FCFF` | 1    |
+| 4   | `$FD00–$FD3F` | 2    |
+| 5   | `$FD40–$FD7F` | 2    |
+| 6   | `$FD80–$FDBF` | 3    |
+| 7   | `$FDC0–$FDFF` | 3    |
+
+`EXTIOCTL` powers up as `$00`, so a freshly started machine has the entire `$FC00–$FDFF` window on the expansion bus and none of it as memory. Reading a chunk that is on the bus with no card answering returns `$FF`; writes to it go nowhere.
+
+No register layout is imposed by the core system — each expansion board defines its own map within its slot, and a board is free to use only the first few bytes of it. See [Chapter 6: Input and Output Interfaces](../1/6_io.md) for the expansion port pinout.
 
 ---
 
 ## `$FEC0–$FEFF` — SGU-1
 
-SGU-1 presents a **single 64-byte window** that is re-bound to a specific channel by writing a channel index to the last byte. Channels are numbered `0`–`8`; writing any value wraps modulo-9, so there is no special "service" channel index. The 65816 never sees a "global" SGU register file — everything is per-channel.
+SGU-1 presents a **single 64-byte window** that is re-bound to a specific bank by writing a selector to the last byte. Values `$00`–`$08` select the nine synthesis channels. `$FF` selects the **service bank**, which is where PCM sample data is uploaded and the master volume lives — so the 65816 does see a small global register file, but only through that selector. Everything in between (`$09`–`$FE`) is reserved: writes are ignored and reads return `$FF`. The selector is stored verbatim; out-of-range values are **not** wrapped onto a channel.
+
+**SGU-1 comes up muted.** The service bank's master volume gates the entire mix and resets to `0`, so the chip is silent until software raises it. This is deliberate: a reset must never blast the user with whatever the channel register file happened to power up holding. Put the channels into a known state first, then unmute. Under OS/816 that is the system's job; a bare-metal program has to do it itself, or it will hear nothing.
 
 The selector:
 
 | Offset         | Register      | R/W | Notes                                                          |
 | -------------- | ------------- | --- | -------------------------------------------------------------- |
-| `$3F` (`$FEFF`)| `CH_SELECT`   | R/W | Write: select channel (`0`–`8`, value wrapped mod 9). Read: returns currently selected channel. |
+| `$3F` (`$FEFF`)| `CH_SELECT`   | R/W | Write: select bank — `$00`–`$08` channel, `$FF` service bank, `$09`–`$FE` reserved. Read: returns the value last written. Reset value `$00`. |
 
 Once a channel is selected, the first 32 bytes (`$00–$1F`) are four **operators** of 8 bytes each; the next 32 bytes (`$20–$3F`) hold **channel-wide** controls.
 
@@ -74,11 +98,11 @@ The 5-bit envelope rates `AR` and `DR` are split across `R2` and `R7`. `TL` (Tot
 | `$21`  | `FREQ_H`         | Channel base frequency, high byte                                           |
 | `$22`  | `VOL`            | Channel volume (signed)                                                     |
 | `$23`  | `PAN`            | Stereo pan (signed; negative = left, positive = right)                      |
-| `$24`  | `FLAGS0`         | Gate, PCM-enable (bit 3), filter mode, ring modulation                      |
+| `$24`  | `FLAGS0`         | `[0] GATE` (level-driven envelope key), `[1] TRIG` (one-shot, self-clearing hard retrigger), `[3] PCM`, `[4] RING_MOD`, `[5] NSLOW` / `[6] NSHIGH` / `[7] NSBAND` filter output selects |
 | `$25`  | `FLAGS1`         | Phase reset, filter reset, PCM loop, per-sweep enables                      |
 | `$26`  | `CUTOFF_L`       | Filter cutoff, low byte                                                     |
 | `$27`  | `CUTOFF_H`       | Filter cutoff, high byte                                                    |
-| `$28`  | `DUTY`           | Pulse width for PULSE waveform (0–127)                                      |
+| `$28`  | `DUTY`           | Pulse width, **signed** (`int8`): the magnitude is the LOW-run length out of 128; the sign places that run at the start (positive) or the end (negative) of the period |
 | `$29`  | `RESON`          | Filter resonance (0–255; feedback is 256 − RESON)                           |
 | `$2A`  | `PCM_POS_L`      | Current PCM sample position, low byte                                       |
 | `$2B`  | `PCM_POS_H`      | Current PCM sample position, high byte                                      |
@@ -100,8 +124,8 @@ The 5-bit envelope rates `AR` and `DR` are split across `R2` and `R7`. `TL` (Tot
 | `$3B`  | `SWCUT_BND`      | Cutoff-sweep boundary                                                       |
 | `$3C`  | `RESTIMER_L`     | Phase-reset timer, low byte                                                 |
 | `$3D`  | `RESTIMER_H`     | Phase-reset timer, high byte                                                |
-| `$3E`  | *reserved*       |                                                                             |
-| `$3F`  | `CH_SELECT`      | Channel selector (see above)                                                |
+| `$3E`  | `LFOW`           | LFO shapes: `[3:2] PM_SHAPE`, `[1:0] AM_SHAPE` — `0` saw, `1` square, `2` triangle, `3` noise |
+| `$3F`  | `CH_SELECT`      | Bank selector (see above)                                                   |
 
 PCM sample data itself lives in 64 KB of RAM internal to the audio chip, addressed via the `PCM_POS` / `PCM_END` / `PCM_RST` pointers; it is **not** visible in the 65816's address space.
 
@@ -111,20 +135,58 @@ Writes to this window are intercepted by NORTH and forwarded to the audio chip v
 
 ## `$FF00–$FF7F` — CGIA
 
-CGIA exposes **128 registers**. The most relevant top-level ones:
+CGIA exposes **128 registers**. The control block occupies the first 64; the upper 64 are four per-plane banks.
 
-| Offset | Register     | Notes                                                                                     |
-| ------ | ------------ | ----------------------------------------------------------------------------------------- |
-| `$00`  | `MODE`       | `[0] HIRES` (96-column / 768 px horizontal) · `[1] INTERLACE` (480-line vertical)         |
-| `$21`  | `PLANE_ORDER`| Encodes one of 24 Z-order permutations of the four planes (Steinhaus-Johnson-Trotter)     |
+| Address       | Register      | R/W | Notes                                                                             |
+| ------------- | ------------- | --- | --------------------------------------------------------------------------------- |
+| `$FF00`       | `MODE`        | R/W | `[0] HIRES` (96-column / 768 px horizontal) · `[1] INTERLACE` (480-line vertical) |
+| `$FF01`       | `BCKGND_BANK` | R/W | Bank number for background-plane fetches                                          |
+| `$FF02`       | `SPRITE_BANK` | R/W | Bank number for sprite fetches                                                    |
+| `$FF10–$FF11` | `RASTER`      | R   | Current raster line (16-bit)                                                      |
+| `$FF12`       | `RST_STATUS`  | R   | Raster status bits                                                                |
+| `$FF18–$FF19` | `INT_RASTER`  | R/W | Line at which to fire a raster interrupt (16-bit)                                 |
+| `$FF1A`       | `INT_ENABLE`  | R/W | `[7] VBI · [6] DLI · [5] RSI`                                                     |
+| `$FF1B`       | `INT_STATUS`  | R/W | Same layout; write to acknowledge                                                 |
+| `$FF30`       | `PLANES`      | R/W | `[7:4]` plane type (0 background, 1 sprite) · `[3:0]` per-plane enable            |
+| `$FF31`       | `ORDER`       | R/W | Encodes one of 24 Z-order permutations of the four planes (Steinhaus-Johnson-Trotter) |
+| `$FF34`       | `BACK_COLOR`  | R/W | Backdrop / border colour                                                          |
+| `$FF38–$FF39` | `OFFSET0`     | R/W | Plane 0 display-list or sprite-descriptor table start (16-bit)                    |
+| `$FF3A–$FF3B` | `OFFSET1`     | R/W | Plane 1 table start                                                               |
+| `$FF3C–$FF3D` | `OFFSET2`     | R/W | Plane 2 table start                                                               |
+| `$FF3E–$FF3F` | `OFFSET3`     | R/W | Plane 3 table start                                                               |
+| `$FF40–$FF4F` | `PLANE0[16]`  | R/W | Plane 0 registers — interpretation depends on plane type and active mode          |
+| `$FF50–$FF5F` | `PLANE1[16]`  | R/W | Plane 1 registers                                                                 |
+| `$FF60–$FF6F` | `PLANE2[16]`  | R/W | Plane 2 registers                                                                 |
+| `$FF70–$FF7F` | `PLANE3[16]`  | R/W | Plane 3 registers                                                                 |
 
-The remaining registers fall into four per-plane banks of sixteen registers each; see [Chapter 4: Graphics and Display](../1/4_graphics.md) and [Chapter 11: Graphics Programming](../2/11_graphics.md) for the plane-register map, display-list instruction encoding, and sprite-descriptor format.
+Addresses not listed inside `$FF00–$FF3F` are reserved. For the per-plane register layouts see [Chapter 4: Graphics and Display](../1/4_graphics.md) and [Chapter 11: Graphics Programming](../2/11_graphics.md) for the plane-register map, display-list instruction encoding, and sprite-descriptor format.
 
 ---
 
-## `$FF80–$FF97` — GPIO Expander (reserved)
+## `$FF80–$FF97` — GPIO Expander
 
-This 24-byte window is reserved for the on-board PCAL6416A GPIO expander that routes the DE-9 joystick inputs. In the current firmware the region is stubbed: all reads return `$FF` and writes are ignored. Until it is activated, use USB HID gamepads via `$FFB0–$FFBF`.
+This 24-byte window maps the on-board **PCAL6416A** I²C GPIO expander that routes the two DE-9 joystick ports — port 0 and port 1 of the expander, one per connector (DE-9 pin 8 is ground). Registers pair up as `xx0` for port 0 and `xx1` for port 1:
+
+| Address           | Register        | Notes                                                              |
+| ----------------- | --------------- | ------------------------------------------------------------------ |
+| `$FF80` / `$FF81` | `IN0` / `IN1`   | Input port — current pin levels                                    |
+| `$FF82` / `$FF83` | `OUT0` / `OUT1` | Output port                                                        |
+| `$FF84` / `$FF85` | `POL0` / `POL1` | Polarity inversion                                                 |
+| `$FF86` / `$FF87` | `CFG0` / `CFG1` | Configuration — 1 = input, 0 = output                              |
+| `$FF88`–`$FF8B`   | `STR0L`/`STR0H`/`STR1L`/`STR1H` | Output drive strength, two bits per pin        |
+| `$FF8C` / `$FF8D` | `LTCH0` / `LTCH1` | Input latch                                                      |
+| `$FF8E` / `$FF8F` | `PLE0` / `PLE1` | Pull-up / pull-down enable                                         |
+| `$FF90` / `$FF91` | `PLS0` / `PLS1` | Pull-up / pull-down selection                                      |
+| `$FF92` / `$FF93` | `INTE0` / `INTE1` | Interrupt mask — clear a bit to request an IRQ on that pin        |
+| `$FF94` / `$FF95` | `INST0` / `INST1` | Interrupt status                                                 |
+| `$FF96`           | —               | Reserved                                                           |
+| `$FF97`           | `OUTCF`         | Output port configuration (push-pull / open-drain)                 |
+
+The interrupt-mask registers are the expander's defining feature for the X65: software asks for IRQs only on the pin transitions it cares about, instead of re-reading every pin on every change.
+
+:::{note}
+The NORTH firmware does not decode this window yet — reads currently return `$FF` and writes are ignored. Until it is activated, use USB HID gamepads via `$FFB0–$FFBF`.
+:::
 
 ---
 
@@ -153,22 +215,22 @@ Two 16-bit countdown timers with 1 µs resolution, modelled on the MOS 6526 CIA.
 
 ## `$FFA0–$FFA7` — RGB LED Chain
 
-The X65 DEV-board carries four on-board WS2812B-style RGB LEDs and supports a chain of up to 256 LEDs via the expansion port's `WS2812` data line.
+The RIA decodes four direct LED registers and the firmware drives all four (`RGB_LED_COUNT 4`), but the X65 DEV-board populates only the first **three** WS2812B-style RGB LEDs; `$FFA3` addresses a fourth position you can populate yourself on the strip header. A chain of up to 256 LEDs is supported via the expansion port's `WS2812` data line.
 
 | Offset   | Register      | R/W | Notes                                                         |
 | -------- | ------------- | --- | ------------------------------------------------------------- |
 | `$FFA0`  | `LED0`        | R/W | Direct RGB332 colour for LED 0; write commits immediately     |
 | `$FFA1`  | `LED1`        | R/W | Direct RGB332 colour for LED 1                                |
 | `$FFA2`  | `LED2`        | R/W | Direct RGB332 colour for LED 2                                |
-| `$FFA3`  | `LED3`        | R/W | Direct RGB332 colour for LED 3                                |
-| `$FFA4`  | `RGB_R`       | R/W | Red byte (0–255); **writing here commits the chain update**   |
-| `$FFA5`  | `RGB_G`       | R/W | Green byte (0–255); latched                                   |
-| `$FFA6`  | `RGB_B`       | R/W | Blue byte (0–255); latched                                    |
-| `$FFA7`  | `RGB_IDX`     | R/W | LED index in the chain (0–255); latched                       |
+| `$FFA3`  | `LED3`        | R/W | Direct RGB332 colour for LED 3 (position unpopulated on the DEV-board) |
+| `$FFA4`  | `LED_IDX`     | R/W | LED index in the chain (0–255); **writing here commits the chain update** |
+| `$FFA5`  | `LED_RED`     | R/W | Red byte (0–255); latched                                     |
+| `$FFA6`  | `LED_GREEN`   | R/W | Green byte (0–255); latched                                   |
+| `$FFA7`  | `LED_BLUE`    | R/W | Blue byte (0–255); latched                                    |
 
 **RGB332 byte** (`$FFA0–$FFA3`): `[7:5] R` · `[4:2] G` · `[1:0] B`. A single `STA $FFA0` sets LED 0 — the LED 0–3 interface is one instruction per LED.
 
-**Chain protocol** (`$FFA4–$FFA7`): to set LED *n* to 24-bit colour, write the LED index to `$FFA7`, the green byte to `$FFA5`, the blue byte to `$FFA6`, and finally the red byte to `$FFA4`. The final write to `$FFA4` is what dispatches the update to the hardware; the other three bytes are simply latched. (Order of the latch writes is free; only the write to `$FFA4` must be last.)
+**Chain protocol** (`$FFA4–$FFA7`): to set LED *n* to 24-bit colour, latch the red, green and blue bytes into `$FFA5`, `$FFA6` and `$FFA7`, then write the LED index to `$FFA4`. The write to `$FFA4` is what dispatches the update to the hardware; the other three bytes are simply latched. (Order of the latch writes is free; only the write to `$FFA4` must be last.)
 
 ---
 
@@ -178,12 +240,12 @@ A PWM-driven piezo buzzer. Two commands are exposed to the CPU; each write forwa
 
 | Offset   | Register     | R/W | Notes                                                                         |
 | -------- | ------------ | --- | ----------------------------------------------------------------------------- |
-| `$FFA8`  | `FREQ_L`     | R/W | Frequency, low byte (see encoding)                                            |
-| `$FFA9`  | `FREQ_H`     | R/W | Frequency, high byte                                                          |
-| `$FFAA`  | `DUTY`       | R/W | Duty cycle, 0 (silent) – 255 (50 % square peak)                               |
-| `$FFAB`  | *reserved*   | R/W | Currently unused                                                              |
+| `$FFA8`  | `BUZZ_FREQ_LO` | R/W | Frequency, low byte (see encoding)                                          |
+| `$FFA9`  | `BUZZ_FREQ_HI` | R/W | Frequency, high byte                                                        |
+| `$FFAA`  | `BUZZ_DUTY`    | R/W | Duty cycle, 0 (silent) – 255 (50 % square peak)                             |
+| `$FFAB`  | `BUZZ_RES`   | R/W | Reserved; currently unused                                                    |
 
-**Frequency encoding.** The 16-bit value `FREQ = FREQ_H:FREQ_L` is mapped logarithmically to audio Hz:
+**Frequency encoding.** The 16-bit value `FREQ = BUZZ_FREQ_HI:BUZZ_FREQ_LO` is mapped logarithmically to audio Hz:
 
 $$
 f(\text{FREQ}) = 20\,\text{Hz} \cdot 2^{10\,\text{FREQ}/65535}
@@ -252,9 +314,80 @@ The **merged-pad 0** view is the bitwise OR of all connected pads across every f
 
 ## `$FFC0–$FFFF` — RIA
 
-The RIA registers live at the very top of bank 0. They cover firmware status, the fastcall API at `$FFF0–$FFF3`, the native-mode 65816 vector table at `$FFE4–$FFFF`, and a handful of system services.
+The RIA registers live at the very top of bank 0. The 65C816 reserves two vector tables up here — native at `$FFE4–$FFEF` and emulation at `$FFF4–$FFFF` — and the RIA fills the gaps the CPU leaves in and around them with system services: hardware multiply/divide, a time-of-day counter, DMA, file descriptors, the UART, an RNG, the interrupt controller and the fastcall API.
 
-The 65816 native-mode vectors (reserved by the CPU) live at fixed offsets:
+### Hardware Multiply and Divide
+
+| Address       | Register | R/W | Notes                                              |
+| ------------- | -------- | --- | -------------------------------------------------- |
+| `$FFC0–$FFC1` | `OPERA`  | R/W | Operand A (16-bit)                                 |
+| `$FFC2–$FFC3` | `OPERB`  | R/W | Operand B (16-bit)                                 |
+| `$FFC4–$FFC7` | `MULAB`  | R   | `OPERA × OPERB` (32-bit product)                   |
+| `$FFC8–$FFC9` | `DIVAB`  | R   | Signed `OPERA` ÷ unsigned `OPERB` (16-bit quotient) |
+
+Both results are computed combinatorially from the current operands — write the operands, then read the result; there is no "start" or "busy" handshake. Division by zero yields `$FFFF`.
+
+### Time of Day
+
+| Address       | Register    | R/W | Notes                                          |
+| ------------- | ----------- | --- | ---------------------------------------------- |
+| `$FFCA–$FFCF` | `TM0`–`TM5` | R   | Monotonic microseconds since boot (48-bit, little-endian) |
+
+### DMA
+
+| Address       | Register   | R/W | Notes                             |
+| ------------- | ---------- | --- | --------------------------------- |
+| `$FFD0–$FFD2` | `ADDRSRC`  | R/W | Source address (24-bit)           |
+| `$FFD3`       | `STEPSRC`  | R/W | Source step                       |
+| `$FFD4–$FFD6` | `ADDRDST`  | R/W | Destination address (24-bit)      |
+| `$FFD7`       | `STEPDST`  | R/W | Destination step                  |
+| `$FFD8`       | `COUNT`    | R/W | Transfer count                    |
+| `$FFD9`       | `DMAERR`   | R   | Transfer `errno`                  |
+
+### File Descriptors
+
+| Address | Register | R/W | Notes                                                          |
+| ------- | -------- | --- | --------------------------------------------------------------- |
+| `$FFDA` | `FDA`    | R/W | File-descriptor A number (obtained from the `open()` API call)  |
+| `$FFDB` | `FDB`    | R/W | File-descriptor B number                                        |
+| `$FFDC` | `FDARW`  | R/W | Read a byte from FDA / write a byte to FDA                      |
+| `$FFDD` | `FDBRW`  | R/W | Read a byte from FDB / write a byte to FDB                      |
+| `$FFDE` | `FDAST`  | R   | File-descriptor A status                                        |
+| `$FFDF` | `FDBST`  | R   | File-descriptor B status                                        |
+
+Streaming a file is a tight loop on `FDARW` — no API round-trip per byte.
+
+### UART, RNG and Interrupt Controller
+
+| Address       | Register     | R/W | Notes                                                     |
+| ------------- | ------------ | --- | ---------------------------------------------------------- |
+| `$FFE0`       | `READY`      | R   | UART FIFO flow control — TX-ready and RX-available flags   |
+| `$FFE1`       | `TX` / `RX`  | R/W | Write to transmit, read to receive                         |
+| `$FFE2–$FFE3` | `RNG`        | R   | Random number generator; two bytes so 16-bit values can be read at once |
+| `$FFEC`       | `IRQ_ENABLE` | R/W | RIA interrupt enable mask                                  |
+| `$FFED`       | `IRQ_STATUS` | R   | Interrupt controller status — which source raised `IRQB`   |
+
+`IRQ_ENABLE` and `IRQ_STATUS` sit in the two bytes the 65C816 leaves reserved inside the native vector table, and `EXTIOCTL` / `EXTMEM` (below) occupy the matching reserved pair in the emulation table.
+
+### Fastcall API
+
+| Address       | Register  | R/W | Notes                                                                 |
+| ------------- | --------- | --- | ---------------------------------------------------------------------- |
+| `$FFF0`       | `OP`/`RET`| R/W | Write the API operation id to begin a kernel call; read the return value |
+| `$FFF1`       | `RET_HI`  | R   | High byte of a 16-bit return value, otherwise `0`                      |
+| `$FFF2`       | `STACK`   | R/W | XSTACK port — 512 bytes for passing call parameters                    |
+| `$FFF3`       | `STATUS`  | R   | `[7]` high while the operation is running; `[0]` high when `ERRNO` is set |
+
+### Extension Control
+
+| Address | Register   | R/W | Notes                                                                   |
+| ------- | ---------- | --- | ------------------------------------------------------------------------ |
+| `$FFF6` | `EXTIOCTL` | R/W | Bitmap of the eight 64-byte chunks of `$FC00–$FDFF` (see the expansion section above) |
+| `$FFF7` | `EXTMEM`   | R/W | Reserved for future use (extended-memory MMU)                            |
+
+### CPU Vectors
+
+The 65C816 vectors (reserved by the CPU) live at fixed offsets:
 
 | Offset  | Vector              |
 | ------- | ------------------- |
@@ -271,4 +404,4 @@ The 65816 native-mode vectors (reserved by the CPU) live at fixed offsets:
 
 Because the X65 boots and operates exclusively in native mode, the emulation-mode vectors exist for completeness but are not used by X65 firmware or applications.
 
-The fastcall window at `$FFF0–$FFF3` is the primary entry point for system calls. Arguments are passed through the 512-byte **XSTACK** maintained by the RIA. The full RIA register list is documented in the spreadsheet linked at the top of this appendix.
+The fastcall window at `$FFF0–$FFF3` is the primary entry point for system calls. Arguments are passed through the 512-byte **XSTACK** maintained by the RIA.

@@ -110,7 +110,9 @@ PLANE_MASK_PIXEL_BITS         %11000000
 ### Affine Transform Mode Registers
 
 - **flags, border_columns, row_height** _(8-bit)_ – Same as before.
-- **texture_bits** _(8-bit)_ – Defines **texture width and height** in bits (size is power of two).
+- **texture_bits** _(8-bit)_ – Texture dimensions, as `[6:4]` height and `[2:0]` width. Each field stores
+  **one less than** the power-of-two exponent, so a stored `0..7` means `1..8` bits, i.e. a texture edge of
+  **2 to 256 pixels**. A 256×256 texture is therefore `texture_bits = $77`, not `$88`.
 - **u, v** _(16-bit, signed)_ – Texture coordinates for the upper-left corner.
 - **du, dv** _(16-bit, signed)_ – Texture step increments per pixel.
 - **dx, dy** _(16-bit, signed)_ – Transform coefficients for scaling and rotation.

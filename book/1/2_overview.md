@@ -41,7 +41,7 @@ Inside bank 0, the high-`$FE`/`$FF` pages window is reserved for memory-mapped I
 | `$FFB0–$FFBF` | HID (keyboard / mouse)                                            |
 | `$FFC0–$FFFF` | RIA registers, including the fastcall API window at `$FFF0–$FFF3` |
 
-Expansion devices live in a separate window starting at `$FC00` (one slot is sixteen bytes; for example, an optional OPL-3 sits at `$FC00–$FC1F`). The full address table — including every RIA sub-register and CGIA plane register — is maintained in [Appendix A: Memory Map](../A/A_memory_map.md).
+Expansion devices live in a separate window at `$FC00–$FDFF`, divided into four 128-byte slots — one per card. The full address table — including every RIA sub-register and CGIA plane register — is maintained in [Appendix A: Memory Map](../A/A_memory_map.md).
 
 The 65C816’s **direct page** can be repointed anywhere in bank 0 with the `D` register, which makes it possible to give different routines, tasks, or interrupt handlers their own private fast-access window without disturbing each other. The hardware **stack** lives in bank 0 as well, and the firmware implements a small auxiliary buffer called the **XSTACK** (512 bytes) that the OS uses to pass call arguments between the 65816 and the RIA when invoking system services.
 

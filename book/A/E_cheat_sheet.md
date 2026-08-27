@@ -127,9 +127,10 @@ The CGIA register window lives at `$FF00–$FF7F`. Frequently-touched registers:
 | `$FF01`       | `bckgnd_bank` | High 8 bits of address for background-plane fetches.                                           |
 | `$FF02`       | `sprite_bank` | High 8 bits of address for sprite fetches.                                                     |
 | `$FF10–$FF11` | `raster`      | Current raster line (read-only).                                                               |
-| `$FF12–$FF13` | `int_raster`  | Line at which to fire a raster interrupt.                                                      |
-| `$FF14`       | `int_enable`  | `[VBI DLI RSI x x x x x]`                                                                      |
-| `$FF15`       | `int_status`  | Same layout; write to acknowledge.                                                             |
+| `$FF12`       | `rst_status`  | Raster status bits.                                                                            |
+| `$FF18–$FF19` | `int_raster`  | Line at which to fire a raster interrupt.                                                      |
+| `$FF1A`       | `int_enable`  | `[VBI DLI RSI x x x x x]`                                                                      |
+| `$FF1B`       | `int_status`  | Same layout; write to acknowledge.                                                             |
 | `$FF30`       | `planes`      | High nibble = plane type (0 background, 1 sprite); low nibble = enable bits per plane.         |
 | `$FF31`       | `order`       | Plane Z-order permutation (one byte selects one of 24 SJT-encoded orderings).                  |
 | `$FF34`       | `back_color`  | Border / fill color.                                                                           |
@@ -178,7 +179,7 @@ The HID window at `$FFB0–$FFBF` is rebindable: writing to `$FFB0` selects whic
 
 ## RGB LED Quick Reference
 
-The LED window at `$FFA0–$FFA7` has two parallel interfaces: four direct RGB332 bytes for the four on-board LEDs, and a four-byte chain protocol for addressing any LED in a WS2812 chain.
+The LED window at `$FFA0–$FFA7` has two parallel interfaces: four direct RGB332 bytes for the on-board LEDs (three are populated on the DEV-board), and a four-byte chain protocol for addressing any LED in a WS2812 chain.
 
 ### Direct RGB332 (LEDs 0–3)
 
@@ -193,16 +194,16 @@ The LED window at `$FFA0–$FFA7` has two parallel interfaces: four direct RGB33
 
 ### Chain Protocol (any LED 0–255, 24-bit RGB)
 
-The write to `$FFA4` is the commit — latch the G, B, and index bytes first, then store the R byte last:
+The write to `$FFA4` is the commit — latch the R, G and B bytes first, then store the LED index last:
 
 ```asm
-    LDA #5                ; target LED index
-    STA $FFA7             ; latched
-    LDA #$80              ; green
+    LDA #$FF              ; red
     STA $FFA5             ; latched
-    LDA #$00              ; blue
+    LDA #$80              ; green
     STA $FFA6             ; latched
-    LDA #$FF              ; red  → this write commits the chain update
+    LDA #$00              ; blue
+    STA $FFA7             ; latched
+    LDA #5                ; target LED index → this write commits the chain update
     STA $FFA4
 ```
 
