@@ -9,6 +9,16 @@
 # Add a row when a new example earns a place on the site. The published name is
 # what emu.yml refers to, so it does not have to match the target.
 
+# Not every example is a whole ROM. `four_byte_burger`, `mixed_modes` and `sotb`
+# assemble to code only - the image, layer and sprite data is merged in afterwards
+# with `xex-filter.pl` (their .asm header comments carry the exact commands), and
+# the blocks come from `examples/src/cgia/data/bins.c`, which is a `gcc bins.c &&
+# ./bins` hack rather than part of any build. Publishing the bare code gives a ROM
+# that loads and shows nothing, so they are deliberately absent below and the
+# committed ones on the site are left alone. `four_byte_burger` cannot be rebuilt
+# here at all: its image comes from a `converter.ts` and a `4BB.png` that are not
+# in this tree.
+
 # <examples target>  <name published under emu/roms/>
 set(SITE_ROMS
     text_modes          MODE0_text
@@ -18,9 +28,6 @@ set(SITE_ROMS
     rsi                 RSI
     vbl                 VBI
     sprites             sprites
-    sotb                SOTB
-    mixed_modes         mixed_modes
-    four_byte_burger    4BB
     lkhs_raster_bar     raster_bar
     font_cp             font_cp
     controller          controller
