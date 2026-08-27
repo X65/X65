@@ -10,3 +10,12 @@
 [submodule "examples"]
 	path = examples
 	url = https://github.com/X65/examples.git
+[submodule "_github"]
+	path = _github
+	url = git@github.com:X65/.github.git
+[submodule "SGU-1"]
+	path = SGU-1
+	url = git@github.com:X65/SGU-1.git
+[submodule "x65.zone"]
+	path = x65.zone
+	url = git@github.com:X65/x65.github.io.git
