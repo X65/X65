@@ -99,7 +99,7 @@ The 5-bit envelope rates `AR` and `DR` are split across `R2` and `R7`. `TL` (Tot
 | `$22`  | `VOL`            | Channel volume (signed)                                                     |
 | `$23`  | `PAN`            | Stereo pan (signed; negative = left, positive = right)                      |
 | `$24`  | `FLAGS0`         | `[0] GATE` (key level: a rise out of release attacks from the current attenuation; a sounding envelope is left alone), `[1] TRIG` (one-shot, self-clearing: restarts the envelope from silence), `[3] PCM`, `[4] RING_MOD`, `[5] NSLOW` / `[6] NSHIGH` / `[7] NSBAND` filter output selects |
-| `$25`  | `FLAGS1`         | Phase reset, filter reset, PCM loop, per-sweep enables                      |
+| `$25`  | `FLAGS1`         | Phase reset, filter reset, PCM loop, per-sweep enables, `[7] DIAG` diagnostic-readback switch |
 | `$26`  | `CUTOFF_L`       | Filter cutoff, low byte                                                     |
 | `$27`  | `CUTOFF_H`       | Filter cutoff, high byte                                                    |
 | `$28`  | `DUTY`           | Pulse width, **signed** (`int8`): the magnitude is the LOW-run length out of 128; the sign places that run at the start (positive) or the end (negative) of the period |

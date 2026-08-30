@@ -334,6 +334,11 @@ Because PCM memory is not CPU-addressable, samples are pushed through a port in 
 | `$FEDE` | Sample bank | Selects a 64 KB bank; only bank `0` is backed today |
 | `$FEDF` | Sample data port | Write stores a byte at the current offset, read returns it; both bump the offset |
 | `$FEE0` | Master volume | Gates the entire mix. **Resets to `0` — the chip comes up muted** |
+| `$FEF0/$FEF1` | Master mix left, lo/hi | The exact 16-bit I²S output word (read-only, live) |
+| `$FEF2/$FEF3` | Master mix right, lo/hi | Same, right channel |
+| `$FEF4/$FEF5` | Sample counter, lo/hi | Low word of the free-running 48 kHz sample clock — a timestamp for readers |
+| `$FEF6` | LFO AM phase | Global LFO amplitude-modulation phase, `0`–`255` (read-only, live) |
+| `$FEF7` | LFO PM phase | Global LFO pitch-modulation phase, `0`–`255` (read-only, live) |
 
 Uploading is therefore a select, three setup writes, and a tight blit:
 
@@ -362,6 +367,32 @@ Note that this transfer touches no channel state at all: service-bank traffic an
 :::{note}
 The selector accepts `$00`–`$08` for the nine channels and `$FF` for the service bank; `$09`–`$FE` are reserved. Portable software should write only those defined values — some builds of the audio firmware still fold an out-of-range selector onto a channel, where a stray write would corrupt a sounding voice.
 :::
+
+### Diagnostic Readback
+
+`FLAGS1` bit 7 (`DIAG`) turns the channel's own register window into a meter. While it is
+set on a channel, a handful of that channel's offsets become **dual-function**: writes still
+land in the register file as always, but reads return live chip state instead of the stored
+byte. Everything not listed — and every offset while `DIAG` is clear — reads back normally.
+All values are pre-`VOL`, pre-pan.
+
+| Window offset | Diagnostic read |
+| --- | --- |
+| op *n* base+0 | Operator envelope attenuation in 0.375 dB steps: `0` = full level, `255` = silent |
+| op *n* base+1 | Envelope state in bits 1:0 (attack/decay/sustain/release); bit 2 set while the `TRIG`-armed key-on delay window is running |
+| op *n* base+2/+3 | The operator's current sample, signed 16-bit, lo/hi |
+| `$20`/`$21` (`FREQ` slots) | The raw channel mix, signed 16-bit, lo/hi — before volume, filter and pan; live for PCM voices too |
+| `$22` (`VOL` slot) | The channel envelope level, `0`–`255` linear — the OUT-weighted sum of the operator envelopes; `0` on a PCM voice |
+
+This is how a player draws VU meters that agree with the chip instead of re-modelling its
+envelopes — `TRIG` retriggers, invisible in a plain readback, show up here for free. Two
+conventions keep it safe alongside a running driver: drivers never set bit 7 (they compose
+`FLAGS1` from their own shadow), so any ordinary `FLAGS1` write drops the channel back to
+normal readback; and a reader that finds bit 7 cleared mid-pass — or the channel selector
+moved — throws the pass away and retries. The two bytes of a 16-bit sample are separate
+bus reads while the chip renders at 48 kHz, so a pair can straddle a sample boundary —
+jitter a scope view can live with, not corruption. Diagnostic readback exists from chip
+version 1.1; the version registers in the service bank identify it.
 
 ## The Output Stage
 
