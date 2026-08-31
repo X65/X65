@@ -126,11 +126,70 @@ A small lookup table keyed by keycode that returns `(page, byte_offset, bit_mask
 
 Bits 1, 2, and 3 of the status byte carry the NUMLOCK, CAPSLOCK, and SCROLLLOCK LED states respectively. These are **host-computed** — the X65 firmware tracks them as the keyboard's HID output report. A program can use them to detect the modifier states without decoding the keycode-bitmap.
 
-## DE-9 Joystick Ports
+## DE-9 GPIO Ports
 
-The on-board DE-9 joystick window at `$FF80–$FF97` is **currently stubbed** in firmware — reads return `$FF` and writes are ignored. Until the path from the PCAL6416A GPIO expander through the RIA interrupt controller is brought up, use USB HID gamepads via `$FFB0–$FFBF` for controller input.
+The two DE-9 connectors are bi-directional 5 V GPIO ports on a PCAL6416A expander, memory-mapped at `$FF80–$FF97`; the joystick pinout is a convention layered on top. [Chapter 6](../1/6_io.md) has the hardware story, pinout, and full register semantics.
 
-Once the region goes live, the expected polling pattern is a small lookup against the expander's port registers, and the IRQ path (via the PCAL6416A's interrupt-mask registers) supports edge-driven input handling without continuous polling.
+:::{note}
+This window is **currently stubbed** in firmware — reads return `$FF` and writes are ignored. Until the path from the PCAL6416A through the RIA interrupt controller is brought up, use USB HID gamepads via `$FFB0–$FFBF` for controller input. The sequences below are the intended programming model for when the region goes live.
+:::
+
+### Reading joysticks
+
+At reset every pin is already an input; the one-time setup is enabling the pull-ups so an idle line reads `1` and a closed switch (shorted to ground) reads `0`:
+
+```asm
+    ; one-time setup: pull-ups on both ports
+    lda #$FF
+    sta $FF8E               ; PLE0 — connect port 0 pulls
+    sta $FF8F               ; PLE1 — connect port 1 pulls
+    ; PLS0/PLS1 reset to $FF = pull-up, so nothing more to do
+
+    ; per-frame poll, stick 1 (active-low)
+    lda $FF80               ; IN0
+    and #%00000001          ; bit 0 = up (DE-9 pin 1)
+    beq up_held             ; 0 = pressed
+
+    lda $FF80
+    and #%00100000          ; bit 5 = fire (DE-9 pin 6)
+    beq fire_held
+```
+
+Writing `$FF` to the polarity registers (`$FF84`/`$FF85`) flips the sense so pressed reads as `1`, if `bne` logic reads better in the program.
+
+### Driving external hardware
+
+The mirror image — write the level first, then flip the pin to output:
+
+```asm
+    ; drive port 0, GPIO line 0 (DE-9 pin 1) high
+    lda $FF82
+    ora #%00000001
+    sta $FF82               ; OUT0 — level to drive (reset default is high)
+    lda $FF86
+    and #%11111110
+    sta $FF86               ; CFG0 — 0 = output, driver on
+```
+
+Outputs are push-pull by default; setting a port's bit in `OUTCF` (`$FF97`) *before* the direction change makes the whole port open-drain for wire-OR buses. Mind the electrical limits in [Chapter 6](../1/6_io.md) when sinking real loads.
+
+### Edge-driven input
+
+Instead of polling, unmask the pins of interest in the interrupt-mask registers and take the IRQ (RIA interrupt controller bit 1, `$FFEC`/`$FFED`):
+
+```asm
+    lda #$FF
+    sta $FF8C               ; LTCH0 — latch inputs so short pulses are held
+    lda #%11011110          ; unmask up (bit 0) and fire (bit 5)
+    sta $FF92               ; INTE0 — 0 = IRQ on change
+
+    ; in the IRQ handler:
+    lda $FF94               ; INST0 — which pin fired
+    ; ...dispatch...
+    lda $FF80               ; IN0 — read state, clears the interrupt
+```
+
+All interrupts are masked at power-on, so a program that never touches `INTE0`/`INTE1` never sees a GPIO IRQ.
 
 ## RGB LED Programming
 

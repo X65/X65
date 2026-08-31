@@ -250,6 +250,32 @@ The buzzer window lives at `$FFA8–$FFAB`. Frequency is encoded logarithmically
     STA $FFAA             ; duty = 0 → no output
 ```
 
+## DE-9 GPIO Quick Reference
+
+Two DE-9 ports of bi-directional 5 V GPIO (PCAL6416A) at `$FF80–$FF97`; port 0 = first connector, port 1 = second. Bits 0–7 map to DE-9 pins 1–7, 9 (pin 8 is ground); joystick convention: Up/Down/Left/Right = bits 0–3, fire = bit 5, buttons 2/3/4 = bits 7/4/6, all active-low. *Not decoded by firmware yet — reads return `$FF`.*
+
+```asm
+    ; Joystick setup: enable pull-ups (pins reset as inputs, PLS defaults to pull-up)
+    LDA #$FF
+    STA $FF8E             ; PLE0 — port 0 pulls on
+    ; Poll (0 = pressed)
+    LDA $FF80             ; IN0
+    AND #%00100000        ; bit 5 = fire
+    BEQ fire_held
+
+    ; GPIO output: level first, then direction
+    LDA #%00000001
+    STA $FF82             ; OUT0 — drive bit 0 high
+    LDA #%11111110
+    STA $FF86             ; CFG0 — 0 = output
+
+    ; Edge IRQ: unmask pin, handler reads INST0 then IN0 to clear
+    LDA #%11111110
+    STA $FF92             ; INTE0 — 0 = IRQ on change (RIA IRQ bit 1)
+```
+
+Full register semantics: [Appendix A](A_memory_map.md), [Chapter 6](../1/6_io.md).
+
 ## System Timers Quick Reference
 
 Two CIA-compatible 16-bit timers at `$FF98–$FF9F`, each counting down in 1 µs ticks.

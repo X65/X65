@@ -94,7 +94,7 @@
 
 **Raspberry Pi Radio Module 2** - The surface-mount Wi-Fi + Bluetooth module used by the X65. Based on CYW43-series silicon (the same wireless core as on the Raspberry Pi Pico W) and driven directly by the NORTH RP2350 over a PIO-bit-banged SPI link. The 65C816 reaches the networking stack through an AT-command interface carried on the main UART.
 
-**DE-9** - The 9-pin connector used for joystick ports in the X65, compatible with Atari-style joysticks, supporting four-button input.
+**DE-9** - The 9-pin connector used for the X65's two GPIO ports. Each carries eight bi-directional 5 V TTL GPIO lines plus ground; the default pin convention is Atari-style joysticks with up to four buttons, but in the C64 spirit the same pins can drive or sense external electronics.
 
 **DVI-D** - Digital Visual Interface, the video output standard used by the X65. Physically connected via an HDMI-shaped socket; only DVI-D TMDS is transmitted, so standard HDMI cables work without the X65 needing HDMI certification.
 
@@ -112,7 +112,7 @@
 
 **NORTH chip** - The RP2350 microcontroller in the X65 that owns the CPU bus, the PSRAM interface, and system services (RIA). Communicates with the SOUTH chip over the PIX bus.
 
-**PCAL6416A** - The on-board 16-bit I²C GPIO expander, from NXP, that handles the DE-9 joystick inputs. Replaces an earlier TCA6416A. Its defining feature in X65 use is the built-in **interrupt-mask registers**: software requests IRQs only for the input transitions it cares about, rather than being paged for every pin change.
+**PCAL6416A** - The on-board 16-bit I²C GPIO expander, from NXP, behind the two DE-9 GPIO ports. Replaces an earlier TCA6416A. It level-translates between the 3.3 V I²C side and the 5 V port side, and its defining feature in X65 use is the built-in **interrupt-mask registers**: software requests IRQs only for the input transitions it cares about, rather than being paged for every pin change.
 
 **PIX (Pico Information eXchange) bus** - The dedicated serial-with-handshake bus connecting the NORTH and SOUTH chips. Carries memory writes, DMA transfers, and per-device commands to the VPU (CGIA), SPU (SGU-1), and other south-side peripherals.
 

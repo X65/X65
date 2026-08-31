@@ -165,24 +165,24 @@ Addresses not listed inside `$FF00–$FF3F` are reserved. For the per-plane regi
 
 ## `$FF80–$FF97` — GPIO Expander
 
-This 24-byte window maps the on-board **PCAL6416A** I²C GPIO expander that routes the two DE-9 joystick ports — port 0 and port 1 of the expander, one per connector (DE-9 pin 8 is ground). Registers pair up as `xx0` for port 0 and `xx1` for port 1:
+This 24-byte window maps the on-board **PCAL6416A** I²C GPIO expander behind the two DE-9 ports — **bi-directional, 5 V-TTL general-purpose I/O** that conventionally carries Atari-style joysticks (see [Chapter 6](../1/6_io.md)). Expander port 0 is the first connector, port 1 the second; port bits 0–7 map to DE-9 pins 1–7 and 9 in order (pin 8 is ground). Under the joystick convention that is Up/Down/Left/Right on bits 0–3, fire on bit 5 (pin 6), and buttons 2/3/4 on bits 7/4/6 (pins 9/5/7), all active-low. Bit 6 can instead be driven high as an output to recreate the classic +5 V supply on pin 7 for old-machine accessories — optional, at the cost of button 4 (see [Chapter 6](../1/6_io.md)). Registers pair up as `xx0` for port 0 and `xx1` for port 1:
 
-| Address           | Register        | Notes                                                              |
-| ----------------- | --------------- | ------------------------------------------------------------------ |
-| `$FF80` / `$FF81` | `IN0` / `IN1`   | Input port — current pin levels                                    |
-| `$FF82` / `$FF83` | `OUT0` / `OUT1` | Output port                                                        |
-| `$FF84` / `$FF85` | `POL0` / `POL1` | Polarity inversion                                                 |
-| `$FF86` / `$FF87` | `CFG0` / `CFG1` | Configuration — 1 = input, 0 = output                              |
-| `$FF88`–`$FF8B`   | `STR0L`/`STR0H`/`STR1L`/`STR1H` | Output drive strength, two bits per pin        |
-| `$FF8C` / `$FF8D` | `LTCH0` / `LTCH1` | Input latch                                                      |
-| `$FF8E` / `$FF8F` | `PLE0` / `PLE1` | Pull-up / pull-down enable                                         |
-| `$FF90` / `$FF91` | `PLS0` / `PLS1` | Pull-up / pull-down selection                                      |
-| `$FF92` / `$FF93` | `INTE0` / `INTE1` | Interrupt mask — clear a bit to request an IRQ on that pin        |
-| `$FF94` / `$FF95` | `INST0` / `INST1` | Interrupt status                                                 |
-| `$FF96`           | —               | Reserved                                                           |
-| `$FF97`           | `OUTCF`         | Output port configuration (push-pull / open-drain)                 |
+| Address           | Register        | R/W | Reset | Notes                                                              |
+| ----------------- | --------------- | --- | ----- | ------------------------------------------------------------------ |
+| `$FF80` / `$FF81` | `IN0` / `IN1`   | R   | live  | Input port — actual pin levels regardless of direction; reading clears that port's pending interrupt |
+| `$FF82` / `$FF83` | `OUT0` / `OUT1` | R/W | `$FF` | Output port — level driven on output-configured pins; reads return the written value, not the pin |
+| `$FF84` / `$FF85` | `POL0` / `POL1` | R/W | `$00` | Polarity inversion — 1 inverts that input's sense in `IN`          |
+| `$FF86` / `$FF87` | `CFG0` / `CFG1` | R/W | `$FF` | Direction — 1 = high-impedance input, 0 = output                   |
+| `$FF88`–`$FF8B`   | `STR0L`/`STR0H`/`STR1L`/`STR1H` | R/W | `$FF` | Output drive strength, two bits per pin (`L` = bits 0–3, `H` = bits 4–7): `00`=¼ … `11`=full |
+| `$FF8C` / `$FF8D` | `LTCH0` / `LTCH1` | R/W | `$00` | Input latch — 1 = a level change is held in `IN` until read       |
+| `$FF8E` / `$FF8F` | `PLE0` / `PLE1` | R/W | `$00` | Pull resistor enable — 1 connects the internal 100 kΩ resistor     |
+| `$FF90` / `$FF91` | `PLS0` / `PLS1` | R/W | `$FF` | Pull direction — 1 = pull-up, 0 = pull-down (needs `PLE` set)      |
+| `$FF92` / `$FF93` | `INTE0` / `INTE1` | R/W | `$FF` | Interrupt mask — clear a bit to request an IRQ on that pin change; all masked at power-on |
+| `$FF94` / `$FF95` | `INST0` / `INST1` | R   | `$00` | Interrupt status — 1 = this pin is the interrupt source            |
+| `$FF96`           | —               | —   | —     | Reserved                                                           |
+| `$FF97`           | `OUTCF`         | R/W | `$00` | Output stage per port: bit 0 = port 0, bit 1 = port 1; 0 = push-pull, 1 = open-drain |
 
-The interrupt-mask registers are the expander's defining feature for the X65: software asks for IRQs only on the pin transitions it cares about, instead of re-reading every pin on every change.
+The expander's `INT` output feeds bit 1 of the RIA interrupt controller (`$FFEC`/`$FFED`). The interrupt-mask registers are its defining feature for the X65: software asks for IRQs only on the pin transitions it cares about, instead of re-reading every pin on every change.
 
 :::{note}
 The NORTH firmware does not decode this window yet — reads currently return `$FF` and writes are ignored. Until it is activated, use USB HID gamepads via `$FFB0–$FFBF`.

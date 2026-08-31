@@ -25,7 +25,7 @@ The X65 is built on the idea that computing should not be a struggle against unn
 The X65 is **not** a direct clone of any vintage system. Instead, it builds upon the **best ideas from past home computers**, integrating modern features while maintaining a low-level programming experience. Some of the key design principles include:
 
 - **Direct hardware access:** Minimal operating system overhead; programs interact directly with hardware.
-- **Rich I/O options:** Supporting classic peripherals (DE-9 joysticks) and modern devices (USB HID keyboards/gamepads, Wi-Fi, and USB mass storage).
+- **Rich I/O options:** Supporting classic peripherals (two DE-9 ports — bi-directional 5 V GPIO that doubles as retro joystick ports) and modern devices (USB HID keyboards/gamepads, Wi-Fi, and USB mass storage).
 - **Advanced graphics and sound:** A beam-chased display system driven by a dedicated display list in CGIA hardware, along with the custom SGU-1 chip for FM synthesis, PCM playback, and SID-style filtering.
 - **Open and expandable:** A full CPU bus expansion connector allows custom hardware to interface seamlessly.
 

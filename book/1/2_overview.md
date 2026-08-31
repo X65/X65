@@ -34,7 +34,7 @@ Inside bank 0, the high-`$FE`/`$FF` pages window is reserved for memory-mapped I
 | ------------- | ----------------------------------------------------------------- |
 | `$FEC0–$FEFF` | SGU-1 (sound)                                                     |
 | `$FF00–$FF7F` | CGIA (graphics, 128 registers)                                    |
-| `$FF80–$FF97` | TCA6416A GPIO expander (joysticks)                                |
+| `$FF80–$FF97` | PCAL6416A GPIO expander (DE-9 GPIO / joystick ports)              |
 | `$FF98–$FF9F` | System timers                                                     |
 | `$FFA0–$FFA7` | RGB LED                                                           |
 | `$FFA8–$FFAB` | Buzzer                                                            |
@@ -51,7 +51,7 @@ The X65 has two interrupt lines visible to the 65C816 — the maskable `IRQ` and
 
 Rather than wiring every device directly to the CPU, all maskable sources are funnelled through an **interrupt controller** inside the **RIA**. The RIA aggregates interrupts from peripherals such as the GPIO expander (joystick edges), system timers, the HID subsystem, and external expansion slots, and asserts a single `IRQ` line to the CPU. Software reads RIA status registers in the `$FFC0–$FFFF` window to discover which source fired.
 
-The joystick GPIO expander is an NXP **PCAL6416A** on the I²C bus; its defining feature for X65 is **interrupt-mask registers**, so software only ever sees IRQs for the input transitions it has explicitly requested.
+The DE-9 GPIO expander is an NXP **PCAL6416A** on the I²C bus; its defining feature for X65 is **interrupt-mask registers**, so software only ever sees IRQs for the input transitions it has explicitly requested.
 
 The graphics chip (CGIA) is wired to **NMI**, where it raises raster-line and vertical-blank interrupts (configured per display-list entry — see [Chapter 4: Graphics](4_graphics.md)). Because NMI bypasses the IRQ mask, raster effects remain responsive even while ordinary IRQ handling is disabled.
 
