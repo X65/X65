@@ -72,3 +72,25 @@ set(SITE_DATA_ROM_mixed_modes_PUBLISHED mixed_modes)
 set(SITE_DATA_ROM_mixed_modes_RELOCATE  "$B000,$FC00,$FFE0,$A000")
 set(SITE_DATA_ROM_mixed_modes_WITH      ${EMU_SOURCE_DIR}/roms/parts/font_8px.xex)
 set(SITE_DATA_ROM_mixed_modes_DATA      mixed_mode_dl.xex mascot_bg.xex hud_layer.xex)
+
+# Tunes that are not examples at all: an original module (.sap/.rad/.mid/.a2m/
+# .mod...) sitting in `emu/roms/` next to the ROM built from it. `sgu-tracker`
+# imports the module into the tracker's own song format and exports a packed
+# .SGM plus an autorun .xex wrapping the 6502 player - one command, no merging,
+# so these need neither `examples` nor `xex-filter.pl`.
+#
+# The source module is committed alongside its ROM so the ROM can be rebuilt
+# when the player or the exporter changes; the export is deterministic, so an
+# unchanged tune re-exports byte-identically and stays out of `git status`.
+#
+# Per-tune flags, if a tune ever needs one (--retime, --song=N), go in
+# SITE_SGM_ROM_<published>_OPTIONS.
+#
+# <module file in emu/roms/>   <name published under emu/roms/>
+set(SITE_SGM_ROMS
+    Draconus.sap             Draconus
+    alloyrun.rad             alloyrun
+    e1m1.mid                 e1m1
+    fm-troni.a2m             fm-troni
+    pinball_illusions.mod    pinball_illusions
+)

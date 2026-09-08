@@ -16,6 +16,7 @@ set(SITE_ROMS_DIR   ${SITE_EMU_DIR}/roms)
 set(SITE_STAGE_DIR  ${PROJECT_BINARY_DIR}/site-roms)
 
 find_program(XEX_FILTER_EXECUTABLE xex-filter.pl)
+find_program(SGU_TRACKER_EXECUTABLE sgu-tracker)
 
 set(_site_commands
     COMMAND ${CMAKE_COMMAND}
@@ -107,6 +108,41 @@ if(XEX_FILTER_EXECUTABLE AND SITE_DATA_ROMS)
                     ${SITE_STAGE_DIR}/${_published}.xex
                     ${SITE_ROMS_DIR}/${_published}.xex)
     endforeach()
+endif()
+
+# Tunes imported straight from an original module by `sgu-tracker` - no
+# examples target, no merging. `--compact` drops what the import left unused
+# before packing, and the .sgm the exporter writes next to the .xex lands in the
+# staging directory rather than in the site's tree.
+if(SITE_SGM_ROMS)
+    if(NOT SGU_TRACKER_EXECUTABLE)
+        message(STATUS "sgu-tracker not found: 'site' will skip the imported "
+                       "tune ROMs (Draconus, alloyrun, e1m1, fm-troni, "
+                       "pinball_illusions)")
+    else()
+        # sgu-tracker writes the .xex (and the .sgm beside it) itself and
+        # will not create a missing directory to do it.
+        list(APPEND _site_commands
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${SITE_STAGE_DIR})
+        list(LENGTH SITE_SGM_ROMS _n)
+        math(EXPR _last "${_n} / 2 - 1")
+        foreach(_i RANGE ${_last})
+            math(EXPR _m "${_i} * 2")
+            math(EXPR _p "${_m} + 1")
+            list(GET SITE_SGM_ROMS ${_m} _module)
+            list(GET SITE_SGM_ROMS ${_p} _published)
+            list(APPEND _site_commands
+                COMMAND ${SGU_TRACKER_EXECUTABLE}
+                        import ${SITE_ROMS_DIR}/${_module}
+                        sgm --xex --compact
+                        ${SITE_SGM_ROM_${_published}_OPTIONS}
+                        -o ${SITE_STAGE_DIR}/${_published}.xex
+                        --exit
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                        ${SITE_STAGE_DIR}/${_published}.xex
+                        ${SITE_ROMS_DIR}/${_published}.xex)
+        endforeach()
+    endif()
 endif()
 
 # VERBATIM: without it the recipe shell eats the `$` in a hex load address

@@ -147,6 +147,16 @@ target generates by compiling and running `examples/src/cgia/data/bins.c`. `4BB`
 in any of them - its picture needs a `converter.ts` and a `4BB.png` that are not in this
 tree, so the committed ROM stands.
 
+A fourth table, `SITE_SGM_ROMS`, covers ROMs that come from no example at all: an original
+module (`Draconus.sap`, `alloyrun.rad`, `e1m1.mid`, `fm-troni.a2m`, `pinball_illusions.mod`)
+committed in `x65.zone/emu/roms/` beside the ROM built from it. `sgu-tracker import <module>
+sgm --xex --compact` imports the tune and writes the packed `.SGM` plus an autorun `.xex`
+around the 6502 player, so these need neither `examples` nor `xex-filter.pl` - only
+`sgu-tracker` on `PATH`, and `site` skips them with a configure-time message when it is
+missing. Per-tune flags (`--retime`, `--song=N`) go in `SITE_SGM_ROM_<published>_OPTIONS`.
+The export is deterministic for a given tracker version, but the player and the exporter
+move, so rebuilding replaces the committed ROM with the current toolchain's output.
+
 ## Architecture
 
 ### The machine
