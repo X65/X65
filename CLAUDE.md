@@ -204,7 +204,8 @@ The same facts are written down in several places, and the copies are not genera
 - **`examples/src/cgia.h` and `examples/src/cgia.asm` are hand-vendored copies** of
   `firmware/src/south/cgia/cgia.h`. Nothing keeps them in step. After touching the firmware CGIA layout,
   `diff firmware/src/south/cgia/cgia.h examples/src/cgia.h` — the only expected differences are `#pragma once` and
-  the `// ---- internals ----` block at the end.
+  the tail from the `sprite_bpp()` helper through the `// ---- internals ----` block (renderer-side helpers that
+  cc65 cannot compile: C99 `for` declarations, and an unused `static inline` warns in every C example).
 - **The SGU-1 register map lives in four places**: `SGU-1/sgu.h` (the core), `SGU-1/README.md` (a full prose table),
   `emulator/src/chips/sgu1.c` (the service bank), and `book/A/A_memory_map.md`.
 - **`emulator/ext/sgu-1` is pinned behind this checkout's `SGU-1`** — the emulator has `9d6bd93`, the umbrella has
