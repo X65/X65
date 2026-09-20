@@ -37,6 +37,32 @@ https://ctrl-alt-rees.com/archive/yellowantphil.com/wacky_wheels/downloads/music
 Special characters in paths are URL-encoded, and `&song=N` selects a sub-song
 from a multi-song file.
 
+## Ranked additions
+
+The 100 entries added in September 2026 are recorded in
+[`top100-rankings.tsv`](top100-rankings.tsv). The list draws from four different
+rankings to cover SID, module, VGM and MIDI music:
+
+- `hvsc`: the [HVSC fan vote](https://remix64.com/supporting-pages/hvscs-top-100-sids-in-2000.html)
+  from 2000. These are the ranked files SGU-Tracker currently lists that were
+  not already in the jukebox.
+- `modland`: files whose bytes match entries in [ModArchive's most downloaded
+  modules chart](https://modarchive.org/index.php?query=tophits&request=view_chart).
+- `vgmrips`: one music track from each selected [top-rated VGMRips
+  pack](https://vgmrips.net/packs/top). `source_rank` is the soundtrack pack's
+  chart position, not a ranking of that track. The positions came from cached
+  chart pages with different crawl dates, so they are historical snapshots.
+- `bitmidi`: distinct songs from [BitMidi's play-count
+  ranking](https://bitmidi.com/api/midi/all?page=0&pageSize=50&orderBy=plays)
+  that are also in SGU-Tracker's `Popular/` directory.
+
+The TSV's `added_order` is playlist order; it is not a global rank. Rankings
+from different archives use different measures. `count` is downloads for
+ModArchive, plays for BitMidi, and empty for the other two. Source charts may
+change after this selection. All 100 source files were fetched, imported and
+saved as native songs with SGU-Tracker 0.11.0. That check establishes that the
+files load; it does not assess how the converted audio sounds.
+
 ## Contributing
 
 ### Adding tunes to `play.lst`
