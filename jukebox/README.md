@@ -63,6 +63,28 @@ change after this selection. All 100 source files were fetched, imported and
 saved as native songs with SGU-Tracker 0.11.0. That check establishes that the
 files load; it does not assess how the converted audio sounds.
 
+## Polish composer additions
+
+The next 50 entries are listed in
+[`polish50-attribution.tsv`](polish50-attribution.tsv). They contain 15 MIDI
+files from Mutopia, four OPL recordings of Chopin works, 16 Atari SAP files,
+and 15 MOD/XM tracker modules. The original compositions are credited to four
+Polish musicians: [Fryderyk Chopin](https://culture.pl/en/artist/fryderyk-chopin-frederic-chopin),
+[Janusz Pelc](https://culture.pl/pl/tworca/janusz-pelc),
+[Piotr Bendyk (XTD)](https://demozoo.org/sceners/1532/), and
+[Adam Skorupa (Scorpik)](https://demozoo.org/sceners/233/).
+
+The source library's composer folders identify the MIDI, SAP, MOD and XM
+authors. The selected SAP files also contain unambiguous `AUTHOR` headers. The
+OPL recordings are arrangements of Chopin compositions; their archive titles
+credit Chopin as the original composer. The TSV links the nationality evidence
+for each entry. This batch is a selection across formats, not a numbered
+popularity chart. Only `fife.xm` has a verified matching file in
+[ModArchive's download chart](https://modarchive.org/index.php?query=tophits&request=view_chart):
+it was number 382 with 13,539 downloads when checked. All 50 source files were
+fetched and imported into native songs with SGU-Tracker 0.11.0; playback sound
+was not assessed.
+
 ## Contributing
 
 ### Adding tunes to `play.lst`
