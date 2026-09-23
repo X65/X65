@@ -42,72 +42,70 @@ added_order	archive	corpus_file	match	chroma	envelope	playlist_entry
 41	asma	heavy_traffic.sap	identical	0.96	0.81	asma:/Composers/Bartek%20Wasiel%20%28BeWu%29/Heavy%20Traffic%20%282013%29.sap
 42	asma	hello.sap	identical	0.97	0.8	asma:/Composers/Artur%20Jurgawka%20%28Jurgi%29/Hello%20%281993%29.sap
 43	examples	hightide.rmt	identical			examples:/Raster%20Music%20Tracker/rmt128/others/hightide.rmt
-44	hvsc	human_race.sid	revision	0.75	0.16	hvsc:/MUSICIANS/H/Hubbard_Rob/Human_Race.sid
-45	examples	ilusia.rmt	revision			examples:/Raster%20Music%20Tracker/rmt128/others/ilusia.rmt
-46	vgmrips	in_the_hunt_stage1.vgz	identical	0.92	0.46	vgmrips:/Systems/Irem/M92/In%20The%20Hunt%20%28W%29%20-%20Kaitei%20Daisensou%20%28J%29/04%20The%20South%20Pole%20%5BStage%201%5D.vgz
-47	examples	ishtar.a2m	identical	0.84	0.65	examples:/Adlib%20Tracker%202/mlf/ishtar.a2m
-48	hvsc	Islamic_Snowmen.GT2reloc.sid	identical	0.85	0.49	hvsc:/MUSICIANS/B/B00daW/Islamic_Snowmen_Coup_de_Terre.sid
-49	asma	jam_session.sap	identical	0.94	0.79	asma:/Groups/Grayscale/Jam%20Session%20%282003%29.sap
-50	examples	jeroen_tel_alloyrun.kt	identical			examples:/klystrack/songs/LTVA-examples/Jeroen_Tel_Alloyrun_%28cover%29.kt
-51	modland	jetsetw.xm	identical	0.93	0.44	modland:/Fasttracker%202/Graff/jet%20set%20willy.xm
-52	modland	khaos.a2m	identical	0.96	0.53	modland:/Ad%20Lib/AdLib%20Tracker%202/Malfunction/khaos%20%284kb%20intro%20tune%29.a2m
-53	asma	komar.sap	identical	0.96	0.82	asma:/Composers/Lukasz%20Sychowicz%20%28X-Ray%29/Komar%20%282002%29.sap
-54	hvsc	Lord_of_Dragonspire.GT2tramp.sid	identical	0.96	0.65	hvsc:/MUSICIANS/P/Page_Jason/Lord_of_Dragonspire.sid
-55	modland	m5v-alon.it	revision	0.74	0.76	modland:/Impulsetracker/Mick%20Rippon/alone.it
-56	examples	macroron.a2m	identical	0.94	0.59	examples:/Adlib%20Tracker%202/televics/macroron.a2m
-57	examples	magica.kt	identical			examples:/klystrack/songs/System64-examples/Magica.kt
-58	vgmrips	metal_slug2_steel_beast.vgz	identical	0.88	0.47	vgmrips:/Systems/SNK/Neo%20Geo/Metal%20Slug%202/05%20Steel%20Beast%206Beets.vgz
-59	modland	moving_that_rhythm.s3m	identical	1.0	0.97	modland:/Screamtracker%203/Golden%20Spud/moving%20that%20rhythm.s3m
-60	examples	muriatic_milkshake.kt	identical			examples:/klystrack/songs/LTVA-examples/muriatic_milkshake.kt
-61	asma	new_generation.sap	identical	0.96	0.82	asma:/Composers/Krzysztof%20Bankowski%20%28sEXTOn%29/New%20Generation%20%281998%29.sap
-62	hvsc	Night_Knight.GT2songs.sid	identical	0.9	0.28	hvsc:/GAMES/M-R/Night_Knight.sid
-63	examples	nightdrv.a2m	identical	0.88	0.94	examples:/Adlib%20Tracker%202/nightdrv.a2m
-64	modland	occ-san-geen.mod	revision	1.0	1.0	modland:/Protracker/Uncle%20Tom/occ-san-geen.mod
-65	hvsc	Oh_Gather_Around.GT2reloc.sid	identical	0.96	0.84	hvsc:/MUSICIANS/P/Prestune/Oh_Gather_Around_on_This_Cold_Advent_Day.sid
-66	hvsc	one_man_and_his_droid.sid	identical	0.84	0.73	hvsc:/MUSICIANS/H/Hubbard_Rob/One_Man_and_his_Droid.sid
-67	modland	os_galax.a2m	identical	0.84	0.02	modland:/Ad%20Lib/AdLib%20Tracker%202/MadBrain/oskari%20travels%20to%20a%20new%20galaxy.a2m
-68	vgmrips	outrun_arcade_magical_sound_shower.vgz	identical	0.96	0.92	vgmrips:/Systems/Sega/Arcade/Out%20Run/01%20Magical%20Sound%20Shower.vgz
-69	modland	outrun_magical_sound_shower.vgz	revision	0.97	0.92	modland:/Video%20Game%20Music/Sega%20Master%20System/Hiroshi%20Kawaguchi/Out%20Run/01%20magical%20sound%20shower.vgz
-70	vgmrips	outrunners_magical_sound_shower.vgz	identical	0.81	0.54	vgmrips:/Systems/Sega/System%20Multi%2032/OutRunners/07%20Magical%20Sound%20Shower%20%281993%29.vgz
-71	modland	paradox_3.a2m	identical	0.82	0.04	modland:/Ad%20Lib/AdLib%20Tracker%202/Kvee/paradox%20%233.a2m
-72	examples	paranoimia_suntronic.kt	identical	0.92	0.65	examples:/klystrack/songs/Paranoimia_%28Suntronic%29.kt
-73	examples	patch16_music.rmt	identical			examples:/Raster%20Music%20Tracker/rmt128/raster/delta.rmt
-74	modland	phantasy_star_palma.vgz	revision	0.88	0.91	modland:/Video%20Game%20Music/Sega%20Master%20System/Tokuhiko%20Uwabo/Phantasy%20Star/05%20palma.vgz
-75	examples	phonkeh.kt	identical			examples:/klystrack/songs/phonkeh.kt
-76	asma	piua_tarczowa.sap	identical	0.83	0.91	asma:/Composers/Czlowiek%20W%20Atomizerze/Piua%20TarCZoWA%20%282003%29.sap
-77	asma	rage_against_16bit.sap	identical	0.94	0.8	asma:/Composers/Lukasz%20Sychowicz%20%28X-Ray%29/Rage%20against%2016-bit%20%281996%29.sap
-78	examples	robocop3_opn2.fur	identical	0.64	-0.01	examples:/Furnace/genesis/robocop3_opn2.fur
-79	examples	RType_Amiga2SID.sng	identical			examples:/GoatTracker%202/GTUltra/JasonPage/RType_Amiga2SID.sng
-80	examples	schwskel.a2m	identical	0.91	0.96	examples:/Adlib%20Tracker%202/schwskel.a2m
-81	asma	scream.sap	identical	0.96	0.89	asma:/Composers/Adrian%20Matoga%20%28Epi%29/Scream%20%282002%29.sap
-82	modland	sidvibes.ahx	identical	0.93	0.76	modland:/AHX/Anthrium/sidvibes%21.ahx
-83	vgmrips	silver_surfer_bgm2.vgz	identical	0.86	0.01	vgmrips:/Systems/Nintendo/Nintendo%20Entertainment%20System/Silver%20Surfer/05%20Section%20BGM%202.vgz
-84	asma	slim_to_none.sap	identical	0.97	0.85	asma:/Composers/Grzegorz%20Kwiatek%20%28Greg%29/Slim%20to%20none%20%282005%29.sap
-85	vgmrips	soldier_blade_operation1.vgz	identical	0.93	0.44	vgmrips:/Systems/NEC/TurboGrafx-16/Soldier%20Blade/03%20Operation%201.vgz
-86	modland	sonic1_bridge_zone.vgz	revision	0.97	0.45	modland:/Video%20Game%20Music/Sega%20Master%20System/YK-2/Sonic%20The%20Hedgehog/sonic%20the%20hedgehog%20-%20bridge%20zone.vgz
-87	vgmrips	sonic1_green_hill.vgz	identical	0.98	0.7	vgmrips:/Systems/Sega/Mega%20Drive/Sonic%20the%20Hedgehog/02%20-%20Green%20Hill%20Zone.vgz
-88	vgmrips	sonic2_ehz.vgz	identical	0.94	0.78	vgmrips:/Systems/Sega/Mega%20Drive/Sonic%20the%20Hedgehog%202/03%20-%20Emerald%20Hill%20Zone.vgz
-89	vgmrips	sonic_cd_palmtree_panic_past.vgz	identical	0.9	0.15	vgmrips:/Systems/Sega/Sega%20CD/Sonic%20the%20Hedgehog%20CD/01%20-%20Palmtree%20Panic%20Zone%20Past.vgz
-90	vgmrips	space_manbow_hydra.vgz	revision	0.87	0.4	vgmrips:/Systems/ASCII/MSX2/Space%20Manbow/04%20Hydra%20%28Normal%20Boss%29.vgz
-91	vgmrips	ssf2_ryu_stage.vgz	identical	0.95	0.75	vgmrips:/Systems/Capcom/CP%20System%20II/Super%20Street%20Fighter%20II%3A%20The%20New%20Challengers%2C%20Super%20Street%20Fighter%20II%20Turbo%20%28U%29%20-%20Super%20Street%20Fighter%20II%20X%3A%20Grand%20Master%20Challenge%20%28J%29/11%20Ryu%20Stage%20I.vgz
-92	examples	star_chips.kt	identical			examples:/klystrack/songs/StarChips.kt
-93	examples	stranglehold.kt	identical			examples:/klystrack/songs/Imported_XMs/STRANGLEHOLD_%28C%29JT.kt
-94	examples	sunset_on_the_moon.rmt	identical			examples:/Raster%20Music%20Tracker/rmt128/others/sunset_on_the_moon.rmt
-95	asma	thc10.sap	identical	0.96	0.83	asma:/Composers/Krystian%20Iwaszko%20%28Pinokio%29/THC10%20%282001%29.sap
-96	asma	thc_tmc.sap	identical	0.96	0.69	asma:/Composers/Krystian%20Iwaszko%20%28Pinokio%29/THC-TMC%20%282004%29.sap
-97	modland	the_world_sleeps.it	revision	0.72	0.96	modland:/Impulsetracker/RS3/the%20world%20sleeps.it
-98	modland	through_sewers.ftm	identical	0.95	0.81	modland:/FamiTracker/Shiru/through%20sewers.ftm
-99	hvsc	thundercats.sid	identical	0.88	0.37	hvsc:/MUSICIANS/H/Hubbard_Rob/Thundercats.sid
-100	examples	to-norah_2SID.sng	identical			examples:/GoatTracker%202/GTUltra/Shogoon/%246To-Norah.sng
-101	modland	trans_atlantic.mod	identical	0.99	0.84	modland:/Protracker/Lizardking/trans%20atlantic.mod
-102	examples	turrican2_rev2s.rmt	identical			examples:/Raster%20Music%20Tracker/rmt128/raster/turrican2_rev2s.rmt
-103	modland	twilight.it	identical	0.83	0.18	modland:/Impulsetracker/CPU/twilight.it
-104	asma	ufo_hunt.sap	identical	0.98	0.86	asma:/Composers/Michal%20Szpilowski%20%28Miker%29/UFO%20Hunt%20%282018%29.sap&song=5
-105	asma	undesigned.sap	identical	0.94	0.85	asma:/Composers/Dariusz%20Duma%20%28Dhor%29/Undesigned%20%282014%29.sap
-106	asma	unplugged_pixels.sap	identical	0.95	0.63	asma:/Composers/Dariusz%20Duma%20%28Dhor%29/Unplugged%20Pixels%20%282007%29.sap
-107	modland	wild_impressions.mod	identical	0.99	0.96	modland:/Protracker/Lizardking/wild%20impressions.mod
-108	asma	x8.sap	identical	0.91	-2.0	asma:/Games/X%3A8%20%282013%29.sap
-109	modland	zandax.a2m	identical	0.94	0.65	modland:/Ad%20Lib/AdLib%20Tracker%202/Nula/zandax.a2m
-110	asma	zip.sap	identical			asma:/Composers/Lukasz%20Sychowicz%20%28X-Ray%29/Zip%20%281995%29.sap
-111	asma	zorro_has_a_sister.sap	identical	0.91	0.5	asma:/Composers/Bartek%20Wasiel%20%28BeWu%29/Zorro%20Has%20A%20Sister%20%282011%29.sap
-112	asma	Zybex.sap	identical	0.79	0.43	asma:/Composers/Adam%20Gilmore/Zybex%20%281988%29.sap&song=4
+44	examples	ilusia.rmt	revision			examples:/Raster%20Music%20Tracker/rmt128/others/ilusia.rmt
+45	vgmrips	in_the_hunt_stage1.vgz	identical	0.92	0.46	vgmrips:/Systems/Irem/M92/In%20The%20Hunt%20%28W%29%20-%20Kaitei%20Daisensou%20%28J%29/04%20The%20South%20Pole%20%5BStage%201%5D.vgz
+46	examples	ishtar.a2m	identical	0.84	0.65	examples:/Adlib%20Tracker%202/mlf/ishtar.a2m
+47	hvsc	Islamic_Snowmen.GT2reloc.sid	identical	0.85	0.49	hvsc:/MUSICIANS/B/B00daW/Islamic_Snowmen_Coup_de_Terre.sid
+48	asma	jam_session.sap	identical	0.94	0.79	asma:/Groups/Grayscale/Jam%20Session%20%282003%29.sap
+49	examples	jeroen_tel_alloyrun.kt	identical			examples:/klystrack/songs/LTVA-examples/Jeroen_Tel_Alloyrun_%28cover%29.kt
+50	modland	jetsetw.xm	identical	0.93	0.44	modland:/Fasttracker%202/Graff/jet%20set%20willy.xm
+51	modland	khaos.a2m	identical	0.96	0.53	modland:/Ad%20Lib/AdLib%20Tracker%202/Malfunction/khaos%20%284kb%20intro%20tune%29.a2m
+52	asma	komar.sap	identical	0.96	0.82	asma:/Composers/Lukasz%20Sychowicz%20%28X-Ray%29/Komar%20%282002%29.sap
+53	hvsc	Lord_of_Dragonspire.GT2tramp.sid	identical	0.96	0.65	hvsc:/MUSICIANS/P/Page_Jason/Lord_of_Dragonspire.sid
+54	examples	macroron.a2m	identical	0.94	0.59	examples:/Adlib%20Tracker%202/televics/macroron.a2m
+55	examples	magica.kt	identical			examples:/klystrack/songs/System64-examples/Magica.kt
+56	vgmrips	metal_slug2_steel_beast.vgz	identical	0.88	0.47	vgmrips:/Systems/SNK/Neo%20Geo/Metal%20Slug%202/05%20Steel%20Beast%206Beets.vgz
+57	modland	moving_that_rhythm.s3m	identical	1.0	0.97	modland:/Screamtracker%203/Golden%20Spud/moving%20that%20rhythm.s3m
+58	examples	muriatic_milkshake.kt	identical			examples:/klystrack/songs/LTVA-examples/muriatic_milkshake.kt
+59	asma	new_generation.sap	identical	0.96	0.82	asma:/Composers/Krzysztof%20Bankowski%20%28sEXTOn%29/New%20Generation%20%281998%29.sap
+60	hvsc	Night_Knight.GT2songs.sid	identical	0.9	0.28	hvsc:/GAMES/M-R/Night_Knight.sid
+61	examples	nightdrv.a2m	identical	0.88	0.94	examples:/Adlib%20Tracker%202/nightdrv.a2m
+62	modland	occ-san-geen.mod	revision	1.0	1.0	modland:/Protracker/Uncle%20Tom/occ-san-geen.mod
+63	hvsc	Oh_Gather_Around.GT2reloc.sid	identical	0.96	0.84	hvsc:/MUSICIANS/P/Prestune/Oh_Gather_Around_on_This_Cold_Advent_Day.sid
+64	hvsc	one_man_and_his_droid.sid	identical	0.84	0.73	hvsc:/MUSICIANS/H/Hubbard_Rob/One_Man_and_his_Droid.sid
+65	modland	os_galax.a2m	identical	0.84	0.02	modland:/Ad%20Lib/AdLib%20Tracker%202/MadBrain/oskari%20travels%20to%20a%20new%20galaxy.a2m
+66	vgmrips	outrun_arcade_magical_sound_shower.vgz	identical	0.96	0.92	vgmrips:/Systems/Sega/Arcade/Out%20Run/01%20Magical%20Sound%20Shower.vgz
+67	modland	outrun_magical_sound_shower.vgz	revision	0.97	0.92	modland:/Video%20Game%20Music/Sega%20Master%20System/Hiroshi%20Kawaguchi/Out%20Run/01%20magical%20sound%20shower.vgz
+68	vgmrips	outrunners_magical_sound_shower.vgz	identical	0.81	0.54	vgmrips:/Systems/Sega/System%20Multi%2032/OutRunners/07%20Magical%20Sound%20Shower%20%281993%29.vgz
+69	modland	paradox_3.a2m	identical	0.82	0.04	modland:/Ad%20Lib/AdLib%20Tracker%202/Kvee/paradox%20%233.a2m
+70	examples	paranoimia_suntronic.kt	identical	0.92	0.65	examples:/klystrack/songs/Paranoimia_%28Suntronic%29.kt
+71	examples	patch16_music.rmt	identical			examples:/Raster%20Music%20Tracker/rmt128/raster/delta.rmt
+72	modland	phantasy_star_palma.vgz	revision	0.88	0.91	modland:/Video%20Game%20Music/Sega%20Master%20System/Tokuhiko%20Uwabo/Phantasy%20Star/05%20palma.vgz
+73	examples	phonkeh.kt	identical			examples:/klystrack/songs/phonkeh.kt
+74	asma	piua_tarczowa.sap	identical	0.83	0.91	asma:/Composers/Czlowiek%20W%20Atomizerze/Piua%20TarCZoWA%20%282003%29.sap
+75	asma	rage_against_16bit.sap	identical	0.94	0.8	asma:/Composers/Lukasz%20Sychowicz%20%28X-Ray%29/Rage%20against%2016-bit%20%281996%29.sap
+76	examples	robocop3_opn2.fur	identical	0.64	-0.01	examples:/Furnace/genesis/robocop3_opn2.fur
+77	examples	RType_Amiga2SID.sng	identical			examples:/GoatTracker%202/GTUltra/JasonPage/RType_Amiga2SID.sng
+78	examples	schwskel.a2m	identical	0.91	0.96	examples:/Adlib%20Tracker%202/schwskel.a2m
+79	asma	scream.sap	identical	0.96	0.89	asma:/Composers/Adrian%20Matoga%20%28Epi%29/Scream%20%282002%29.sap
+80	modland	sidvibes.ahx	identical	0.93	0.76	modland:/AHX/Anthrium/sidvibes%21.ahx
+81	vgmrips	silver_surfer_bgm2.vgz	identical	0.86	0.01	vgmrips:/Systems/Nintendo/Nintendo%20Entertainment%20System/Silver%20Surfer/05%20Section%20BGM%202.vgz
+82	asma	slim_to_none.sap	identical	0.97	0.85	asma:/Composers/Grzegorz%20Kwiatek%20%28Greg%29/Slim%20to%20none%20%282005%29.sap
+83	vgmrips	soldier_blade_operation1.vgz	identical	0.93	0.44	vgmrips:/Systems/NEC/TurboGrafx-16/Soldier%20Blade/03%20Operation%201.vgz
+84	modland	sonic1_bridge_zone.vgz	revision	0.97	0.45	modland:/Video%20Game%20Music/Sega%20Master%20System/YK-2/Sonic%20The%20Hedgehog/sonic%20the%20hedgehog%20-%20bridge%20zone.vgz
+85	vgmrips	sonic1_green_hill.vgz	identical	0.98	0.7	vgmrips:/Systems/Sega/Mega%20Drive/Sonic%20the%20Hedgehog/02%20-%20Green%20Hill%20Zone.vgz
+86	vgmrips	sonic2_ehz.vgz	identical	0.94	0.78	vgmrips:/Systems/Sega/Mega%20Drive/Sonic%20the%20Hedgehog%202/03%20-%20Emerald%20Hill%20Zone.vgz
+87	vgmrips	sonic_cd_palmtree_panic_past.vgz	identical	0.9	0.15	vgmrips:/Systems/Sega/Sega%20CD/Sonic%20the%20Hedgehog%20CD/01%20-%20Palmtree%20Panic%20Zone%20Past.vgz
+88	vgmrips	space_manbow_hydra.vgz	revision	0.87	0.4	vgmrips:/Systems/ASCII/MSX2/Space%20Manbow/04%20Hydra%20%28Normal%20Boss%29.vgz
+89	vgmrips	ssf2_ryu_stage.vgz	identical	0.95	0.75	vgmrips:/Systems/Capcom/CP%20System%20II/Super%20Street%20Fighter%20II%3A%20The%20New%20Challengers%2C%20Super%20Street%20Fighter%20II%20Turbo%20%28U%29%20-%20Super%20Street%20Fighter%20II%20X%3A%20Grand%20Master%20Challenge%20%28J%29/11%20Ryu%20Stage%20I.vgz
+90	examples	star_chips.kt	identical			examples:/klystrack/songs/StarChips.kt
+91	examples	stranglehold.kt	identical			examples:/klystrack/songs/Imported_XMs/STRANGLEHOLD_%28C%29JT.kt
+92	examples	sunset_on_the_moon.rmt	identical			examples:/Raster%20Music%20Tracker/rmt128/others/sunset_on_the_moon.rmt
+93	asma	thc10.sap	identical	0.96	0.83	asma:/Composers/Krystian%20Iwaszko%20%28Pinokio%29/THC10%20%282001%29.sap
+94	asma	thc_tmc.sap	identical	0.96	0.69	asma:/Composers/Krystian%20Iwaszko%20%28Pinokio%29/THC-TMC%20%282004%29.sap
+95	modland	the_world_sleeps.it	revision	0.72	0.96	modland:/Impulsetracker/RS3/the%20world%20sleeps.it
+96	modland	through_sewers.ftm	identical	0.95	0.81	modland:/FamiTracker/Shiru/through%20sewers.ftm
+97	hvsc	thundercats.sid	identical	0.88	0.37	hvsc:/MUSICIANS/H/Hubbard_Rob/Thundercats.sid
+98	examples	to-norah_2SID.sng	identical			examples:/GoatTracker%202/GTUltra/Shogoon/%246To-Norah.sng
+99	modland	trans_atlantic.mod	identical	0.99	0.84	modland:/Protracker/Lizardking/trans%20atlantic.mod
+100	examples	turrican2_rev2s.rmt	identical			examples:/Raster%20Music%20Tracker/rmt128/raster/turrican2_rev2s.rmt
+101	modland	twilight.it	identical	0.83	0.18	modland:/Impulsetracker/CPU/twilight.it
+102	asma	ufo_hunt.sap	identical	0.98	0.86	asma:/Composers/Michal%20Szpilowski%20%28Miker%29/UFO%20Hunt%20%282018%29.sap&song=5
+103	asma	undesigned.sap	identical	0.94	0.85	asma:/Composers/Dariusz%20Duma%20%28Dhor%29/Undesigned%20%282014%29.sap
+104	asma	unplugged_pixels.sap	identical	0.95	0.63	asma:/Composers/Dariusz%20Duma%20%28Dhor%29/Unplugged%20Pixels%20%282007%29.sap
+105	modland	wild_impressions.mod	identical	0.99	0.96	modland:/Protracker/Lizardking/wild%20impressions.mod
+106	asma	x8.sap	identical	0.91	-2.0	asma:/Games/X%3A8%20%282013%29.sap
+107	modland	zandax.a2m	identical	0.94	0.65	modland:/Ad%20Lib/AdLib%20Tracker%202/Nula/zandax.a2m
+108	asma	zip.sap	identical			asma:/Composers/Lukasz%20Sychowicz%20%28X-Ray%29/Zip%20%281995%29.sap
+109	asma	zorro_has_a_sister.sap	identical	0.91	0.5	asma:/Composers/Bartek%20Wasiel%20%28BeWu%29/Zorro%20Has%20A%20Sister%20%282011%29.sap
+110	asma	Zybex.sap	identical	0.79	0.43	asma:/Composers/Adam%20Gilmore/Zybex%20%281988%29.sap&song=4
