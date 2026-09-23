@@ -85,6 +85,41 @@ it was number 382 with 13,539 downloads when checked. All 50 source files were
 fetched and imported into native songs with SGU-Tracker 0.11.0; playback sound
 was not assessed.
 
+## Test corpus additions
+
+The next 112 entries come from SGU-Tracker's own test corpus, the
+third-party tunes in the tracker's `tests/tunes` directory that its
+importers are checked against. They are listed in
+[`testcorpus-validation.tsv`](testcorpus-validation.tsv). Each corpus file
+was traced to a path in one of the archives SGU-Tracker browses: 33 from
+modland, 27 from ASMA, 25 from the trackers' example songs, 18 from
+VGMRips, seven from HVSC and two from Reality. For 102 of them the archive
+file is byte-identical to the corpus file. For the other 10 it is a
+different revision of the same piece, such as a newer rip or a changed
+title or credit tag; the TSV's `match` column says which.
+
+Every entry was imported with SGU-Tracker 0.11.0 and played as part of a
+playlist. For 91 of them the first 60 seconds were also rendered by the
+original format's reference player (sidplayfp, libopenmpt, libgme,
+vgm2wav, Furnace, or the tracker's AdLib Tracker 2, klystrack and AHX
+reference renderers) and compared with the SGU-1 render. `chroma` is the
+average per-frame agreement of the two renders' pitch-class content, which
+does not depend on timbre: 1.0 means the same notes at the same time.
+`envelope` is the correlation of their loudness over time. 64 of the 91
+reach a chroma of 0.9 or more. Both numbers are low where a song opens
+quietly or its tempo drifts slightly, so they point to entries worth
+hearing rather than proving an entry wrong. The GoatTracker, Raster Music
+Tracker and extended klystrack songs, two digital-sample SAP files, and one
+RAD file whose reference render came out silent have no scores.
+
+Ten more candidates were dropped. Five were test or demo pieces rather than
+music. One was a SAP file whose sub-songs are all in-game loops of 10
+seconds or less. Four had chroma well below the rest at both the start and
+later in the song: `super mario.a2m`, the Bombaman title screen, Lagrange
+Point's "Aqueduct" and `Captain_Future_Preview.sid`. Zybex and UFO Hunt
+use `&song=` to select their main sub-song, since their first sub-song is a
+short jingle. None of this measures how the converted audio sounds.
+
 ## Contributing
 
 ### Adding tunes to `play.lst`
