@@ -36,6 +36,7 @@ reality:/Modules/RAD-v1/Void/Void%20-%20Alloyrun.rad
 hvsc:/MUSICIANS/H/Hubbard_Rob/Sanxion.sid
 hvsc:/MUSICIANS/H/Hubbard_Rob/International_Karate.sid
 hvsc:/MUSICIANS/H/Hubbard_Rob/Commando.sid
+hvsc:/MUSICIANS/H/Hubbard_Rob/Delta.sid
 hvsc:/MUSICIANS/H/Hubbard_Rob/Knucklebusters.sid
 hvsc:/MUSICIANS/H/Hubbard_Rob/Auf_Wiedersehen_Monty.sid
 hvsc:/MUSICIANS/H/Hubbard_Rob/Lightforce.sid
@@ -43,7 +44,6 @@ hvsc:/MUSICIANS/H/Hubbard_Rob/Zoids.sid
 hvsc:/MUSICIANS/H/Hubbard_Rob/ACE_II.sid
 hvsc:/MUSICIANS/H/Hubbard_Rob/Thrust.sid
 hvsc:/MUSICIANS/H/Hubbard_Rob/Gerry_the_Germ.sid
-hvsc:/MUSICIANS/H/Hubbard_Rob/Kentilla.sid
 modland:/Protracker/Captain/space_debris.mod
 modland:/Screamtracker%203/Karsten%20Koch/aryx.s3m
 modland:/Fasttracker%202/Andreas%20Viklund/coop-Virtuos/dreams.xm
@@ -61,13 +61,11 @@ modland:/Screamtracker%203/Skaven/network.s3m
 modland:/Protracker/Purple%20Motion/soul-o-matic.mod
 modland:/Protracker/Maktone/class09.mod
 modland:/Screamtracker%203/Necros/eden.s3m
-modland:/Screamtracker%203/Phoenix/babylon.s3m
 modland:/Impulsetracker/Aitrus/mystified.it
 vgmrips:/Systems/Namco/Namco%20System%202/Dragon%20Saber%3A%20After%20Story%20of%20Dragon%20Spirit/04%20Submerged%20City%20%28Stage%201%29.vgz
 vgmrips:/Systems/Sega/Arcade/Out%20Run/02%20Passing%20Breeze.vgz
 vgmrips:/Systems/Toaplan/Toaplan%202/Battle%20Garegga/06%20Fly%20to%20the%20Leaden%20Sky%20%5BStage%201%20Valley%5D.vgz
 vgmrips:/Systems/ASCII/MSX2/Space%20Manbow/03%20Battle%20Ship%20%281st.BGM%29.vgz
-vgmrips:/Systems/Nintendo/Nintendo%20Entertainment%20System/Journey%20to%20Silius%20%28U%2C%20E%2C%20A%29%20-%20Raf%20World%20%28J%29/03%20Stage%201%2C%20Final%20Stage.vgz
 vgmrips:/Systems/Sharp/X68000/Akumajo%20Dracula/08%20Thrashard%20in%20The%20Cave%20%28Stage%202%29.vgz
 vgmrips:/Systems/ASCII/MSX2/Metal%20Gear%202%3A%20Solid%20Snake/01%20Theme%20of%20Solid%20Snake%20%28Opening%20BGM%201%29.vgz
 vgmrips:/Systems/NEC/PC-8801/The%20Scheme/03%20The%20Legend%20of%20Hero.vgz
@@ -140,7 +138,6 @@ asma:/Composers/Piotr%20Bendyk%20%28XTD%29/Sixth%20Sense%20%282016%29.sap
 asma:/Composers/Piotr%20Bendyk%20%28XTD%29/Surprise%20%282013%29.sap
 asma:/Composers/Piotr%20Bendyk%20%28XTD%29/Surprise%202%20%282013%29.sap
 asma:/Composers/Piotr%20Bendyk%20%28XTD%29/The%20Third%20%282014%29.sap
-modland:/Fasttracker%202/Scorpik/fife.xm
 modland:/Protracker/Scorpik/a%20friend%20has%20died.mod
 modland:/Protracker/Scorpik/global%20slash%20st.mod
 modland:/Protracker/Scorpik/mr.smith.mod
@@ -149,7 +146,6 @@ modland:/Fasttracker%202/Scorpik/fudge.xm
 modland:/Protracker/Scorpik/crazy%20norby.mod
 modland:/Protracker/Scorpik/invisible%20world.mod
 modland:/Protracker/Scorpik/space%20ballad.mod
-modland:/Protracker/Scorpik/field%20day.mod
 modland:/Protracker/Scorpik/drunk%20cat.chip.mod
 modland:/Screamtracker%203/Skaven/unreal%20%5D%5B%20-%20the%202nd%20reality.s3m
 asma:/Composers/Radek%20Sterba%20%28Raster%29/3D%20%282009%29.sap
@@ -175,7 +171,6 @@ modland:/Protracker/Travolta/condom%20corruption.mod
 examples:/klystrack/songs/LTVA-examples/crosswords.kt
 reality:/Modules/RAD-v2/Extent%20of%20the%20Jam/Cybernet.rad
 asma:/Composers/Radek%20Sterba%20%28Raster%29/Delta%20%282003%29.sap
-vgmrips:/Systems/NEC/TurboGrafx-16/Devil%20Crash%20%28J%29%20-%20Devil%27s%20Crush%20%28U%29/02%20Main%20Theme.vgz
 asma:/Composers/Marcin%20Jastrzemski%20%28Fatman%29/Digital%20Drum%20%281995%29.sap
 asma:/Composers/Bartek%20Wasiel%20%28BeWu%29/Dropsy%20King%20%282003%29.sap
 reality:/Modules/RAD-v2/Void/Void%20-%20Dystopia.rad
@@ -200,7 +195,6 @@ asma:/Composers/Lukasz%20Sychowicz%20%28X-Ray%29/Komar%20%282002%29.sap
 hvsc:/MUSICIANS/P/Page_Jason/Lord_of_Dragonspire.sid
 examples:/Adlib%20Tracker%202/televics/macroron.a2m
 examples:/klystrack/songs/System64-examples/Magica.kt
-vgmrips:/Systems/SNK/Neo%20Geo/Metal%20Slug%202/05%20Steel%20Beast%206Beets.vgz
 modland:/Screamtracker%203/Golden%20Spud/moving%20that%20rhythm.s3m
 examples:/klystrack/songs/LTVA-examples/muriatic_milkshake.kt
 asma:/Composers/Krzysztof%20Bankowski%20%28sEXTOn%29/New%20Generation%20%281998%29.sap
@@ -216,11 +210,9 @@ examples:/klystrack/songs/Paranoimia_%28Suntronic%29.kt
 examples:/Raster%20Music%20Tracker/rmt128/raster/delta.rmt
 modland:/Video%20Game%20Music/Sega%20Master%20System/Tokuhiko%20Uwabo/Phantasy%20Star/05%20palma.vgz
 examples:/klystrack/songs/phonkeh.kt
-asma:/Composers/Czlowiek%20W%20Atomizerze/Piua%20TarCZoWA%20%282003%29.sap
 asma:/Composers/Lukasz%20Sychowicz%20%28X-Ray%29/Rage%20against%2016-bit%20%281996%29.sap
 examples:/Furnace/genesis/robocop3_opn2.fur
 examples:/GoatTracker%202/GTUltra/JasonPage/RType_Amiga2SID.sng
-examples:/Adlib%20Tracker%202/schwskel.a2m
 asma:/Composers/Adrian%20Matoga%20%28Epi%29/Scream%20%282002%29.sap
 modland:/AHX/Anthrium/sidvibes%21.ahx
 vgmrips:/Systems/Nintendo/Nintendo%20Entertainment%20System/Silver%20Surfer/05%20Section%20BGM%202.vgz
