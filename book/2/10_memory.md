@@ -120,7 +120,7 @@ A typical fastcall sequence:
 
 ; Invoke syscall
     lda #SYSCALL_ID
-    sta $FFF1                ; XSTACK_OP
+    sta $FFF0                ; API_OP
 
 ; On return: result (if any) is left on XSTACK or in A
     lda $FFF2                ; XSTACK_DATA (pops one byte)

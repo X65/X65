@@ -30,7 +30,7 @@ For instructions requiring additional data, these follow the instruction code.
 - **0** – Insert empty lines filled with the background color.
   - Bits 6-4: Number of empty lines.
   - Bit 7: Trigger a Display List Interrupt (DLI).
-- **1** – Duplicate the last raster line multiple times.
+- **1** – Reserved (TBD).
 - **2** – Jump to another location in the display list.
   - If DLI bit is set, execution waits for Vertical Blank before jumping.
 - **3** – Load new memory pointers. **Bits 4-7** are flag bits selecting which scan pointers will be updated; the matching 16-bit values follow the instruction byte in the order listed.

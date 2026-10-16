@@ -69,7 +69,7 @@ The contrast is worth remembering: the 16-bit stack pointer is a hardware capabi
 
 Alongside the hardware stack, the RIA firmware exposes a **512-byte auxiliary buffer called XSTACK** — a last-in-first-out region that lives inside NORTH, not in CPU-visible PSRAM. Its job is to carry arguments and return data between 65C816 code and the fastcall API at `$FFF0–$FFF3` without clobbering the hardware stack or forcing callers to pass pointers into PSRAM.
 
-A typical fastcall pattern writes a few bytes to the XSTACK, sets up `A`/`X`/`Y`, writes the call opcode to `$FFF1`, and on return reads the result either from registers or back off the XSTACK. From the application programmer's point of view the XSTACK is just another stack, reachable through RIA registers; its benefit is that it is NORTH-local, so reading and writing it does not stall on PSRAM.
+A typical fastcall pattern writes a few bytes to the XSTACK, sets up `A`/`X`/`Y`, writes the call opcode to `$FFF0`, and on return reads the result either from registers or back off the XSTACK. From the application programmer's point of view the XSTACK is just another stack, reachable through RIA registers; its benefit is that it is NORTH-local, so reading and writing it does not stall on PSRAM.
 
 ## Memory-Mapped I/O Window
 
