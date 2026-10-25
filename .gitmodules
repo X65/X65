@@ -9,7 +9,7 @@
 	url = https://github.com/X65/emu.git
 [submodule "examples"]
 	path = examples
-	url = https://github.com/X65/examples.git
+	url = https://git.chrome.pl/X65/examples.git
 [submodule "_github"]
 	path = _github
 	url = git@github.com:X65/.github.git
