@@ -34,7 +34,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'AGENTS.md']
 todo_include_todos = True
 
 html_js_files = [
-    'https://plausible.io/js/script.js',
+    ('https://stats.chrome.pl/api/script.js?siteId=19a9a6f3e638', {'defer': 'defer'}),
 ]
 
 # -- Options for HTML output -------------------------------------------------
