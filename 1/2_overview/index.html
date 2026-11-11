@@ -1,0 +1,474 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Chapter 2: System Architecture Overview" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.x65.zone/1/2_overview/" />
+<meta property="og:site_name" content="X65" />
+<meta property="og:description" content="The X65 microcomputer is built around the WDC 65C816 CPU, a 16-bit successor to the 6502 with a 24-bit address space capable of reaching up to 16 MB of memory. Surrounding it is a small set of cust..." />
+<meta name="description" content="The X65 microcomputer is built around the WDC 65C816 CPU, a 16-bit successor to the 6502 with a 24-bit address space capable of reaching up to 16 MB of memory. Surrounding it is a small set of cust..." />
+<link rel="index" title="Index" href="../../genindex/"><link rel="search" title="Search" href="../../search/"><link rel="next" title="Chapter 3: Memory and Storage" href="../3_memory_storage/"><link rel="prev" title="Chapter 1: Introduction" href="../1_introduction/">
+        <link rel="canonical" href="https://docs.x65.zone/1/2_overview/">
+        <link rel="prefetch" href="../../_static/paw_logo_32.png" as="image">
+
+    <link rel="shortcut icon" href="../../_static/paw_logo_32_gray.png"><!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Chapter 2: System Architecture Overview - X65.docs</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ea49a994" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #0E556F;
+  --color-brand-content: #0E556F;
+  --color-brand-visited: #052544;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../"><div class="brand">X65.docs</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/paw_logo_32.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">X65.docs</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search/" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../part_1/">Part 1: The X65 Microcomputer</a><input aria-label="Toggle navigation of Part 1: The X65 Microcomputer" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../1_introduction/">Chapter 1: Introduction</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Chapter 2: System Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../3_memory_storage/">Chapter 3: Memory and Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_graphics/">Chapter 4: Graphics and Display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../5_audio/">Chapter 5: Sound and Audio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../6_io/">Chapter 6: Input and Output Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../7_devel/">Chapter 7: Development and Emulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../part_2/">Part 2: Programming the X65 in 65816 Assembly</a><input aria-label="Toggle navigation of Part 2: Programming the X65 in 65816 Assembly" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../2/08_assembly/">Chapter 8: Introduction to 65816 Assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/09_dev_env/">Chapter 9: Development Environment Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/10_memory/">Chapter 10: Memory Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/11_graphics/">Chapter 11: Graphics Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/12_sound/">Chapter 12: Sound Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/13_input_output/">Chapter 13: Input/Output Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/14_os/">Chapter 14: Operating System (OS/816)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/15_advanced/">Chapter 15: Advanced Programming Techniques</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/16_examples/">Chapter 16: Example Projects and Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/17_afterword/">Chapter 17: Afterword</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/A_memory_map/">Appendix A: Memory Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/B_glossary/">Appendix B: Glossary of X65 Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/C_65816_migration/">Appendix C: From 6502 to 65816 Migration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/D_systems_comparison/">Appendix D: X65 Compared to Classic 8-bit Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/E_cheat_sheet/">Appendix E: X65 Quick Reference Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/F_xex_format/">Appendix F: XEX File Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/G_sgu1/">Appendix G: The SGU-1 Sound Generator</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/blob/main/book/1/2_overview.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/edit/main/book/1/2_overview.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="chapter-2-system-architecture-overview">
+<h1>Chapter 2: System Architecture Overview<a class="headerlink" href="#chapter-2-system-architecture-overview" title="Link to this heading">¶</a></h1>
+<p>The X65 microcomputer is built around the <strong>WDC 65C816</strong> CPU, a 16-bit successor to the 6502 with a 24-bit address space capable of reaching up to 16 MB of memory. Surrounding it is a small set of custom peripheral chips — <strong>CGIA</strong> for graphics, <strong>SGU-1</strong> for sound, and <strong>RIA</strong> for system services and interrupt aggregation — each implemented in firmware on Raspberry Pi <strong>RP2350</strong> microcontrollers. The system is organised as a <strong>NORTH</strong> chip (CPU bus, memory, system services) and a <strong>SOUTH</strong> chip (graphics, terminal), connected by a dedicated inter-chip bus called <strong>PIX</strong>; a third RP2350 hosts the SGU-1 audio chip and hangs off SOUTH over an SPI link.</p>
+<section id="cpu-the-65c816-in-native-mode">
+<h2>CPU: The 65C816 in Native Mode<a class="headerlink" href="#cpu-the-65c816-in-native-mode" title="Link to this heading">¶</a></h2>
+<p>The X65 operating system boots the 65C816 into <strong>native mode</strong> right away, where its full 16-bit data path and 24-bit address bus are exposed to software. In native mode the accumulator (<code class="docutils literal notranslate"><span class="pre">A</span></code>), index registers (<code class="docutils literal notranslate"><span class="pre">X</span></code>/<code class="docutils literal notranslate"><span class="pre">Y</span></code>), and stack pointer (<code class="docutils literal notranslate"><span class="pre">S</span></code>) can be switched to 16-bit; a <strong>direct page register (<code class="docutils literal notranslate"><span class="pre">D</span></code>)</strong> lets zero-page-style addressing be relocated anywhere in bank 0; and two bank registers — <strong>program bank (<code class="docutils literal notranslate"><span class="pre">PBR</span></code>)</strong> and <strong>data bank (<code class="docutils literal notranslate"><span class="pre">DBR</span></code>)</strong> — extend addressing across the full 16 MB.</p>
+<p>Legacy 6502 code generally does <strong>not</strong> need a mode switch: the 65C816 in native mode is a full superset of the 65C02 instruction set, so existing 6502/65C02 routines execute as-is alongside native-mode code. Switching back into <strong>emulation mode</strong> via <code class="docutils literal notranslate"><span class="pre">XCE</span></code> is technically possible, but it is discouraged and not supported by the project — the X65 firmware, OS, and toolchain all assume native mode throughout. For the full enhanced register and instruction set, see <a class="reference internal" href="../../A/C_65816_migration/"><span class="std std-doc">Appendix C: 65C816 Migration</span></a> and <a class="reference internal" href="../../A/E_cheat_sheet/"><span class="std std-doc">Appendix E: Cheat Sheet</span></a>.</p>
+</section>
+<section id="cpu-bus-circuitry">
+<h2>CPU Bus Circuitry<a class="headerlink" href="#cpu-bus-circuitry" title="Link to this heading">¶</a></h2>
+<p>The 65C816 multiplexes its address and data bus to expose a 24-bit address space without growing its physical pin count. During the <strong>LOW</strong> half of the <code class="docutils literal notranslate"><span class="pre">PHI2</span></code> clock cycle, the data pins (<code class="docutils literal notranslate"><span class="pre">D0–D7</span></code>) carry the upper address bits (<code class="docutils literal notranslate"><span class="pre">A16–A23</span></code>); during the <strong>HIGH</strong> half they switch to data read/write.</p>
+<p>The <strong>NORTH</strong> chip bridges the CPU bus directly: all 24 CPU address/data lines plus the <code class="docutils literal notranslate"><span class="pre">VAB</span></code> and <code class="docutils literal notranslate"><span class="pre">RWB</span></code> control signals are wired to dedicated RP2350 GPIO pins. A Programmable I/O (PIO) program sequences the two halves of the cycle — sampling the upper address bits <code class="docutils literal notranslate"><span class="pre">A16–A23</span></code> off the multiplexed data pins during the LOW phase of <code class="docutils literal notranslate"><span class="pre">PHI2</span></code>, then servicing the actual read or write on those same pins during the HIGH phase. Architecturally NORTH plays the same role a modern PC’s <strong>northbridge</strong> plays for an x86 CPU: it isolates the CPU from differently-clocked memory and peripherals, and routes each access either to the 16 MB PSRAM or to the correct on-system chip — the Video Processing Unit (CGIA), the Sound Generator Unit (SGU-1), the RIA, or the <code class="docutils literal notranslate"><span class="pre">$FE</span></code>/<code class="docutils literal notranslate"><span class="pre">$FF</span></code> pages MMIO devices — across the full 24-bit address space.</p>
+<section id="vab-memory-cycle-optimisation">
+<h3>VAB Memory Cycle Optimisation<a class="headerlink" href="#vab-memory-cycle-optimisation" title="Link to this heading">¶</a></h3>
+<p>The 65C816 exposes two signals — <strong>VDA</strong> (Valid Data Address) and <strong>VPA</strong> (Valid Program Address) — that mark cycles in which the CPU is actually accessing memory. Combined into a single <strong>Valid Address Bus (VAB)</strong> signal, they identify the roughly 30 % of cycles in which the CPU is doing internal work and does not need the bus.</p>
+<p>On those cycles the X65 can advance <code class="docutils literal notranslate"><span class="pre">PHI2</span></code> immediately, without waiting for a memory round-trip. This shortens internal CPU cycles to the minimum the 65C816 can sustain and meaningfully raises effective throughput compared with a naive bus interface that pays full memory latency on every cycle.</p>
+</section>
+<section id="l2-cache">
+<h3>L2 Cache<a class="headerlink" href="#l2-cache" title="Link to this heading">¶</a></h3>
+<p>PSRAM is fast, but the serial QPI link to it still costs tens of nanoseconds per access. NORTH mitigates this with a <strong>64 KB L2 cache</strong> kept in the RP2350’s internal SRAM, which runs at full MCU speed with no wait states. The cache is transparent to the 65C816 and exists purely to amortise the PSRAM protocol delays for typical access patterns.</p>
+</section>
+</section>
+<section id="memory-map-and-addressing">
+<h2>Memory Map and Addressing<a class="headerlink" href="#memory-map-and-addressing" title="Link to this heading">¶</a></h2>
+<p>The X65’s main memory is <strong>16 MB of QSPI PSRAM</strong> organised as two 8 MB banks, switched on the fly by the NORTH chip when the CPU crosses the bank boundary at address <code class="docutils literal notranslate"><span class="pre">$800000</span></code>. From the CPU’s perspective this is a single flat 24-bit address space.</p>
+<p>Inside bank 0, the high-<code class="docutils literal notranslate"><span class="pre">$FE</span></code>/<code class="docutils literal notranslate"><span class="pre">$FF</span></code> pages window is reserved for memory-mapped I/O. The canonical layout is:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Range</p></th>
+<th class="head"><p>Device</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FEC0–$FEFF</span></code></p></td>
+<td><p>SGU-1 (sound)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF00–$FF7F</span></code></p></td>
+<td><p>CGIA (graphics, 128 registers)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF80–$FF97</span></code></p></td>
+<td><p>PCAL6416A GPIO expander (DE-9 GPIO / joystick ports)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF98–$FF9F</span></code></p></td>
+<td><p>System timers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA0–$FFA7</span></code></p></td>
+<td><p>RGB LED</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA8–$FFAB</span></code></p></td>
+<td><p>Buzzer</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB0–$FFBF</span></code></p></td>
+<td><p>HID (keyboard / mouse)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFC0–$FFFF</span></code></p></td>
+<td><p>RIA registers, including the fastcall API window at <code class="docutils literal notranslate"><span class="pre">$FFF0–$FFF3</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Expansion devices live in a separate window at <code class="docutils literal notranslate"><span class="pre">$FC00–$FDFF</span></code>, divided into four 128-byte slots — one per card. The full address table — including every RIA sub-register and CGIA plane register — is maintained in <a class="reference internal" href="../../A/A_memory_map/"><span class="std std-doc">Appendix A: Memory Map</span></a>.</p>
+<p>The 65C816’s <strong>direct page</strong> can be repointed anywhere in bank 0 with the <code class="docutils literal notranslate"><span class="pre">D</span></code> register, which makes it possible to give different routines, tasks, or interrupt handlers their own private fast-access window without disturbing each other. The hardware <strong>stack</strong> lives in bank 0 as well, and the firmware implements a small auxiliary buffer called the <strong>XSTACK</strong> (512 bytes) that the OS uses to pass call arguments between the 65816 and the RIA when invoking system services.</p>
+</section>
+<section id="interrupt-handling-and-priority-system">
+<h2>Interrupt Handling and Priority System<a class="headerlink" href="#interrupt-handling-and-priority-system" title="Link to this heading">¶</a></h2>
+<p>The X65 has two interrupt lines visible to the 65C816 — the maskable <code class="docutils literal notranslate"><span class="pre">IRQ</span></code> and the non-maskable <code class="docutils literal notranslate"><span class="pre">NMI</span></code> — plus the <code class="docutils literal notranslate"><span class="pre">RES</span></code> reset line. The 65C816 dispatches each through its native-mode vector table at the top of bank 0 (<code class="docutils literal notranslate"><span class="pre">$FFE4–$FFFF</span></code>).</p>
+<p>Rather than wiring every device directly to the CPU, all maskable sources are funnelled through an <strong>interrupt controller</strong> inside the <strong>RIA</strong>. The RIA aggregates interrupts from peripherals such as the GPIO expander (joystick edges), system timers, the HID subsystem, and external expansion slots, and asserts a single <code class="docutils literal notranslate"><span class="pre">IRQ</span></code> line to the CPU. Software reads RIA status registers in the <code class="docutils literal notranslate"><span class="pre">$FFC0–$FFFF</span></code> window to discover which source fired.</p>
+<p>The DE-9 GPIO expander is an NXP <strong>PCAL6416A</strong> on the I²C bus; its defining feature for X65 is <strong>interrupt-mask registers</strong>, so software only ever sees IRQs for the input transitions it has explicitly requested.</p>
+<p>The graphics chip (CGIA) is wired to <strong>NMI</strong>, where it raises raster-line and vertical-blank interrupts (configured per display-list entry — see <a class="reference internal" href="../4_graphics/"><span class="std std-doc">Chapter 4: Graphics</span></a>). Because NMI bypasses the IRQ mask, raster effects remain responsive even while ordinary IRQ handling is disabled.</p>
+<p>In-depth coverage of writing interrupt handlers in 65816 assembly is reserved for <a class="reference internal" href="../../2/15_advanced/"><span class="std std-doc">Chapter 15: Advanced Topics</span></a>.</p>
+</section>
+<section id="system-clock-and-performance">
+<h2>System Clock and Performance<a class="headerlink" href="#system-clock-and-performance" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">PHI2</span></code> is generated in software by the RP2350 PIO rather than by a fixed crystal divider, which means the X65’s headline clock is configurable and tracks whatever the firmware programs the PIO state machine to produce. The CPU throughput bottleneck is the memory round-trip latency, thus bumping the <code class="docutils literal notranslate"><span class="pre">PHI2</span></code> clock above certain thresholds yields diminishing returns — the CPU simply spends most time waiting for memory.</p>
+<p>Combined with the VAB optimisation described above, the X65 sustains noticeably more useful work per second than a hardwired-<code class="docutils literal notranslate"><span class="pre">PHI2</span></code> design at the same nominal clock.</p>
+<section id="clock-tree">
+<h3>Clock Tree<a class="headerlink" href="#clock-tree" title="Link to this heading">¶</a></h3>
+<p>The NORTH chip runs at <strong>336 MHz</strong> — a multiple of 48, chosen so that the USB clock can be derived cleanly from the system PLL. This frees the RP2350’s second PLL to drive the HSTX (DVI) output, which must produce a pixel-perfect 60 Hz frame. If video timing were still divided from the system clock, overclocking NORTH would drag the framerate with it; decoupling the two means VBI-synchronous software can rely on a clean 60 Hz regardless of CPU-side tuning.</p>
+<p>PSRAM runs at a convenient integer division of the same 336 MHz — <strong>112 MHz</strong> — which happens to be the sweet spot for the APS6404L-3SQR-ZR parts at 3.3 V.</p>
+<p>A quick status dump from the monitor shows the whole tree:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>]status
+X65 microcomputer
+
+CPU : ~4.2MHz
+CORE: 336.0MHz
+DVI : 768x480@60.0Hz/24bpp
+RAM : 16MB, 2 banks, 112.0MHz
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">CPU</span></code> line is the effective <code class="docutils literal notranslate"><span class="pre">PHI2</span></code> the 65C816 is clocked at — an estimation rather than a fixed number, since actual throughput depends on the mix of instructions and memory access patterns.</p>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../3_memory_storage/">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Chapter 3: Memory and Storage</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../1_introduction/">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Chapter 1: Introduction</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Tomasz Sterna
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Chapter 2: System Architecture Overview</a><ul>
+<li><a class="reference internal" href="#cpu-the-65c816-in-native-mode">CPU: The 65C816 in Native Mode</a></li>
+<li><a class="reference internal" href="#cpu-bus-circuitry">CPU Bus Circuitry</a><ul>
+<li><a class="reference internal" href="#vab-memory-cycle-optimisation">VAB Memory Cycle Optimisation</a></li>
+<li><a class="reference internal" href="#l2-cache">L2 Cache</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#memory-map-and-addressing">Memory Map and Addressing</a></li>
+<li><a class="reference internal" href="#interrupt-handling-and-priority-system">Interrupt Handling and Priority System</a></li>
+<li><a class="reference internal" href="#system-clock-and-performance">System Clock and Performance</a><ul>
+<li><a class="reference internal" href="#clock-tree">Clock Tree</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=187304be"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/tabs.js?v=3ee01567"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../_static/design-tabs.js?v=fcb327ea"></script>
+    <script defer="defer" src="https://stats.chrome.pl/api/script.js?siteId=19a9a6f3e638"></script>
+    </body>
+</html>

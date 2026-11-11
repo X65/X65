@@ -1,0 +1,679 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Chapter 12: Sound Programming" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.x65.zone/2/12_sound/" />
+<meta property="og:site_name" content="X65" />
+<meta property="og:description" content="The SGU-1 synthesis model and the audio plumbing are covered in Chapter 5; the full register map lives in Appendix A, and Appendix G documents what every field means numerically. This chapter is th..." />
+<meta name="description" content="The SGU-1 synthesis model and the audio plumbing are covered in Chapter 5; the full register map lives in Appendix A, and Appendix G documents what every field means numerically. This chapter is th..." />
+<link rel="index" title="Index" href="../../genindex/"><link rel="search" title="Search" href="../../search/"><link rel="next" title="Chapter 13: Input/Output Handling" href="../13_input_output/"><link rel="prev" title="Chapter 11: Graphics Programming" href="../11_graphics/">
+        <link rel="canonical" href="https://docs.x65.zone/2/12_sound/">
+        <link rel="prefetch" href="../../_static/paw_logo_32.png" as="image">
+
+    <link rel="shortcut icon" href="../../_static/paw_logo_32_gray.png"><!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Chapter 12: Sound Programming - X65.docs</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ea49a994" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #0E556F;
+  --color-brand-content: #0E556F;
+  --color-brand-visited: #052544;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../"><div class="brand">X65.docs</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/paw_logo_32.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">X65.docs</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search/" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../part_1/">Part 1: The X65 Microcomputer</a><input aria-label="Toggle navigation of Part 1: The X65 Microcomputer" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../1/1_introduction/">Chapter 1: Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/2_overview/">Chapter 2: System Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/3_memory_storage/">Chapter 3: Memory and Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/4_graphics/">Chapter 4: Graphics and Display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/5_audio/">Chapter 5: Sound and Audio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/6_io/">Chapter 6: Input and Output Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/7_devel/">Chapter 7: Development and Emulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../part_2/">Part 2: Programming the X65 in 65816 Assembly</a><input aria-label="Toggle navigation of Part 2: Programming the X65 in 65816 Assembly" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../08_assembly/">Chapter 8: Introduction to 65816 Assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09_dev_env/">Chapter 9: Development Environment Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../10_memory/">Chapter 10: Memory Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../11_graphics/">Chapter 11: Graphics Programming</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Chapter 12: Sound Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../13_input_output/">Chapter 13: Input/Output Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../14_os/">Chapter 14: Operating System (OS/816)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../15_advanced/">Chapter 15: Advanced Programming Techniques</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../16_examples/">Chapter 16: Example Projects and Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../17_afterword/">Chapter 17: Afterword</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/A_memory_map/">Appendix A: Memory Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/B_glossary/">Appendix B: Glossary of X65 Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/C_65816_migration/">Appendix C: From 6502 to 65816 Migration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/D_systems_comparison/">Appendix D: X65 Compared to Classic 8-bit Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/E_cheat_sheet/">Appendix E: X65 Quick Reference Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/F_xex_format/">Appendix F: XEX File Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/G_sgu1/">Appendix G: The SGU-1 Sound Generator</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/blob/main/book/2/12_sound.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/edit/main/book/2/12_sound.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="chapter-12-sound-programming">
+<h1>Chapter 12: Sound Programming<a class="headerlink" href="#chapter-12-sound-programming" title="Link to this heading">¶</a></h1>
+<p>The SGU-1 synthesis model and the audio plumbing are covered in <a class="reference internal" href="../../1/5_audio/"><span class="std std-doc">Chapter 5</span></a>; the full register map lives in <a class="reference internal" href="../../A/A_memory_map/"><span class="std std-doc">Appendix A</span></a>, and <a class="reference internal" href="../../A/G_sgu1/"><span class="std std-doc">Appendix G</span></a> documents what every field means numerically. This chapter is the programming-side counterpart — the idiomatic sequences for picking a channel, setting up a voice, running an envelope, sweeping a parameter, playing back PCM, and beeping the buzzer.</p>
+<section id="the-sgu-1-register-window">
+<h2>The SGU-1 Register Window<a class="headerlink" href="#the-sgu-1-register-window" title="Link to this heading">¶</a></h2>
+<p>The whole of the SGU-1 is reached through a <strong>64-byte window at <code class="docutils literal notranslate"><span class="pre">$FEC0–$FEFF</span></code></strong>. That window is <strong>channel-switched</strong>: the byte at offset <code class="docutils literal notranslate"><span class="pre">$3F</span></code> (i.e. <code class="docutils literal notranslate"><span class="pre">$FEFF</span></code>) is a selector that remaps the other 63 bytes to the registers of one specific channel. Writing a channel number <code class="docutils literal notranslate"><span class="pre">$00</span></code>-<code class="docutils literal notranslate"><span class="pre">$08</span></code> there switches the window, and <code class="docutils literal notranslate"><span class="pre">$FF</span></code> selects the <strong>service bank</strong> instead — the sample port, reset controls and final mixer gain. Values <code class="docutils literal notranslate"><span class="pre">$09</span></code>-<code class="docutils literal notranslate"><span class="pre">$FE</span></code> are reserved – write only the defined ones.</p>
+</section>
+<section id="bringing-the-chip-up">
+<h2>Bringing the Chip Up<a class="headerlink" href="#bringing-the-chip-up" title="Link to this heading">¶</a></h2>
+<p>Two things have to happen before any note will sound, and both are easy to forget because neither produces an error — just silence.</p>
+<p><strong>Reset the chip.</strong> A warm start inherits the previous program’s voices and DSP
+state. Reset domains through the SGU-1 service bank with the keyed command:</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="c1">; 8-bit accumulator, data bank $00</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$FF</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEFF</span><span class="w">               </span><span class="c1">; service bank</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$AF</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FED8</span><span class="w">               </span><span class="c1">; voices, timebase, mix and service state</span>
+</pre></div>
+</div>
+<p>Core resets take effect at the next audio sample boundary. Service state resets
+immediately, including master volume; PCM memory is preserved. <code class="docutils literal notranslate"><span class="pre">$A1</span></code> resets
+voices alone, <code class="docutils literal notranslate"><span class="pre">$A2</span></code> the timebase, <code class="docutils literal notranslate"><span class="pre">$A4</span></code> the mix, and <code class="docutils literal notranslate"><span class="pre">$A8</span></code> service state. Combine
+the low bits as needed. Clearing register bytes alone does not reset all DSP state.</p>
+<p><strong>Unmute.</strong> The chip comes up silent by design: the service bank’s master volume gates the entire mix and resets to zero, so that a reset can never blast whatever the register file happened to be holding. Select the service bank with <code class="docutils literal notranslate"><span class="pre">$FF</span></code> and raise it.</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$FF</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEFF</span><span class="w">               </span><span class="c1">; select the service bank</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$FF</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE0</span><span class="w">               </span><span class="c1">; master volume -- unmute</span>
+</pre></div>
+</div>
+<p>The full cycle is therefore <strong>reset, unmute, select a channel, configure it, set its volume, key on</strong>. To configure a different channel, select it and configure again; changes to one channel do not touch the others’ state.</p>
+<p>Channel volume deserves its own step in that list because it is zero after a reset, and a channel with <code class="docutils literal notranslate"><span class="pre">VOL</span> <span class="pre">=</span> <span class="pre">0</span></code> is silent no matter how carefully its operators are programmed.</p>
+</section>
+<section id="selecting-a-channel">
+<h2>Selecting a Channel<a class="headerlink" href="#selecting-a-channel" title="Link to this heading">¶</a></h2>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mi">0</span><span class="w">                  </span><span class="c1">; channel 0</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEFF</span><span class="w">               </span><span class="c1">; SGU channel-select</span>
+</pre></div>
+</div>
+<p>After this, all reads and writes to <code class="docutils literal notranslate"><span class="pre">$FEC0–$FEFE</span></code> apply to channel 0. The selector itself is stateful on the audio side — the next write to <code class="docutils literal notranslate"><span class="pre">$FEFF</span></code> switches; no other operation invalidates the selection.</p>
+</section>
+<section id="the-channel-layout-at-a-glance">
+<h2>The Channel Layout, At a Glance<a class="headerlink" href="#the-channel-layout-at-a-glance" title="Link to this heading">¶</a></h2>
+<p>The 63 programmable bytes fall into two halves:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">$FEC0–$FEDF</span></code></strong> — four 8-byte <strong>operators</strong> (numbered 0..3).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">$FEE0–$FEFE</span></code></strong> — <strong>channel-wide</strong> controls: frequency, volume, pan, filter, sweeps, PCM pointers, flags.</p></li>
+</ul>
+<p>Per-operator registers (<code class="docutils literal notranslate"><span class="pre">R0..R7</span></code>) hold everything needed for one FM operator: waveform, multiplier, detune, envelope rates and levels, routing, and the small handful of ESFM-style extras (fixed-frequency flag, delayed key-on, ring mod, hard sync). See <a class="reference internal" href="../../A/A_memory_map/"><span class="std std-doc">Appendix A</span></a> for bit-level layout.</p>
+</section>
+<section id="programming-a-voice">
+<h2>Programming a Voice<a class="headerlink" href="#programming-a-voice" title="Link to this heading">¶</a></h2>
+<p>The order of operations matters less than you might expect: registers take effect as they are written, and the envelope only starts on the key-on. The canonical setup sequence, assuming the chip has already been reset and unmuted:</p>
+<ol class="arabic simple">
+<li><p>Select the channel.</p></li>
+<li><p>Set per-operator fields: waveform, <code class="docutils literal notranslate"><span class="pre">MUL</span></code>, <code class="docutils literal notranslate"><span class="pre">TL</span></code>, envelope (<code class="docutils literal notranslate"><span class="pre">AR</span></code> / <code class="docutils literal notranslate"><span class="pre">DR</span></code> / <code class="docutils literal notranslate"><span class="pre">SL</span></code> / <code class="docutils literal notranslate"><span class="pre">RR</span></code> / <code class="docutils literal notranslate"><span class="pre">SR</span></code>), routing (<code class="docutils literal notranslate"><span class="pre">OUT</span></code> = this operator’s level into the channel mix, <code class="docutils literal notranslate"><span class="pre">MOD</span></code> = how hard the <em>previous</em> operator modulates it – feedback on operator 0).</p></li>
+<li><p>Set channel fields: pitch (<code class="docutils literal notranslate"><span class="pre">FREQ</span></code>), <strong>volume (<code class="docutils literal notranslate"><span class="pre">VOL</span></code>)</strong> — zero after a reset, so a channel left at the default is silent — pan (<code class="docutils literal notranslate"><span class="pre">PAN</span></code>), filter taps (<code class="docutils literal notranslate"><span class="pre">FLAGS0</span></code>), any sweep enables (<code class="docutils literal notranslate"><span class="pre">FLAGS1</span></code>).</p></li>
+<li><p>Key on: set <code class="docutils literal notranslate"><span class="pre">GATE</span></code> and <code class="docutils literal notranslate"><span class="pre">TRIG</span></code> together in <code class="docutils literal notranslate"><span class="pre">FLAGS0</span></code>.</p></li>
+</ol>
+<p>A simple two-operator FM setup — one carrier, one modulator — at middle A, with a pluck-like envelope:</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="c1">; Channel 0</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mi">0</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEFF</span>
+
+<span class="w">    </span><span class="c1">; Operator 0 = modulator</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mb">%00000000</span><span class="w">          </span><span class="c1">; R0: no TRM/VIB/KSR; MUL = 1</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEC0</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mb">%00011000</span><span class="w">          </span><span class="c1">; R1: TL = 24 (moderate modulation depth)</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEC1</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$E1</span><span class="w">                </span><span class="c1">; R2: AR=14 (fast), DR=1 (long decay)</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEC2</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$07</span><span class="w">                </span><span class="c1">; R3: SL=0, RR=7 (medium release)</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEC3</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mi">0</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEC4</span><span class="w">               </span><span class="c1">; R4: DT=0, SR=0</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEC5</span><span class="w">               </span><span class="c1">; R5: no delay / FIX / WPAR</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mb">%00000000</span><span class="w">          </span><span class="c1">; R6: no feedback (MOD on operator 0 is feedback gain)</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEC6</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mb">%00000000</span><span class="w">          </span><span class="c1">; R7: OUT=0 (internal only), WAVE=0 (SINE)</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEC7</span>
+
+<span class="w">    </span><span class="c1">; Operator 1 = carrier</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mb">%00000001</span><span class="w">          </span><span class="c1">; R0: MUL = 1</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEC8</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mi">0</span><span class="w">                  </span><span class="c1">; R1: TL = 0 (loud)</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEC9</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$F1</span><span class="w">                </span><span class="c1">; R2: AR=15, DR=1</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FECA</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$07</span><span class="w">                </span><span class="c1">; R3: SL=0, RR=7</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FECB</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mi">0</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FECC</span><span class="w">               </span><span class="c1">; R4: DT=0, SR=0</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FECD</span><span class="w">               </span><span class="c1">; R5: no delay / FIX / WPAR</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mb">%00001110</span><span class="w">          </span><span class="c1">; R6: MOD=7 -- take full modulation from operator 0</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FECE</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mb">%11100000</span><span class="w">          </span><span class="c1">; R7: OUT=7 (max), WAVE=0 (SINE)</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FECF</span>
+
+<span class="w">    </span><span class="c1">; Channel: pitch, volume, gate</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="o">&lt;</span><span class="mi">7382</span><span class="w">              </span><span class="c1">; A4 (440 Hz); FREQ = Hz * 2^24 / 1000000</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE0</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="o">&gt;</span><span class="mi">7382</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE1</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$40</span><span class="w">                </span><span class="c1">; VOL = 64</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE2</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mi">0</span><span class="w">                  </span><span class="c1">; PAN centre</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE3</span>
+
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mb">%00000011</span><span class="w">          </span><span class="c1">; FLAGS0: GATE + TRIG (note-on from silence)</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE4</span>
+</pre></div>
+</div>
+<p>The two bits do different jobs. <code class="docutils literal notranslate"><span class="pre">GATE</span></code> (bit 0) is the key <strong>level</strong>, not an edge. Raising it on a released or idle voice starts the note — the envelope enters attack from whatever attenuation it currently sits at — but writing it to a voice that is <em>already sounding</em> leaves the envelope entirely alone, which is why a new <code class="docutils literal notranslate"><span class="pre">FREQ</span></code> under a held gate slurs instead of retriggering. <code class="docutils literal notranslate"><span class="pre">TRIG</span></code> (bit 1) is the one-shot, self-clearing bit that restarts the envelope from silence: it is the only way to retrigger a note that is still sounding, and leaving it clear is the only way to avoid restarting one. The two together spell out the four note events – <code class="docutils literal notranslate"><span class="pre">%11</span></code> note-on, <code class="docutils literal notranslate"><span class="pre">%01</span></code> legato key-down, <code class="docutils literal notranslate"><span class="pre">%00</span></code> note-off, <code class="docutils literal notranslate"><span class="pre">%10</span></code> note-cut – each a single write. <a class="reference internal" href="../../A/G_sgu1/"><span class="std std-doc">Appendix G</span></a> has the full table.</p>
+</section>
+<section id="changing-a-voice-while-it-sounds">
+<h2>Changing a Voice While It Sounds<a class="headerlink" href="#changing-a-voice-while-it-sounds" title="Link to this heading">¶</a></h2>
+<p>The SGU-1 has no shadow registers and no double-buffering: the synthesis engine reads each register as it renders each sample, so a write takes effect on the next one, mid-note. Rewriting a sounding voice is therefore normal practice, and for legato, slides, swells and filter motion it is the only way to get the effect at all: the alternatives (a <code class="docutils literal notranslate"><span class="pre">TRIG</span></code>, or a <code class="docutils literal notranslate"><span class="pre">GATE</span></code> cycle) both disturb the envelope you are trying to keep.</p>
+<p><strong>Legato</strong> is a pitch change with the gate left up. Nothing else changes; the envelope carries on from wherever it is:</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mi">0</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEFF</span><span class="w">               </span><span class="c1">; select channel 0</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="o">&lt;</span><span class="mi">8286</span><span class="w">              </span><span class="c1">; new pitch (B4, 493.9 Hz)</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE0</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="o">&gt;</span><span class="mi">8286</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE1</span><span class="w">               </span><span class="c1">; FLAGS0 untouched -- the note slurs</span>
+</pre></div>
+</div>
+<p><strong>A slide</strong> is the same write repeated, a step at a time, from the driver’s per-frame tick:</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="c1">; once per frame while the note is held; freq_lo/hi is the driver's shadow</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mi">0</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEFF</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="n">freq_lo</span>
+<span class="w">    </span><span class="k">clc</span>
+<span class="w">    </span><span class="k">adc</span><span class="w"> </span><span class="p">#</span><span class="o">&lt;</span><span class="n">SLIDE_STEP</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="n">freq_lo</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE0</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="n">freq_hi</span>
+<span class="w">    </span><span class="k">adc</span><span class="w"> </span><span class="p">#</span><span class="o">&gt;</span><span class="n">SLIDE_STEP</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="n">freq_hi</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE1</span>
+</pre></div>
+</div>
+<p>Or hand the whole gesture to the hardware and let the frequency sweep run it, which costs one setup and no per-frame work at all (see <a class="reference internal" href="#sweeps">Sweeps</a> below). What you must not do is both: an armed sweep writes back into <code class="docutils literal notranslate"><span class="pre">FREQ</span></code> itself, so a CPU-driven slide and a hardware sweep on the same parameter will fight over the register.</p>
+<p>The same applies to every other channel and operator parameter. <code class="docutils literal notranslate"><span class="pre">VOL</span></code> under a held gate is a swell or a fade, <code class="docutils literal notranslate"><span class="pre">CUTOFF</span></code> is filter motion, <code class="docutils literal notranslate"><span class="pre">DUTY</span></code> is PWM, and operator <code class="docutils literal notranslate"><span class="pre">TL</span></code> / <code class="docutils literal notranslate"><span class="pre">MOD</span></code> / <code class="docutils literal notranslate"><span class="pre">OUT</span></code> morph the timbre the way a filter would on a subtractive synth.</p>
+<p>One register needs care: <code class="docutils literal notranslate"><span class="pre">FLAGS0</span></code> holds <code class="docutils literal notranslate"><span class="pre">TRIG</span></code> next to the filter taps and the PCM bit. <code class="docutils literal notranslate"><span class="pre">TRIG</span></code> self-clears, so reading the register back will not show it — but a shadow byte or an instrument image with the bit still set will re-fire the retrigger the next time anything writes that register, resetting the envelope. Keep <code class="docutils literal notranslate"><span class="pre">GATE</span></code> and <code class="docutils literal notranslate"><span class="pre">TRIG</span></code> out of stored patches and out of the driver’s shadow, and add them explicitly at the note event: <code class="docutils literal notranslate"><span class="pre">ORA</span> <span class="pre">#$01</span></code> for a key-down, <code class="docutils literal notranslate"><span class="pre">ORA</span> <span class="pre">#$03</span></code> for a note-on.</p>
+</section>
+<section id="envelope-shapes">
+<h2>Envelope Shapes<a class="headerlink" href="#envelope-shapes" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">AR</span></code>, <code class="docutils literal notranslate"><span class="pre">DR</span></code>, <code class="docutils literal notranslate"><span class="pre">SR</span></code>, and <code class="docutils literal notranslate"><span class="pre">RR</span></code> are 5-bit rates (<code class="docutils literal notranslate"><span class="pre">AR</span></code> and <code class="docutils literal notranslate"><span class="pre">DR</span></code> are split across <code class="docutils literal notranslate"><span class="pre">R2</span></code> low nibble and <code class="docutils literal notranslate"><span class="pre">R7</span></code> high bits — see Appendix A for the exact packing). <code class="docutils literal notranslate"><span class="pre">SL</span></code> is a 4-bit <strong>level</strong> (the sustain plateau height, not a rate); <code class="docutils literal notranslate"><span class="pre">TL</span></code> is a 7-bit <strong>total level</strong> attenuation split across <code class="docutils literal notranslate"><span class="pre">R1</span></code> low bits and <code class="docutils literal notranslate"><span class="pre">R6[0]</span></code>.</p>
+<p>A few practical envelopes:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Sound</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">AR</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">DR</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">SL</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">SR</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">RR</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">TL</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Percussion</p></td>
+<td><p>31</p></td>
+<td><p>14</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>15</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>Pad</p></td>
+<td><p>10</p></td>
+<td><p>4</p></td>
+<td><p>12</p></td>
+<td><p>2</p></td>
+<td><p>8</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>Pluck</p></td>
+<td><p>31</p></td>
+<td><p>4</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>7</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>Bell</p></td>
+<td><p>31</p></td>
+<td><p>2</p></td>
+<td><p>0</p></td>
+<td><p>4</p></td>
+<td><p>10</p></td>
+<td><p>0</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>These are starting points — FM’s timbre depends heavily on per-operator <code class="docutils literal notranslate"><span class="pre">TL</span></code> and routing. Use a short test harness that key-ons on every VBI to iterate fast.</p>
+</section>
+<section id="filter">
+<h2>Filter<a class="headerlink" href="#filter" title="Link to this heading">¶</a></h2>
+<p>Each channel has a <strong>per-channel multimode filter</strong> shared by all of its operators. Cutoff is 16 bits (<code class="docutils literal notranslate"><span class="pre">CUTOFF_L</span></code> / <code class="docutils literal notranslate"><span class="pre">CUTOFF_H</span></code>), resonance is 8 bits (<code class="docutils literal notranslate"><span class="pre">RESON</span></code>, <code class="docutils literal notranslate"><span class="pre">0</span></code> = no feedback, <code class="docutils literal notranslate"><span class="pre">255</span></code> = maximal resonance). The output taps are selected by <code class="docutils literal notranslate"><span class="pre">FLAGS0</span></code> bits 5 (low), 6 (high) and 7 (band); selected taps are summed, so a compound mode is just two bits set. With all three clear the filter is bypassed entirely.</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="o">&lt;</span><span class="mi">4000</span><span class="w">              </span><span class="c1">; cutoff value</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE6</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="o">&gt;</span><span class="mi">4000</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE7</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mi">120</span><span class="w">                </span><span class="c1">; RESON: moderate resonance</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE9</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mb">%00100001</span><span class="w">          </span><span class="c1">; FLAGS0: low-pass tap (bit 5) + GATE</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE4</span>
+</pre></div>
+</div>
+<p>Reset the filter state on a new note by setting the “filter reset” bit in <code class="docutils literal notranslate"><span class="pre">FLAGS1</span></code> — useful for percussion sounds that should start cleanly without the prior note’s trail.</p>
+</section>
+<section id="sweeps">
+<h2>Sweeps<a class="headerlink" href="#sweeps" title="Link to this heading">¶</a></h2>
+<p>Three <strong>per-channel hardware sweeps</strong> — frequency, volume, cutoff — each described by a 16-bit <code class="docutils literal notranslate"><span class="pre">SPEED</span></code>, an 8-bit <code class="docutils literal notranslate"><span class="pre">AMOUNT</span></code> (direction + magnitude), and an 8-bit <code class="docutils literal notranslate"><span class="pre">BOUND</span></code> (travel limit + wrap / bounce behaviour). Enable them with the matching bits in <code class="docutils literal notranslate"><span class="pre">FLAGS1</span></code>.</p>
+<p>Canonical uses:</p>
+<ul class="simple">
+<li><p><strong>Frequency sweep</strong>: vibrato, pitch bends, arpeggios. Fast small amplitude = vibrato; slow large amplitude = glide.</p></li>
+<li><p><strong>Volume sweep</strong>: tremolo, fades, and attack/decay shaping outside the operator envelope.</p></li>
+<li><p><strong>Cutoff sweep</strong>: filter motion that follows the note instead of a global LFO.</p></li>
+</ul>
+<p>Example — a slow upward cutoff sweep that opens the filter after key-on:</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="o">&lt;</span><span class="mi">200</span><span class="w">               </span><span class="c1">; SWCUT_SPEED</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEF8</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="o">&gt;</span><span class="mi">200</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEF9</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mb">%10001000</span><span class="w">          </span><span class="c1">; SWCUT_AMT: bit 7 = up, step = 8</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEFA</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$E0</span><span class="w">                </span><span class="c1">; SWCUT_BOUND</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEFB</span>
+
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mb">%01000000</span><span class="w">          </span><span class="c1">; FLAGS1: cutoff-sweep enable</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE5</span>
+</pre></div>
+</div>
+<p>(Exact <code class="docutils literal notranslate"><span class="pre">AMOUNT</span></code> / <code class="docutils literal notranslate"><span class="pre">BOUND</span></code> / <code class="docutils literal notranslate"><span class="pre">FLAGS1</span></code> bit positions are in Appendix A.)</p>
+</section>
+<section id="pcm-playback">
+<h2>PCM Playback<a class="headerlink" href="#pcm-playback" title="Link to this heading">¶</a></h2>
+<p>Any channel can switch from FM synthesis to <strong>PCM playback</strong> by setting the PCM-enable bit in <code class="docutils literal notranslate"><span class="pre">FLAGS0</span></code> (bit 3). The channel’s three 16-bit pointers then drive playback:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PCM_POS</span></code> — the current play position (initialized to where you want playback to start).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PCM_END</span></code> — the end boundary. When <code class="docutils literal notranslate"><span class="pre">PCM_POS</span></code> reaches this, the channel either stops or loops.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PCM_RST</span></code> — the loop restart position (used when the <code class="docutils literal notranslate"><span class="pre">PCM_LOOP</span></code> bit is set in <code class="docutils literal notranslate"><span class="pre">FLAGS1</span></code>).</p></li>
+</ul>
+<p>PCM sample data lives in the audio chip’s internal 64 KB sample RAM, addressable by these 16-bit pointers. Loading a sample into that memory is done through a separate firmware path (asset loader); from the CPU side, a program treats the sample region as opaque once loaded.</p>
+<p>A looping one-shot:</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="o">&lt;</span><span class="n">sample_start</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEEA</span><span class="w">               </span><span class="c1">; PCM_POS_L</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="o">&gt;</span><span class="n">sample_start</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEEB</span><span class="w">               </span><span class="c1">; PCM_POS_H</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="o">&lt;</span><span class="n">sample_end</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEEC</span><span class="w">               </span><span class="c1">; PCM_END_L</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="o">&gt;</span><span class="n">sample_end</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEED</span><span class="w">               </span><span class="c1">; PCM_END_H</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="o">&lt;</span><span class="n">sample_loop</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEEE</span><span class="w">               </span><span class="c1">; PCM_RST_L</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="o">&gt;</span><span class="n">sample_loop</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEEF</span><span class="w">               </span><span class="c1">; PCM_RST_H</span>
+
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mb">%00000100</span><span class="w">          </span><span class="c1">; FLAGS1: PCM_LOOP</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE5</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mb">%00001001</span><span class="w">          </span><span class="c1">; FLAGS0: PCM + GATE</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FEE4</span>
+</pre></div>
+</div>
+<p>Pitch of the playback is driven by the channel’s <code class="docutils literal notranslate"><span class="pre">FREQ</span></code> register as with FM channels, so the same sample can be re-pitched across the keyboard for sampler-style instruments.</p>
+<section id="pcm-as-a-wavetable-operator">
+<h3>PCM as a wavetable operator<a class="headerlink" href="#pcm-as-a-wavetable-operator" title="Link to this heading">¶</a></h3>
+<p>A subtler use of the sample region: any operator can pick <code class="docutils literal notranslate"><span class="pre">WAVE</span> <span class="pre">=</span> <span class="pre">7</span></code> (SAMPLE), which treats a 1024-sample slice of the sample region as a wavetable, with <code class="docutils literal notranslate"><span class="pre">PCM_RST</span></code> pointing at the slice base. This lets a channel mix a sampled voice as the modulator or carrier in an otherwise-FM patch — the defining flexibility of the SGU-1 over pure-FM chips.</p>
+</section>
+</section>
+<section id="system-buzzer">
+<h2>System Buzzer<a class="headerlink" href="#system-buzzer" title="Link to this heading">¶</a></h2>
+<p>The buzzer is a separate, simpler subsystem at <code class="docutils literal notranslate"><span class="pre">$FFA8–$FFAB</span></code> (see <a class="reference internal" href="../../1/6_io/"><span class="std std-doc">Chapter 6</span></a>), intended for the sort of blip-and-beep the OS or an application wants without spinning up a full SGU voice.</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="c1">; ~1 kHz beep at 50% duty for a short time</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$FF</span><span class="w">                </span><span class="c1">; FREQ_L</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFA8</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$8C</span><span class="w">                </span><span class="c1">; FREQ_H (together encodes ~1 kHz — see Chapter 6)</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFA9</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$80</span><span class="w">                </span><span class="c1">; DUTY = 50%</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFAA</span>
+<span class="w">    </span><span class="c1">; ... wait ...</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$00</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFAA</span><span class="w">               </span><span class="c1">; DUTY = 0 silences</span>
+</pre></div>
+</div>
+<p>The frequency is encoded logarithmically, so a byte-table lookup for common pitches (note names to FREQ values) is a practical way to “play notes” on the buzzer. For any real music, use SGU-1 instead.</p>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h2>
+<p>Programming the SGU-1 is register-driven and mostly stateless: select the channel, write its registers, key it on. The channel-switched window keeps the per-channel programming compact; hardware envelopes, sweeps, and PCM mode keep the CPU burden low even for rich patches. The tracker plus the shipped player routines handle the song-engine layer; the buzzer covers the system-beep use case without touching the synth. Full register / bit layouts are in <a class="reference internal" href="../../A/A_memory_map/"><span class="std std-doc">Appendix A</span></a>.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../13_input_output/">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Chapter 13: Input/Output Handling</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../11_graphics/">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Chapter 11: Graphics Programming</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Tomasz Sterna
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Chapter 12: Sound Programming</a><ul>
+<li><a class="reference internal" href="#the-sgu-1-register-window">The SGU-1 Register Window</a></li>
+<li><a class="reference internal" href="#bringing-the-chip-up">Bringing the Chip Up</a></li>
+<li><a class="reference internal" href="#selecting-a-channel">Selecting a Channel</a></li>
+<li><a class="reference internal" href="#the-channel-layout-at-a-glance">The Channel Layout, At a Glance</a></li>
+<li><a class="reference internal" href="#programming-a-voice">Programming a Voice</a></li>
+<li><a class="reference internal" href="#changing-a-voice-while-it-sounds">Changing a Voice While It Sounds</a></li>
+<li><a class="reference internal" href="#envelope-shapes">Envelope Shapes</a></li>
+<li><a class="reference internal" href="#filter">Filter</a></li>
+<li><a class="reference internal" href="#sweeps">Sweeps</a></li>
+<li><a class="reference internal" href="#pcm-playback">PCM Playback</a><ul>
+<li><a class="reference internal" href="#pcm-as-a-wavetable-operator">PCM as a wavetable operator</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#system-buzzer">System Buzzer</a></li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=187304be"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/tabs.js?v=3ee01567"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../_static/design-tabs.js?v=fcb327ea"></script>
+    <script defer="defer" src="https://stats.chrome.pl/api/script.js?siteId=19a9a6f3e638"></script>
+    </body>
+</html>

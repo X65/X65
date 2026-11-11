@@ -1,0 +1,668 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Chapter 13: Input/Output Handling" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.x65.zone/2/13_input_output/" />
+<meta property="og:site_name" content="X65" />
+<meta property="og:description" content="The I/O hardware and memory map are described in Chapter 6 and Appendix A. This chapter is the programming-side counterpart — concrete assembly idioms for polling HID devices, driving LEDs and the ..." />
+<meta name="description" content="The I/O hardware and memory map are described in Chapter 6 and Appendix A. This chapter is the programming-side counterpart — concrete assembly idioms for polling HID devices, driving LEDs and the ..." />
+<link rel="index" title="Index" href="../../genindex/"><link rel="search" title="Search" href="../../search/"><link rel="next" title="Chapter 14: Operating System (OS/816)" href="../14_os/"><link rel="prev" title="Chapter 12: Sound Programming" href="../12_sound/">
+        <link rel="canonical" href="https://docs.x65.zone/2/13_input_output/">
+        <link rel="prefetch" href="../../_static/paw_logo_32.png" as="image">
+
+    <link rel="shortcut icon" href="../../_static/paw_logo_32_gray.png"><!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Chapter 13: Input/Output Handling - X65.docs</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ea49a994" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #0E556F;
+  --color-brand-content: #0E556F;
+  --color-brand-visited: #052544;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../"><div class="brand">X65.docs</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/paw_logo_32.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">X65.docs</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search/" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../part_1/">Part 1: The X65 Microcomputer</a><input aria-label="Toggle navigation of Part 1: The X65 Microcomputer" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../1/1_introduction/">Chapter 1: Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/2_overview/">Chapter 2: System Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/3_memory_storage/">Chapter 3: Memory and Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/4_graphics/">Chapter 4: Graphics and Display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/5_audio/">Chapter 5: Sound and Audio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/6_io/">Chapter 6: Input and Output Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/7_devel/">Chapter 7: Development and Emulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../part_2/">Part 2: Programming the X65 in 65816 Assembly</a><input aria-label="Toggle navigation of Part 2: Programming the X65 in 65816 Assembly" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../08_assembly/">Chapter 8: Introduction to 65816 Assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09_dev_env/">Chapter 9: Development Environment Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../10_memory/">Chapter 10: Memory Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../11_graphics/">Chapter 11: Graphics Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../12_sound/">Chapter 12: Sound Programming</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Chapter 13: Input/Output Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../14_os/">Chapter 14: Operating System (OS/816)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../15_advanced/">Chapter 15: Advanced Programming Techniques</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../16_examples/">Chapter 16: Example Projects and Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../17_afterword/">Chapter 17: Afterword</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/A_memory_map/">Appendix A: Memory Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/B_glossary/">Appendix B: Glossary of X65 Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/C_65816_migration/">Appendix C: From 6502 to 65816 Migration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/D_systems_comparison/">Appendix D: X65 Compared to Classic 8-bit Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/E_cheat_sheet/">Appendix E: X65 Quick Reference Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/F_xex_format/">Appendix F: XEX File Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/G_sgu1/">Appendix G: The SGU-1 Sound Generator</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/blob/main/book/2/13_input_output.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/edit/main/book/2/13_input_output.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="chapter-13-input-output-handling">
+<span id="chapter-13-inputoutput-handling"></span><h1>Chapter 13: Input/Output Handling<a class="headerlink" href="#chapter-13-input-output-handling" title="Link to this heading">¶</a></h1>
+<p>The I/O hardware and memory map are described in <a class="reference internal" href="../../1/6_io/"><span class="std std-doc">Chapter 6</span></a> and <a class="reference internal" href="../../A/A_memory_map/"><span class="std std-doc">Appendix A</span></a>. This chapter is the programming-side counterpart — concrete assembly idioms for polling HID devices, driving LEDs and the buzzer, using the UART, and reaching the networking stack.</p>
+<section id="polling-usb-hid-gamepads">
+<h2>Polling USB HID Gamepads<a class="headerlink" href="#polling-usb-hid-gamepads" title="Link to this heading">¶</a></h2>
+<p>The HID window at <strong><code class="docutils literal notranslate"><span class="pre">$FFB0–$FFBF</span></code></strong> is device-switched: writing to <code class="docutils literal notranslate"><span class="pre">$FFB0</span></code> selects which device appears in the next fifteen bytes. For gamepads, the selector’s low nibble is <code class="docutils literal notranslate"><span class="pre">2</span></code>; the high nibble picks the pad index (<code class="docutils literal notranslate"><span class="pre">0</span></code> = merged, <code class="docutils literal notranslate"><span class="pre">1..4</span></code> = physical pads 1..4).</p>
+<section id="merged-pad-0-single-player">
+<h3>Merged pad 0 (single-player)<a class="headerlink" href="#merged-pad-0-single-player" title="Link to this heading">¶</a></h3>
+<p>The simplest and the idiomatic starting point — read one virtual pad that is the bitwise OR of every connected controller:</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="c1">; Select merged gamepad</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$02</span><span class="w">                </span><span class="c1">; low nibble 2 = gamepad, high nibble 0 = merged</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFB0</span>
+
+<span class="w">    </span><span class="c1">; Direction buttons</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FFB1</span><span class="w">               </span><span class="c1">; D-pad + features</span>
+<span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="p">#</span><span class="mb">%00001000</span><span class="w">          </span><span class="c1">; bit 3 = right</span>
+<span class="w">    </span><span class="k">bne</span><span class="w"> </span><span class="n">right_held</span>
+
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FFB1</span>
+<span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="p">#</span><span class="mb">%00000100</span><span class="w">          </span><span class="c1">; bit 2 = left</span>
+<span class="w">    </span><span class="k">bne</span><span class="w"> </span><span class="n">left_held</span>
+
+<span class="w">    </span><span class="c1">; Primary action button (bit 0 of buttons byte 0)</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FFB3</span>
+<span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="p">#</span><span class="mb">%00000001</span>
+<span class="w">    </span><span class="k">bne</span><span class="w"> </span><span class="n">button_a_held</span>
+</pre></div>
+</div>
+<p>Bit 7 of <code class="docutils literal notranslate"><span class="pre">$FFB1</span></code> is the <strong>valid</strong> flag — <code class="docutils literal notranslate"><span class="pre">0</span></code> means no pad is connected. Single-player code should either treat an invalid pad as “no input” or use it to show a “connect a controller” screen.</p>
+</section>
+<section id="multi-player">
+<h3>Multi-player<a class="headerlink" href="#multi-player" title="Link to this heading">¶</a></h3>
+<p>For multiplayer games, walk pads 1 through 4:</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">ldx</span><span class="w"> </span><span class="p">#</span><span class="mi">1</span><span class="w">                  </span><span class="c1">; start at player 1</span>
+<span class="nl">next_player:</span>
+<span class="w">    </span><span class="k">txa</span>
+<span class="w">    </span><span class="k">asl</span><span class="w">                     </span><span class="c1">; *= 2 (shift into high nibble)</span>
+<span class="w">    </span><span class="k">asl</span>
+<span class="w">    </span><span class="k">asl</span>
+<span class="w">    </span><span class="k">asl</span>
+<span class="w">    </span><span class="k">ora</span><span class="w"> </span><span class="p">#</span><span class="mh">$02</span><span class="w">                </span><span class="c1">; combine with gamepad type</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFB0</span><span class="w">               </span><span class="c1">; select that pad</span>
+
+<span class="w">    </span><span class="c1">; Read this pad's state...</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FFB1</span>
+<span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="p">#</span><span class="mb">%10000000</span>
+<span class="w">    </span><span class="k">beq</span><span class="w"> </span><span class="n">skip_player</span><span class="w">         </span><span class="c1">; high bit clear = not connected</span>
+<span class="w">    </span><span class="c1">; ... process input for player X ...</span>
+
+<span class="nl">skip_player:</span>
+<span class="w">    </span><span class="k">inx</span>
+<span class="w">    </span><span class="k">cpx</span><span class="w"> </span><span class="p">#</span><span class="mi">5</span>
+<span class="w">    </span><span class="k">bne</span><span class="w"> </span><span class="n">next_player</span>
+</pre></div>
+</div>
+<p>Each pad’s ten-byte report covers D-pad, digital-stick approximations, two button bytes, analog stick coordinates, and triggers — see <a class="reference internal" href="../../A/A_memory_map/"><span class="std std-doc">Appendix A</span></a> for the exact offsets.</p>
+</section>
+<section id="analog-sticks-and-deadzones">
+<h3>Analog sticks and deadzones<a class="headerlink" href="#analog-sticks-and-deadzones" title="Link to this heading">¶</a></h3>
+<p>Analog stick bytes are signed 8-bit values. A reasonable deadzone filter:</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FFB5</span><span class="w">               </span><span class="c1">; left stick X, signed</span>
+<span class="w">    </span><span class="k">sec</span>
+<span class="w">    </span><span class="k">sbc</span><span class="w"> </span><span class="p">#</span><span class="o">-</span><span class="mi">16</span><span class="w">                </span><span class="c1">; shift negative range up</span>
+<span class="w">    </span><span class="k">cmp</span><span class="w"> </span><span class="p">#</span><span class="mi">32</span><span class="w">                 </span><span class="c1">; below 16 in either direction = deadzone</span>
+<span class="w">    </span><span class="k">bcc</span><span class="w"> </span><span class="n">inside_deadzone</span>
+<span class="w">    </span><span class="c1">; ... use stick value ...</span>
+<span class="nl">inside_deadzone:</span>
+</pre></div>
+</div>
+<p>Tune the deadzone for the game; <code class="docutils literal notranslate"><span class="pre">±16</span></code> is a reasonable starting point for sticks that have seen some use.</p>
+</section>
+</section>
+<section id="polling-usb-hid-keyboards">
+<h2>Polling USB HID Keyboards<a class="headerlink" href="#polling-usb-hid-keyboards" title="Link to this heading">¶</a></h2>
+<p>Keyboard state is <strong>256 bits</strong> (one per HID keycode), exposed through the same window in two 16-byte pages. The low nibble of the selector is <code class="docutils literal notranslate"><span class="pre">0</span></code> (keyboard); the high nibble is <code class="docutils literal notranslate"><span class="pre">0</span></code> for bytes 0–15, <code class="docutils literal notranslate"><span class="pre">1</span></code> for bytes 16–31.</p>
+<section id="any-key-pressed">
+<h3>“Any key pressed?”<a class="headerlink" href="#any-key-pressed" title="Link to this heading">¶</a></h3>
+<p>Page 0, offset 0 is the device status byte. Bit 0 is connected, and the rest of the byte plus the next fifteen bytes reflect which keycodes are currently down. Fast existence check:</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$00</span><span class="w">                </span><span class="c1">; keyboard, page 0</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFB0</span>
+
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FFB1</span>
+<span class="w">    </span><span class="k">ora</span><span class="w"> </span><span class="mh">$FFB2</span>
+<span class="w">    </span><span class="k">ora</span><span class="w"> </span><span class="mh">$FFB3</span>
+<span class="w">    </span><span class="c1">; ... through $FFBF ...</span>
+<span class="w">    </span><span class="k">beq</span><span class="w"> </span><span class="n">no_key_pressed</span>
+</pre></div>
+</div>
+<p>For most games, a dedicated “any key” check is enough to dismiss a title screen.</p>
+</section>
+<section id="is-this-specific-key-down">
+<h3>“Is this specific key down?”<a class="headerlink" href="#is-this-specific-key-down" title="Link to this heading">¶</a></h3>
+<p>Each state bit lives at bit <code class="docutils literal notranslate"><span class="pre">(keycode</span> <span class="pre">&amp;</span> <span class="pre">7)</span></code> of byte <code class="docutils literal notranslate"><span class="pre">(keycode</span> <span class="pre">&gt;&gt;</span> <span class="pre">3)</span> <span class="pre">+</span> <span class="pre">1</span></code> (offset 1, because byte 0 is the status byte). For HID keycode <code class="docutils literal notranslate"><span class="pre">$04</span></code> (letter A):</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$00</span><span class="w">                </span><span class="c1">; page 0</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFB0</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FFB1</span><span class="w">               </span><span class="c1">; byte 0 of state = status byte is there, bit 4 is "A"</span>
+<span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="p">#</span><span class="mb">%00010000</span><span class="w">          </span><span class="c1">; bit 4</span>
+<span class="w">    </span><span class="k">bne</span><span class="w"> </span><span class="n">a_key_down</span>
+</pre></div>
+</div>
+<p>For a keycode in page 1 (≥ 128), select page 1 first:</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$10</span><span class="w">                </span><span class="c1">; keyboard, page 1</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFB0</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FFB7</span><span class="w">               </span><span class="c1">; appropriate byte on page 1</span>
+<span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="p">#</span><span class="mb">%00000100</span><span class="w">          </span><span class="c1">; the bit for the target key</span>
+<span class="w">    </span><span class="k">bne</span><span class="w"> </span><span class="n">key_down</span>
+</pre></div>
+</div>
+<p>A small lookup table keyed by keycode that returns <code class="docutils literal notranslate"><span class="pre">(page,</span> <span class="pre">byte_offset,</span> <span class="pre">bit_mask)</span></code> is the usual way to make this readable from higher-level code.</p>
+</section>
+<section id="modifier-leds">
+<h3>Modifier LEDs<a class="headerlink" href="#modifier-leds" title="Link to this heading">¶</a></h3>
+<p>Bits 1, 2, and 3 of the status byte carry the NUMLOCK, CAPSLOCK, and SCROLLLOCK LED states respectively. These are <strong>host-computed</strong> — the X65 firmware tracks them as the keyboard’s HID output report. A program can use them to detect the modifier states without decoding the keycode-bitmap.</p>
+</section>
+</section>
+<section id="de-9-gpio-ports">
+<h2>DE-9 GPIO Ports<a class="headerlink" href="#de-9-gpio-ports" title="Link to this heading">¶</a></h2>
+<p>The two DE-9 connectors are bi-directional 5 V GPIO ports on a PCAL6416A expander, memory-mapped at <code class="docutils literal notranslate"><span class="pre">$FF80–$FF97</span></code>; the joystick pinout is a convention layered on top. <a class="reference internal" href="../../1/6_io/"><span class="std std-doc">Chapter 6</span></a> has the hardware story, pinout, and full register semantics.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This window is <strong>currently stubbed</strong> in firmware — reads return <code class="docutils literal notranslate"><span class="pre">$FF</span></code> and writes are ignored. Until the path from the PCAL6416A through the RIA interrupt controller is brought up, use USB HID gamepads via <code class="docutils literal notranslate"><span class="pre">$FFB0–$FFBF</span></code> for controller input. The sequences below are the intended programming model for when the region goes live.</p>
+</div>
+<section id="reading-joysticks">
+<h3>Reading joysticks<a class="headerlink" href="#reading-joysticks" title="Link to this heading">¶</a></h3>
+<p>At reset every pin is already an input; the one-time setup is enabling the pull-ups so an idle line reads <code class="docutils literal notranslate"><span class="pre">1</span></code> and a closed switch (shorted to ground) reads <code class="docutils literal notranslate"><span class="pre">0</span></code>:</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="c1">; one-time setup: pull-ups on both ports</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$FF</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FF8E</span><span class="w">               </span><span class="c1">; PLE0 — connect port 0 pulls</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FF8F</span><span class="w">               </span><span class="c1">; PLE1 — connect port 1 pulls</span>
+<span class="w">    </span><span class="c1">; PLS0/PLS1 reset to $FF = pull-up, so nothing more to do</span>
+
+<span class="w">    </span><span class="c1">; per-frame poll, stick 1 (active-low)</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FF80</span><span class="w">               </span><span class="c1">; IN0</span>
+<span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="p">#</span><span class="mb">%00000001</span><span class="w">          </span><span class="c1">; bit 0 = up (DE-9 pin 1)</span>
+<span class="w">    </span><span class="k">beq</span><span class="w"> </span><span class="n">up_held</span><span class="w">             </span><span class="c1">; 0 = pressed</span>
+
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FF80</span>
+<span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="p">#</span><span class="mb">%00100000</span><span class="w">          </span><span class="c1">; bit 5 = fire (DE-9 pin 6)</span>
+<span class="w">    </span><span class="k">beq</span><span class="w"> </span><span class="n">fire_held</span>
+</pre></div>
+</div>
+<p>Writing <code class="docutils literal notranslate"><span class="pre">$FF</span></code> to the polarity registers (<code class="docutils literal notranslate"><span class="pre">$FF84</span></code>/<code class="docutils literal notranslate"><span class="pre">$FF85</span></code>) flips the sense so pressed reads as <code class="docutils literal notranslate"><span class="pre">1</span></code>, if <code class="docutils literal notranslate"><span class="pre">bne</span></code> logic reads better in the program.</p>
+</section>
+<section id="driving-external-hardware">
+<h3>Driving external hardware<a class="headerlink" href="#driving-external-hardware" title="Link to this heading">¶</a></h3>
+<p>The mirror image — write the level first, then flip the pin to output:</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="c1">; drive port 0, GPIO line 0 (DE-9 pin 1) high</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FF82</span>
+<span class="w">    </span><span class="k">ora</span><span class="w"> </span><span class="p">#</span><span class="mb">%00000001</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FF82</span><span class="w">               </span><span class="c1">; OUT0 — level to drive (reset default is high)</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FF86</span>
+<span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="p">#</span><span class="mb">%11111110</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FF86</span><span class="w">               </span><span class="c1">; CFG0 — 0 = output, driver on</span>
+</pre></div>
+</div>
+<p>Outputs are push-pull by default; setting a port’s bit in <code class="docutils literal notranslate"><span class="pre">OUTCF</span></code> (<code class="docutils literal notranslate"><span class="pre">$FF97</span></code>) <em>before</em> the direction change makes the whole port open-drain for wire-OR buses. Mind the electrical limits in <a class="reference internal" href="../../1/6_io/"><span class="std std-doc">Chapter 6</span></a> when sinking real loads.</p>
+</section>
+<section id="edge-driven-input">
+<h3>Edge-driven input<a class="headerlink" href="#edge-driven-input" title="Link to this heading">¶</a></h3>
+<p>Instead of polling, unmask the pins of interest in the interrupt-mask registers and take the IRQ (RIA interrupt controller bit 1, <code class="docutils literal notranslate"><span class="pre">$FFEC</span></code>/<code class="docutils literal notranslate"><span class="pre">$FFED</span></code>):</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$FF</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FF8C</span><span class="w">               </span><span class="c1">; LTCH0 — latch inputs so short pulses are held</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mb">%11011110</span><span class="w">          </span><span class="c1">; unmask up (bit 0) and fire (bit 5)</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FF92</span><span class="w">               </span><span class="c1">; INTE0 — 0 = IRQ on change</span>
+
+<span class="w">    </span><span class="c1">; in the IRQ handler:</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FF94</span><span class="w">               </span><span class="c1">; INST0 — which pin fired</span>
+<span class="w">    </span><span class="c1">; ...dispatch...</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FF80</span><span class="w">               </span><span class="c1">; IN0 — read state, clears the interrupt</span>
+</pre></div>
+</div>
+<p>All interrupts are masked at power-on, so a program that never touches <code class="docutils literal notranslate"><span class="pre">INTE0</span></code>/<code class="docutils literal notranslate"><span class="pre">INTE1</span></code> never sees a GPIO IRQ.</p>
+</section>
+</section>
+<section id="rgb-led-programming">
+<h2>RGB LED Programming<a class="headerlink" href="#rgb-led-programming" title="Link to this heading">¶</a></h2>
+<p>Two interfaces share <code class="docutils literal notranslate"><span class="pre">$FFA0–$FFA7</span></code>. Use whichever matches the application.</p>
+<section id="direct-rgb332-on-board-leds-0-3">
+<span id="direct-rgb332--on-board-leds-03"></span><h3>Direct RGB332 — on-board LEDs 0..3<a class="headerlink" href="#direct-rgb332-on-board-leds-0-3" title="Link to this heading">¶</a></h3>
+<p>The simplest way to light one of the four direct-addressable LEDs. Format: <code class="docutils literal notranslate"><span class="pre">[7:5]R</span> <span class="pre">·</span> <span class="pre">[4:2]G</span> <span class="pre">·</span> <span class="pre">[1:0]B</span></code>. A single <code class="docutils literal notranslate"><span class="pre">STA</span></code> commits.</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mb">%11100000</span><span class="w">          </span><span class="c1">; pure red</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFA0</span><span class="w">               </span><span class="c1">; LED 0 → red</span>
+
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mb">%00011100</span><span class="w">          </span><span class="c1">; pure green</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFA1</span><span class="w">               </span><span class="c1">; LED 1 → green</span>
+
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mi">0</span><span class="w">                  </span><span class="c1">; off</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFA2</span><span class="w">               </span><span class="c1">; LED 2 → off</span>
+</pre></div>
+</div>
+<p>No setup, no sequencing, no need to touch any other register. Ideal for status indicators.</p>
+</section>
+<section id="chain-protocol-any-led-0-255-full-24-bit-colour">
+<span id="chain-protocol--any-led-0255-full-24-bit-colour"></span><h3>Chain protocol — any LED 0..255, full 24-bit colour<a class="headerlink" href="#chain-protocol-any-led-0-255-full-24-bit-colour" title="Link to this heading">¶</a></h3>
+<p>The four bytes at <code class="docutils literal notranslate"><span class="pre">$FFA4–$FFA7</span></code> address an arbitrary LED in the WS2812 chain (including the on-board LEDs, which sit at the chain’s low indices). The write to <strong><code class="docutils literal notranslate"><span class="pre">$FFA4</span></code> is the commit</strong> — the other three bytes are just latched, so the order is: index, green, blue, <strong>then red</strong>.</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="c1">; Light LED 5 (on the chain) bright red</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mi">5</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFA7</span><span class="w">               </span><span class="c1">; index — latched</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$00</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFA5</span><span class="w">               </span><span class="c1">; G — latched</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$00</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFA6</span><span class="w">               </span><span class="c1">; B — latched</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$FF</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFA4</span><span class="w">               </span><span class="c1">; R — commits the update</span>
+</pre></div>
+</div>
+<p>To animate the chain, build a small table of (index, R, G, B) quads and loop over it — each quad is four stores.</p>
+</section>
+</section>
+<section id="system-buzzer">
+<h2>System Buzzer<a class="headerlink" href="#system-buzzer" title="Link to this heading">¶</a></h2>
+<p>Beeping the buzzer is the simplest I/O operation on the board: two writes to set frequency, one to set duty. Freq is encoded logarithmically (see <a class="reference internal" href="../../1/6_io/"><span class="std std-doc">Chapter 6</span></a>):</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="c1">; ~1 kHz at 50% duty</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$FF</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFA8</span><span class="w">               </span><span class="c1">; FREQ_L</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$8C</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFA9</span><span class="w">               </span><span class="c1">; FREQ_H</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mh">$80</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFAA</span><span class="w">               </span><span class="c1">; DUTY</span>
+<span class="w">    </span><span class="c1">; ... wait ...</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mi">0</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFAA</span><span class="w">               </span><span class="c1">; silence</span>
+</pre></div>
+</div>
+<p>Practical pattern: keep a small lookup table from note index → 16-bit FREQ code, then <code class="docutils literal notranslate"><span class="pre">ldx</span> <span class="pre">note;</span> <span class="pre">lda</span> <span class="pre">table_lo,x;</span> <span class="pre">sta</span> <span class="pre">$FFA8;</span> <span class="pre">lda</span> <span class="pre">table_hi,x;</span> <span class="pre">sta</span> <span class="pre">$FFA9</span></code> to start a tone; set DUTY to 0 to stop.</p>
+</section>
+<section id="uart-monitor-console-from-a-program">
+<span id="uart--monitor-console-from-a-program"></span><h2>UART / Monitor Console from a Program<a class="headerlink" href="#uart-monitor-console-from-a-program" title="Link to this heading">¶</a></h2>
+<p>The UART pair at <code class="docutils literal notranslate"><span class="pre">$FFE0–$FFE1</span></code> gives a program direct access to the same serial path that the monitor uses. With nothing special to configure, a program can print to the host terminal over USB-CDC or talk to another serial device.</p>
+<section id="transmit">
+<h3>Transmit<a class="headerlink" href="#transmit" title="Link to this heading">¶</a></h3>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="nl">tx_byte:</span><span class="w">                    </span><span class="c1">; A = byte to send</span>
+<span class="w">    </span><span class="k">pha</span>
+<span class="nl">tx_wait:</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FFE0</span><span class="w">               </span><span class="c1">; status</span>
+<span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="p">#</span><span class="mb">%10000000</span><span class="w">          </span><span class="c1">; bit 7 = TX writable</span>
+<span class="w">    </span><span class="k">beq</span><span class="w"> </span><span class="n">tx_wait</span>
+<span class="w">    </span><span class="k">pla</span>
+<span class="w">    </span><span class="k">sta</span><span class="w"> </span><span class="mh">$FFE1</span><span class="w">               </span><span class="c1">; write the byte</span>
+<span class="w">    </span><span class="k">rts</span>
+</pre></div>
+</div>
+<p>Sending a zero-terminated string:</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="nl">puts:</span><span class="w">                       </span><span class="c1">; X:Y = string pointer (cc65 convention)</span>
+<span class="w">    </span><span class="c1">; ... loop: lda (str),y; beq done; jsr tx_byte; iny; bne loop; done: rts ...</span>
+</pre></div>
+</div>
+</section>
+<section id="receive">
+<h3>Receive<a class="headerlink" href="#receive" title="Link to this heading">¶</a></h3>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="nl">rx_byte:</span><span class="w">                    </span><span class="c1">; return byte in A, or carry set if none pending</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FFE0</span><span class="w">               </span><span class="c1">; status</span>
+<span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="p">#</span><span class="mb">%01000000</span><span class="w">          </span><span class="c1">; bit 6 = RX ready</span>
+<span class="w">    </span><span class="k">beq</span><span class="w"> </span><span class="n">no_rx</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="mh">$FFE1</span><span class="w">               </span><span class="c1">; read the byte (also clears the ready flag)</span>
+<span class="w">    </span><span class="k">clc</span>
+<span class="w">    </span><span class="k">rts</span>
+<span class="nl">no_rx:</span>
+<span class="w">    </span><span class="k">sec</span>
+<span class="w">    </span><span class="k">rts</span>
+</pre></div>
+</div>
+<p>A polling program reads one byte per VBI or main-loop iteration.</p>
+</section>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h2>
+<p>The X65’s I/O surface is uniformly memory-mapped and uniformly poll-or-IRQ-driven. HID gamepad and keyboard support is a single selector-plus-read pattern per device; LEDs and the buzzer are one-or-a-few stores; the UART is a classic two-register status-plus-data flow. Register offsets and bit layouts are in <a class="reference internal" href="../../A/A_memory_map/"><span class="std std-doc">Appendix A</span></a>; the hardware context is in <a class="reference internal" href="../../1/6_io/"><span class="std std-doc">Chapter 6</span></a>.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../14_os/">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Chapter 14: Operating System (OS/816)</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../12_sound/">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Chapter 12: Sound Programming</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Tomasz Sterna
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Chapter 13: Input/Output Handling</a><ul>
+<li><a class="reference internal" href="#polling-usb-hid-gamepads">Polling USB HID Gamepads</a><ul>
+<li><a class="reference internal" href="#merged-pad-0-single-player">Merged pad 0 (single-player)</a></li>
+<li><a class="reference internal" href="#multi-player">Multi-player</a></li>
+<li><a class="reference internal" href="#analog-sticks-and-deadzones">Analog sticks and deadzones</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#polling-usb-hid-keyboards">Polling USB HID Keyboards</a><ul>
+<li><a class="reference internal" href="#any-key-pressed">“Any key pressed?”</a></li>
+<li><a class="reference internal" href="#is-this-specific-key-down">“Is this specific key down?”</a></li>
+<li><a class="reference internal" href="#modifier-leds">Modifier LEDs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#de-9-gpio-ports">DE-9 GPIO Ports</a><ul>
+<li><a class="reference internal" href="#reading-joysticks">Reading joysticks</a></li>
+<li><a class="reference internal" href="#driving-external-hardware">Driving external hardware</a></li>
+<li><a class="reference internal" href="#edge-driven-input">Edge-driven input</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rgb-led-programming">RGB LED Programming</a><ul>
+<li><a class="reference internal" href="#direct-rgb332-on-board-leds-0-3">Direct RGB332 — on-board LEDs 0..3</a></li>
+<li><a class="reference internal" href="#chain-protocol-any-led-0-255-full-24-bit-colour">Chain protocol — any LED 0..255, full 24-bit colour</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#system-buzzer">System Buzzer</a></li>
+<li><a class="reference internal" href="#uart-monitor-console-from-a-program">UART / Monitor Console from a Program</a><ul>
+<li><a class="reference internal" href="#transmit">Transmit</a></li>
+<li><a class="reference internal" href="#receive">Receive</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=187304be"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/tabs.js?v=3ee01567"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../_static/design-tabs.js?v=fcb327ea"></script>
+    <script defer="defer" src="https://stats.chrome.pl/api/script.js?siteId=19a9a6f3e638"></script>
+    </body>
+</html>

@@ -1,0 +1,476 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Appendix F: XEX File Format" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.x65.zone/A/F_xex_format/" />
+<meta property="og:site_name" content="X65" />
+<meta property="og:description" content="Every X65 binary is a.xex file — boot ROMs, user applications, monitor load payloads. The format is derived from the Atari 8-bit.xex executable format, with three X65-specific extensions for the wi..." />
+<meta name="description" content="Every X65 binary is a.xex file — boot ROMs, user applications, monitor load payloads. The format is derived from the Atari 8-bit.xex executable format, with three X65-specific extensions for the wi..." />
+<link rel="index" title="Index" href="../../genindex/"><link rel="search" title="Search" href="../../search/"><link rel="next" title="Appendix G: The SGU-1 Sound Generator" href="../G_sgu1/"><link rel="prev" title="Appendix E: X65 Quick Reference Cheat Sheet" href="../E_cheat_sheet/">
+        <link rel="canonical" href="https://docs.x65.zone/A/F_xex_format/">
+        <link rel="prefetch" href="../../_static/paw_logo_32.png" as="image">
+
+    <link rel="shortcut icon" href="../../_static/paw_logo_32_gray.png"><!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Appendix F: XEX File Format - X65.docs</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ea49a994" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #0E556F;
+  --color-brand-content: #0E556F;
+  --color-brand-visited: #052544;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../"><div class="brand">X65.docs</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/paw_logo_32.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">X65.docs</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search/" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../part_1/">Part 1: The X65 Microcomputer</a><input aria-label="Toggle navigation of Part 1: The X65 Microcomputer" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../1/1_introduction/">Chapter 1: Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/2_overview/">Chapter 2: System Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/3_memory_storage/">Chapter 3: Memory and Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/4_graphics/">Chapter 4: Graphics and Display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/5_audio/">Chapter 5: Sound and Audio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/6_io/">Chapter 6: Input and Output Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/7_devel/">Chapter 7: Development and Emulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../part_2/">Part 2: Programming the X65 in 65816 Assembly</a><input aria-label="Toggle navigation of Part 2: Programming the X65 in 65816 Assembly" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../2/08_assembly/">Chapter 8: Introduction to 65816 Assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/09_dev_env/">Chapter 9: Development Environment Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/10_memory/">Chapter 10: Memory Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/11_graphics/">Chapter 11: Graphics Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/12_sound/">Chapter 12: Sound Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/13_input_output/">Chapter 13: Input/Output Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/14_os/">Chapter 14: Operating System (OS/816)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/15_advanced/">Chapter 15: Advanced Programming Techniques</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/16_examples/">Chapter 16: Example Projects and Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/17_afterword/">Chapter 17: Afterword</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../A_memory_map/">Appendix A: Memory Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../B_glossary/">Appendix B: Glossary of X65 Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../C_65816_migration/">Appendix C: From 6502 to 65816 Migration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../D_systems_comparison/">Appendix D: X65 Compared to Classic 8-bit Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../E_cheat_sheet/">Appendix E: X65 Quick Reference Cheat Sheet</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Appendix F: XEX File Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../G_sgu1/">Appendix G: The SGU-1 Sound Generator</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/blob/main/book/A/F_xex_format.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/edit/main/book/A/F_xex_format.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="appendix-f-xex-file-format">
+<h1>Appendix F: XEX File Format<a class="headerlink" href="#appendix-f-xex-file-format" title="Link to this heading">¶</a></h1>
+<p>Every X65 binary is a <code class="docutils literal notranslate"><span class="pre">.xex</span></code> file — boot ROMs, user applications, monitor <code class="docutils literal notranslate"><span class="pre">load</span></code> payloads. The format is derived from the Atari 8-bit <code class="docutils literal notranslate"><span class="pre">.xex</span></code> executable format, with three X65-specific extensions for the wider 24-bit address space and the firmware monitor’s INFO command. This appendix documents what is on disk, byte for byte. The build pipeline that produces these files is covered in <a class="reference internal" href="../../2/09_dev_env/"><span class="std std-doc">Chapter 9</span></a>; the OS/816 shell that loads user-application <code class="docutils literal notranslate"><span class="pre">.xex</span></code> files is in <a class="reference internal" href="../../2/14_os/"><span class="std std-doc">Chapter 14</span></a>.</p>
+<section id="overall-structure">
+<h2>Overall Structure<a class="headerlink" href="#overall-structure" title="Link to this heading">¶</a></h2>
+<p>A <code class="docutils literal notranslate"><span class="pre">.xex</span></code> is a sequence of independently-addressed <strong>segments</strong>. Each segment names a memory range and supplies the bytes to load there. Segments are processed strictly in file order, and a later segment may overwrite bytes written by an earlier one. All multi-byte fields are little-endian (low byte first).</p>
+<p>The file opens with bank <code class="docutils literal notranslate"><span class="pre">$00</span></code> selected as the implicit load target. Bank-switch sentinel segments (described below) change which bank subsequent segments target.</p>
+</section>
+<section id="file-header">
+<h2>File Header<a class="headerlink" href="#file-header" title="Link to this heading">¶</a></h2>
+<p>The first two bytes of the file must be <code class="docutils literal notranslate"><span class="pre">$FF</span> <span class="pre">$FF</span></code>. The same <code class="docutils literal notranslate"><span class="pre">$FF</span> <span class="pre">$FF</span></code> magic may appear between later segments and is silently skipped by the loader; emitting it is optional after the first segment.</p>
+</section>
+<section id="segment-layout">
+<h2>Segment Layout<a class="headerlink" href="#segment-layout" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Bytes</p></th>
+<th class="head"><p>Field</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0–1</p></td>
+<td><p>2</p></td>
+<td><p>Header</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FFFF</span></code> (required in 1st segment, optional after)</p></td>
+</tr>
+<tr class="row-odd"><td><p>2–3</p></td>
+<td><p>2</p></td>
+<td><p>Start address A</p></td>
+<td><p>Little-endian, <code class="docutils literal notranslate"><span class="pre">$0000</span></code>–<code class="docutils literal notranslate"><span class="pre">$FFFF</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>4–5</p></td>
+<td><p>2</p></td>
+<td><p>End address B</p></td>
+<td><p>Little-endian, A ≤ B ≤ <code class="docutils literal notranslate"><span class="pre">$FFFF</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>6…</p></td>
+<td><p>B−A+1</p></td>
+<td><p>Payload</p></td>
+<td><p>Loaded into A…B of the current bank</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>After the payload, another segment may follow immediately (with or without a leading <code class="docutils literal notranslate"><span class="pre">$FFFF</span></code>) until end-of-file.</p>
+</section>
+<section id="bank-switch-sentinel-fffe-segment">
+<span id="bank-switch-sentinel--fffe-segment"></span><h2>Bank-Switch Sentinel — <code class="docutils literal notranslate"><span class="pre">$FFFE</span></code> Segment<a class="headerlink" href="#bank-switch-sentinel-fffe-segment" title="Link to this heading">¶</a></h2>
+<p>The original Atari format addresses 64 KB; the X65 lives in a 24-bit space, so the loader needs a way to retarget banks mid-file.</p>
+<p>A segment whose start address <strong>and</strong> end address are both <code class="docutils literal notranslate"><span class="pre">$FFFE</span></code> is <strong>not</strong> a one-byte write to address <code class="docutils literal notranslate"><span class="pre">$FFFE</span></code>. Instead, the loader reads the segment’s single payload byte and uses it as the <strong>bank number for all following segments</strong>.</p>
+<p>The bank starts at <code class="docutils literal notranslate"><span class="pre">$00</span></code> when the file is opened. A typical multi-bank <code class="docutils literal notranslate"><span class="pre">.xex</span></code> opens with bank-zero segments, then emits an <code class="docutils literal notranslate"><span class="pre">$FFFE</span></code>-sentinel with payload <code class="docutils literal notranslate"><span class="pre">$01</span></code> to switch banks, and the segments that follow now write into bank <code class="docutils literal notranslate"><span class="pre">$01</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>FF FE   FF FE      ; start=$FFFE, end=$FFFE → sentinel
+01                 ; bank for subsequent segments
+</pre></div>
+</div>
+</section>
+<section id="help-info-segment-fc00-in-bank-00">
+<span id="helpinfo-segment--fc00-in-bank-00"></span><h2>HELP/INFO Segment — <code class="docutils literal notranslate"><span class="pre">$FC00</span></code> in Bank <code class="docutils literal notranslate"><span class="pre">$00</span></code><a class="headerlink" href="#help-info-segment-fc00-in-bank-00" title="Link to this heading">¶</a></h2>
+<p>A segment whose start address is <code class="docutils literal notranslate"><span class="pre">$FC00</span></code> <em>and</em> whose target bank is <code class="docutils literal notranslate"><span class="pre">$00</span></code> is <strong>not loaded into RAM</strong>. The loader skips its payload entirely.</p>
+<p>This region carries user-visible help/info text, displayed by the NORTH firmware monitor’s <code class="docutils literal notranslate"><span class="pre">info</span></code> command (see <a class="reference internal" href="../../1/6_io/"><span class="std std-doc">Chapter 6</span></a>). The convention exists because <code class="docutils literal notranslate"><span class="pre">$FC00</span></code>–<code class="docutils literal notranslate"><span class="pre">$FCFF</span></code> is reserved for expansion-slot MMIO (see <a class="reference internal" href="../A_memory_map/"><span class="std std-doc">Appendix A</span></a>) — writing to it during load would be both pointless and unsafe — so the loader repurposes that address as a “this segment is metadata, skip it” signal.</p>
+<p>In the words of the firmware help text:</p>
+<blockquote>
+<div><p>LOAD and INFO read ROM files from a USB drive. A ROM file contains both ASCII information for the user and binary information for the system. The ROM file is an Atari XEX-derived binary format, and may contain many chunks loaded into different memory areas. The chunk marked for load into the area starting at <code class="docutils literal notranslate"><span class="pre">$FC00</span></code> in bank <code class="docutils literal notranslate"><span class="pre">$00</span></code> is special: it carries HELP/INFO text and is <strong>not</strong> loaded into RAM. The <code class="docutils literal notranslate"><span class="pre">INFO</span></code> monitor command displays it.</p>
+</div></blockquote>
+<p>A <code class="docutils literal notranslate"><span class="pre">$FFFE</span></code>-sentinel that has switched the current bank to a non-zero value <strong>does not</strong> cause subsequent <code class="docutils literal notranslate"><span class="pre">$FC00</span></code> segments to be skipped — only bank <code class="docutils literal notranslate"><span class="pre">$00</span></code> triggers the skip.</p>
+</section>
+<section id="auto-run-via-the-reset-vector-fffc-fffd">
+<span id="auto-run-via-the-reset-vector--fffcfffd"></span><h2>Auto-Run via the Reset Vector — <code class="docutils literal notranslate"><span class="pre">$FFFC</span></code>–<code class="docutils literal notranslate"><span class="pre">$FFFD</span></code><a class="headerlink" href="#auto-run-via-the-reset-vector-fffc-fffd" title="Link to this heading">¶</a></h2>
+<p>When the entire file has been processed, the loader checks whether bytes have been written to <strong>both</strong> <code class="docutils literal notranslate"><span class="pre">$FFFC</span></code> and <code class="docutils literal notranslate"><span class="pre">$FFFD</span></code> (the 65C816 reset vector low and high bytes, in any segment). If so, it releases the CPU reset; the CPU then begins execution at the address held in <code class="docutils literal notranslate"><span class="pre">$FFFC</span></code>–<code class="docutils literal notranslate"><span class="pre">$FFFD</span></code>.</p>
+<p>The idiomatic auto-run footer is therefore a small segment writing the entry-point address into the reset vector:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>FF FC   FF FD      ; segment loading into $FFFC..$FFFD
+00 20              ; reset vector = $2000
+</pre></div>
+</div>
+<p>Files that omit the reset-vector load successfully but do not start running — a useful posture for libraries, overlays, and data-only <code class="docutils literal notranslate"><span class="pre">.xex</span></code> images.</p>
+</section>
+<section id="runad-initad-compatibility-note">
+<span id="runad--initad-compatibility-note"></span><h2>RUNAD / INITAD Compatibility Note<a class="headerlink" href="#runad-initad-compatibility-note" title="Link to this heading">¶</a></h2>
+<p>The classic Atari XEX vectors <code class="docutils literal notranslate"><span class="pre">RUNAD</span></code> (<code class="docutils literal notranslate"><span class="pre">$02E0</span></code>–<code class="docutils literal notranslate"><span class="pre">$02E1</span></code>) and <code class="docutils literal notranslate"><span class="pre">INITAD</span></code> (<code class="docutils literal notranslate"><span class="pre">$02E2</span></code>–<code class="docutils literal notranslate"><span class="pre">$02E3</span></code>) <strong>are not honored by the X65 loader</strong>. A <code class="docutils literal notranslate"><span class="pre">.xex</span></code> that relies on writing those addresses to start or hook execution will load its bytes successfully but will not run. Port such code by emitting an extra segment that writes the entry point to <code class="docutils literal notranslate"><span class="pre">$FFFC</span></code>–<code class="docutils literal notranslate"><span class="pre">$FFFD</span></code> instead.</p>
+</section>
+<section id="worked-example">
+<h2>Worked Example<a class="headerlink" href="#worked-example" title="Link to this heading">¶</a></h2>
+<p>A minimal auto-running program — load <code class="docutils literal notranslate"><span class="pre">$42</span></code> into <code class="docutils literal notranslate"><span class="pre">A</span></code> at address <code class="docutils literal notranslate"><span class="pre">$2000</span></code>, then run from there:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>FF FF              ; magic (required, first segment only mandatory)
+00 20   01 20      ; start=$2000, end=$2001
+A9 42              ; payload: LDA #$42
+FF FC   FF FD      ; reset-vector segment header
+00 20              ; reset vector = $2000 → run after load
+</pre></div>
+</div>
+</section>
+<section id="inspecting-xex-files-in-a-hex-editor">
+<h2>Inspecting <code class="docutils literal notranslate"><span class="pre">.xex</span></code> Files in a Hex Editor<a class="headerlink" href="#inspecting-xex-files-in-a-hex-editor" title="Link to this heading">¶</a></h2>
+<p>The <strong>ImHex</strong> hex editor (<a class="reference external" href="https://imhex.werwolv.net">https://imhex.werwolv.net</a>) ships an <strong>XEX pattern</strong> in its built-in Content Store that highlights segment headers, start/end addresses, and payload boundaries directly on the hex view. Install it via <em>Help → Content Store → search “XEX” → Install</em>; opening any <code class="docutils literal notranslate"><span class="pre">.xex</span></code> in ImHex afterwards turns the file into a colour-coded structural view, which is the fastest way to confirm that a build matches the layout described above. The pattern follows the Atari layout — the X65-specific <code class="docutils literal notranslate"><span class="pre">$FFFE</span></code> bank-switch sentinel and <code class="docutils literal notranslate"><span class="pre">$FC00</span></code>/bank-<code class="docutils literal notranslate"><span class="pre">$00</span></code> HELP/INFO segments appear as ordinary segments in the colouring; their meaning is implicit from their addresses.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../G_sgu1/">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Appendix G: The SGU-1 Sound Generator</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../E_cheat_sheet/">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Appendix E: X65 Quick Reference Cheat Sheet</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Tomasz Sterna
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Appendix F: XEX File Format</a><ul>
+<li><a class="reference internal" href="#overall-structure">Overall Structure</a></li>
+<li><a class="reference internal" href="#file-header">File Header</a></li>
+<li><a class="reference internal" href="#segment-layout">Segment Layout</a></li>
+<li><a class="reference internal" href="#bank-switch-sentinel-fffe-segment">Bank-Switch Sentinel — <code class="docutils literal notranslate"><span class="pre">$FFFE</span></code> Segment</a></li>
+<li><a class="reference internal" href="#help-info-segment-fc00-in-bank-00">HELP/INFO Segment — <code class="docutils literal notranslate"><span class="pre">$FC00</span></code> in Bank <code class="docutils literal notranslate"><span class="pre">$00</span></code></a></li>
+<li><a class="reference internal" href="#auto-run-via-the-reset-vector-fffc-fffd">Auto-Run via the Reset Vector — <code class="docutils literal notranslate"><span class="pre">$FFFC</span></code>–<code class="docutils literal notranslate"><span class="pre">$FFFD</span></code></a></li>
+<li><a class="reference internal" href="#runad-initad-compatibility-note">RUNAD / INITAD Compatibility Note</a></li>
+<li><a class="reference internal" href="#worked-example">Worked Example</a></li>
+<li><a class="reference internal" href="#inspecting-xex-files-in-a-hex-editor">Inspecting <code class="docutils literal notranslate"><span class="pre">.xex</span></code> Files in a Hex Editor</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=187304be"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/tabs.js?v=3ee01567"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../_static/design-tabs.js?v=fcb327ea"></script>
+    <script defer="defer" src="https://stats.chrome.pl/api/script.js?siteId=19a9a6f3e638"></script>
+    </body>
+</html>

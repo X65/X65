@@ -1,0 +1,676 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Chapter 4: Graphics and Display" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.x65.zone/1/4_graphics/" />
+<meta property="og:site_name" content="X65" />
+<meta property="og:description" content="The Color Graphics Interface Adaptor (CGIA): The CGIA (Color Graphics Interface Adaptor) is the graphics subsystem of the X65 microcomputer, merging design elements from both the Atari ANTIC and Co..." />
+<meta name="description" content="The Color Graphics Interface Adaptor (CGIA): The CGIA (Color Graphics Interface Adaptor) is the graphics subsystem of the X65 microcomputer, merging design elements from both the Atari ANTIC and Co..." />
+<link rel="index" title="Index" href="../../genindex/"><link rel="search" title="Search" href="../../search/"><link rel="next" title="Chapter 5: Sound and Audio" href="../5_audio/"><link rel="prev" title="Chapter 3: Memory and Storage" href="../3_memory_storage/">
+        <link rel="canonical" href="https://docs.x65.zone/1/4_graphics/">
+        <link rel="prefetch" href="../../_static/paw_logo_32.png" as="image">
+
+    <link rel="shortcut icon" href="../../_static/paw_logo_32_gray.png"><!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Chapter 4: Graphics and Display - X65.docs</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ea49a994" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #0E556F;
+  --color-brand-content: #0E556F;
+  --color-brand-visited: #052544;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../"><div class="brand">X65.docs</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/paw_logo_32.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">X65.docs</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search/" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../part_1/">Part 1: The X65 Microcomputer</a><input aria-label="Toggle navigation of Part 1: The X65 Microcomputer" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../1_introduction/">Chapter 1: Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../2_overview/">Chapter 2: System Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../3_memory_storage/">Chapter 3: Memory and Storage</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Chapter 4: Graphics and Display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../5_audio/">Chapter 5: Sound and Audio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../6_io/">Chapter 6: Input and Output Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../7_devel/">Chapter 7: Development and Emulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../part_2/">Part 2: Programming the X65 in 65816 Assembly</a><input aria-label="Toggle navigation of Part 2: Programming the X65 in 65816 Assembly" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../2/08_assembly/">Chapter 8: Introduction to 65816 Assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/09_dev_env/">Chapter 9: Development Environment Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/10_memory/">Chapter 10: Memory Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/11_graphics/">Chapter 11: Graphics Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/12_sound/">Chapter 12: Sound Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/13_input_output/">Chapter 13: Input/Output Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/14_os/">Chapter 14: Operating System (OS/816)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/15_advanced/">Chapter 15: Advanced Programming Techniques</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/16_examples/">Chapter 16: Example Projects and Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/17_afterword/">Chapter 17: Afterword</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/A_memory_map/">Appendix A: Memory Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/B_glossary/">Appendix B: Glossary of X65 Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/C_65816_migration/">Appendix C: From 6502 to 65816 Migration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/D_systems_comparison/">Appendix D: X65 Compared to Classic 8-bit Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/E_cheat_sheet/">Appendix E: X65 Quick Reference Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/F_xex_format/">Appendix F: XEX File Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/G_sgu1/">Appendix G: The SGU-1 Sound Generator</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/blob/main/book/1/4_graphics.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/edit/main/book/1/4_graphics.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="chapter-4-graphics-and-display">
+<h1>Chapter 4: Graphics and Display<a class="headerlink" href="#chapter-4-graphics-and-display" title="Link to this heading">¶</a></h1>
+<section id="the-color-graphics-interface-adaptor-cgia">
+<h2>The Color Graphics Interface Adaptor (CGIA)<a class="headerlink" href="#the-color-graphics-interface-adaptor-cgia" title="Link to this heading">¶</a></h2>
+<p>The <strong>CGIA (Color Graphics Interface Adaptor)</strong> is the graphics subsystem of the X65 microcomputer, merging design elements from both the <strong>Atari ANTIC</strong> and <strong>Commodore VIC-II/TED</strong> architectures. It provides a <strong>display list system</strong> similar to ANTIC while incorporating a <strong>separate character color mapping system</strong> akin to the VIC-II and TED chips. This combination allows for a flexible yet efficient graphics pipeline, offloading much of the rendering workload from the CPU.</p>
+<section id="principles-of-operation">
+<h3>Principles of Operation<a class="headerlink" href="#principles-of-operation" title="Link to this heading">¶</a></h3>
+<p>The CGIA is an <strong>on-bus device</strong>, with <strong>memory-mapped registers</strong>. While the current implementation is done using a microcontroller firmware, that’s only one approach - it could also be realized in an <strong>FPGA</strong> or <strong>custom ASIC design</strong>.</p>
+<p>CGIA has <strong>128 registers</strong>, mapped at <code class="docutils literal notranslate"><span class="pre">$FF00..$FF7F</span></code>, used to configure its operation. It is a <strong>fetch master</strong> on the south-side bus — once configured, it pulls display-list instructions, character data, color maps, and sprite data straight out of system memory each frame, without intervention from the 65C816.</p>
+<p>Its primary function is to manage and generate <strong>four overlaying graphics planes</strong>, each of which can be independently enabled or disabled. Each plane can operate in one of two modes:</p>
+<ul class="simple">
+<li><p><strong>Background graphics plane</strong></p></li>
+<li><p><strong>Sprites plane</strong></p></li>
+</ul>
+<section id="background-graphics-plane-operation">
+<h4>Background Graphics Plane Operation<a class="headerlink" href="#background-graphics-plane-operation" title="Link to this heading">¶</a></h4>
+<p>When a plane is set to background graphics, it uses a <strong>Display List</strong> to control rendering on a <strong>line-by-line basis</strong>, and has up to <strong>four memory scan pointers</strong>:</p>
+<ul class="simple">
+<li><p><strong>memory_data</strong> (LMS)</p></li>
+<li><p><strong>foreground_color</strong> (LFS)</p></li>
+<li><p><strong>background_color</strong> (LBS)</p></li>
+<li><p><strong>character_data</strong> (LCG)</p></li>
+</ul>
+<p>These are 16-bit pointers into memory, combined with that plane’s <strong>bank register</strong>, which supplies address bits 16–23. Each of the four planes selects its bank independently.</p>
+<p>At the beginning of each display frame, CGIA loads the first display list instruction and begins rendering. The instruction selects one of <strong>8 display-mode slots</strong>, currently assigned as follows:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Slot</p></th>
+<th class="head"><p>Name</p></th>
+<th class="head"><p>Family</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>MODE0</p></td>
+<td><p>Paletted text/tile</p></td>
+<td><p>Per-plane palette; no attribute memory needed</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>MODE1</p></td>
+<td><p>Paletted bitmap</p></td>
+<td><p>Per-plane palette; direct pixel indexing</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>MODE2</p></td>
+<td><p>Attribute text/tile</p></td>
+<td><p>Per-cell foreground/background from scan pointers</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>MODE3</p></td>
+<td><p>Attribute bitmap</p></td>
+<td><p>Per-cell foreground/background from scan pointers</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>—</p></td>
+<td><p>Reserved</p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>—</p></td>
+<td><p>Reserved</p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>MODE6</p></td>
+<td><p>HAM6</p></td>
+<td><p>Hold-and-Modify, 4 pixels per 3 bytes</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>MODE7</p></td>
+<td><p>Affine</p></td>
+<td><p>Chunky pixels with hardware affine transforms</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>CGIA then draws <strong>8 pixels at a time</strong> using fetched character, bitmap, or colour data, and repeats this process to fill the raster line.</p>
+<p>This is done <strong>separately for each of the 4 planes</strong>, which are <strong>composited</strong> in one line color buffer.</p>
+<p>Once a raster line is fully constructed, it is pushed to a <strong>hardware rasterizer</strong> that converts the data into <strong>TMDS symbols</strong> for DVI/HDMI output. The output signal is <strong>768×480 &#64; 60 Hz</strong>. By default each logical pixel is doubled in both axes — symbol sent twice, raster line repeated once — producing an effective <strong>384×240</strong> logical resolution. Two bits in the CGIA mode register opt in to higher fidelity: <code class="docutils literal notranslate"><span class="pre">HIRES</span></code> switches to 96-column (768 px) horizontal mode, and <code class="docutils literal notranslate"><span class="pre">INTERLACE</span></code> enables a 480-line vertical mode.</p>
+</section>
+<section id="sprite-plane-operation">
+<h4>Sprite Plane Operation<a class="headerlink" href="#sprite-plane-operation" title="Link to this heading">¶</a></h4>
+<p>If a plane is configured as a <strong>sprite plane</strong>, it doesn’t use a display list. Instead, it uses a <strong>sprite descriptor table</strong>, starting from a configurable pointer. At the beginning of the frame, <strong>eight sprite descriptors</strong> are loaded. Each sprite descriptor sets the sprite screen position, width, height and modes (multicolor, pixel doubling, etc.).</p>
+<p>On each raster line, CGIA checks which sprites overlap that line (from <code class="docutils literal notranslate"><span class="pre">y_pos</span></code> to <code class="docutils literal notranslate"><span class="pre">y_pos</span> <span class="pre">+</span> <span class="pre">height</span></code>). It then fetches and draws the appropriate pixels into the raster line, based on the current <code class="docutils literal notranslate"><span class="pre">x_pos</span></code>. Sprites are drawn in <strong>descending order</strong>, so lower-numbered sprites overwrite higher-numbered ones (i.e., sprite 1 has higher priority than sprite 2).</p>
+<p>Once the sprite finishes drawing (the raster line reaches its bottom), the sprite descriptor is reloaded with new contents. This allows the sprite to be reused in a lower part of the screen with a different X position and appearance, creating a built-in sprite multiplexer.</p>
+</section>
+</section>
+<section id="real-time-non-persistent-raster-line-rendering">
+<h3>Real-Time, Non-Persistent Raster Line Rendering<a class="headerlink" href="#real-time-non-persistent-raster-line-rendering" title="Link to this heading">¶</a></h3>
+<p>This rendering process occurs <strong>in real time</strong>, at a <strong>perfect 60 Hz</strong>, for every line of the active picture. The DVI-D output is driven by the RP2350’s HSTX block, clocked from the chip’s second PLL rather than divided off the system clock — so the framerate stays at exactly 60 Hz regardless of CPU-side tuning, and VBI-synchronous software can rely on it. Importantly, there is <strong>no persistent framebuffer</strong>; every line is generated and transmitted immediately and is not stored in memory. A full framebuffer at the output resolution would consume hundreds of kilobytes, which is impractical for the X65’s architecture.</p>
+<p>The different display list screen modes essentially serve as graphics <strong>data compression formats</strong>, enabling display of complex visuals using minimal memory. For example, a <strong>single byte write can affect an 8x8 pixel matrix</strong> in text mode. This allows the X65 to render rich graphics with efficient CPU and RAM usage.</p>
+</section>
+<section id="display-list-and-scan-pointers">
+<h3>Display List and Scan Pointers<a class="headerlink" href="#display-list-and-scan-pointers" title="Link to this heading">¶</a></h3>
+<p>At the core of CGIA’s rendering system is the <strong>display list</strong>, a structured set of instructions that dictate how each scanline is rendered. Each display list <strong>starts with a LOAD instruction</strong>, specifying memory offsets for different scan pointer sources:</p>
+<ul class="simple">
+<li><p><strong>Memory Scan (LMS):</strong> Defines the offset of display memory, holding character or tile data.</p></li>
+<li><p><strong>Foreground Color Scan (LFS):</strong> Points to the foreground color map.</p></li>
+<li><p><strong>Background Color Scan (LBS):</strong> Points to the background color map.</p></li>
+<li><p><strong>Character Generator (LCG):</strong> Defines the shape of characters or tiles.</p></li>
+</ul>
+<p>A display list can mix different graphical modes, much like ANTIC’s mode lines, allowing <strong>mode switching per scanline</strong>. The <strong>row height of each mode</strong> is configurable via the <code class="docutils literal notranslate"><span class="pre">row_height</span></code> plane register (1–256 raster lines per row). For example, a <strong>C64-style text mode</strong> uses a row height of 7, meaning 8 raster lines per character row.</p>
+<p>A display-list instruction’s <strong>DLI flag</strong> requests an interrupt on the last raster line of its row, including an empty row. This provides a synchronization point for raster bars, screen splits and palette changes.</p>
+</section>
+<section id="graphics-modes-planes-and-color-palette">
+<h3>Graphics Modes, Planes, and Color Palette<a class="headerlink" href="#graphics-modes-planes-and-color-palette" title="Link to this heading">¶</a></h3>
+<p>The CGIA graphics are rendered in <strong>four overlaying planes</strong>, each of which can be configured to display background graphics using a <strong>display list</strong> or sprite graphics using a <strong>sprite descriptor table</strong>. This allows for complex layering effects and efficient memory usage. The CGIA supports multiple graphics modes, which can be defined on a per-line basis through the display list system. These include:</p>
+<ul class="simple">
+<li><p><strong>Paletted text/tile (MODE0) and bitmap (MODE1):</strong> No attribute memory; up to eight colours sit in the plane’s registers and each pixel indexes that palette.</p></li>
+<li><p><strong>Attribute text/tile (MODE2) and bitmap (MODE3):</strong> Per-cell foreground/background colours fetched via separate scan pointers — the classic VIC-II layout.</p></li>
+<li><p><strong>Multicolor mode flag:</strong> A per-instruction bit on text and bitmap modes that switches to a <strong>4-color-per-cell representation</strong>, where each byte encodes four pixels. Because the cell narrows to 4 pixels wide, multi-color text on a 320-pixel screen yields <strong>80 columns</strong> out of the box.</p></li>
+<li><p><strong>Double-width flag:</strong> A separate per-plane and per-instruction bit (<code class="docutils literal notranslate"><span class="pre">PLANE_MASK_DOUBLE_WIDTH</span></code> / <code class="docutils literal notranslate"><span class="pre">CGIA_DL_DOUBLE_WIDTH_BIT</span></code>) available on every text mode. It doubles the horizontal pixel size of each cell, producing the chunky “wide character” look from Atari 8-bit text modes; combined with multi-color, it gives the C64-style 8-pixel-per-byte rectangle pixels.</p></li>
+</ul>
+<p>The X65 features a <strong>256-color palette</strong>, composed of 32 distinct hues, each available in 8 different brightness levels. Each mode can define <strong>foreground and background colors per character/tile</strong>, much like the VIC-II, but with additional flexibility due to CGIA’s three separate scan pointers.</p>
+<section id="mode0-and-mode1-paletted-modes">
+<span id="mode0-and-mode1--paletted-modes"></span><h4>MODE0 and MODE1 — Paletted Modes<a class="headerlink" href="#mode0-and-mode1-paletted-modes" title="Link to this heading">¶</a></h4>
+<p>MODE0 (paletted text/tile) and MODE1 (paletted bitmap) share a single mechanism: instead of fetching per-cell colours through the scan pointers, they take their colours from an <strong>8-entry palette</strong> stored directly in the plane’s own registers — specifically, the upper half of the sixteen plane registers (<code class="docutils literal notranslate"><span class="pre">shared_colors[0..7]</span></code>), where each byte is an index into the global 256-colour CGIA palette.</p>
+<p>Both modes let software choose one of four <strong>colour depths</strong> via the plane’s <code class="docutils literal notranslate"><span class="pre">PIXEL_BITS</span></code> field:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>bpp</p></th>
+<th class="head"><p>Colours per pixel</p></th>
+<th class="head"><p>MODE1 bitmap layout</p></th>
+<th class="head"><p>MODE0 glyph budget</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>1 pixel per bit (8 pixels per byte)</p></td>
+<td><p>256 glyphs</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>4</p></td>
+<td><p>2 pixels per bit-pair (4 pixels per byte)</p></td>
+<td><p>128 glyphs</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>8</p></td>
+<td><p>4 pixels packed into 3 bytes (HAM-style)</p></td>
+<td><p>64 glyphs</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>8 + half-bright</p></td>
+<td><p>2 pixels per nibble, high bit = half-bright</p></td>
+<td><p>32 glyphs</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>In MODE1 (bitmap) the raw bits index the palette directly. In MODE0 (text/tile) the character-generator bit for the current pixel becomes the <strong>low</strong> bit of the palette index — and the <strong>high</strong> bits of the palette index are “stolen” from the <strong>high</strong> bits of the character code byte. The font ROM is then addressed only by the bits that remain. So the same byte that picks a glyph also picks which slice of the palette that glyph paints with: consecutive ranges of character codes paint with consecutive palette pairs, while the char-gen bit picks the off/on colour within each pair.</p>
+<p>Concretely:</p>
+<ul class="simple">
+<li><p><strong>1 bpp</strong> — no bit is stolen; all 256 character codes are usable, every cell paints from <code class="docutils literal notranslate"><span class="pre">palette[0..1]</span></code>.</p></li>
+<li><p><strong>2 bpp</strong> — bit 7 is stolen as palette bit 1. 128 glyphs (<code class="docutils literal notranslate"><span class="pre">$00..$7F</span></code>). Codes <code class="docutils literal notranslate"><span class="pre">$00..$7F</span></code> paint with <code class="docutils literal notranslate"><span class="pre">palette[0..1]</span></code>, codes <code class="docutils literal notranslate"><span class="pre">$80..$FF</span></code> paint with <code class="docutils literal notranslate"><span class="pre">palette[2..3]</span></code>.</p></li>
+<li><p><strong>3 bpp</strong> — bits 7..6 are stolen as palette bits 2..1. 64 glyphs (<code class="docutils literal notranslate"><span class="pre">$00..$3F</span></code>). Four palette pairs across the four char-code quarters: <code class="docutils literal notranslate"><span class="pre">$00..$3F</span></code> → <code class="docutils literal notranslate"><span class="pre">palette[0..1]</span></code>, <code class="docutils literal notranslate"><span class="pre">$40..$7F</span></code> → <code class="docutils literal notranslate"><span class="pre">[2..3]</span></code>, <code class="docutils literal notranslate"><span class="pre">$80..$BF</span></code> → <code class="docutils literal notranslate"><span class="pre">[4..5]</span></code>, <code class="docutils literal notranslate"><span class="pre">$C0..$FF</span></code> → <code class="docutils literal notranslate"><span class="pre">[6..7]</span></code>.</p></li>
+<li><p><strong>4 bpp</strong> — bits 7..5 participate (top bit is the half-bright flag, see below); 32 glyphs (<code class="docutils literal notranslate"><span class="pre">$00..$1F</span></code>).</p></li>
+</ul>
+<p>The trade is per-mode and per-scene: text-heavy screens stay at 1 bpp, decorated tilemaps move up to 2 or 3 bpp, splash screens with rich colour can afford 4 bpp at the cost of a small glyph set.</p>
+<p><strong>Half-bright (4 bpp).</strong> At 4 bpp the character-code byte splits as <code class="docutils literal notranslate"><span class="pre">[HB</span> <span class="pre">|</span> <span class="pre">P2</span> <span class="pre">P1</span> <span class="pre">|</span> <span class="pre">g4</span> <span class="pre">g3</span> <span class="pre">g2</span> <span class="pre">g1</span> <span class="pre">g0]</span></code>: the very top bit is the <strong>half-bright flag</strong>, bits 6..5 are stolen as palette bits 2..1, and only the low five bits identify a glyph. The half-bright flag is <em>not</em> part of palette selection — it acts <strong>after</strong> the per-cell <code class="docutils literal notranslate"><span class="pre">shared_colors[]</span></code> lookup. The flag is one bit per cell; once the per-pixel palette index has chosen one of the eight <code class="docutils literal notranslate"><span class="pre">shared_colors[]</span></code> entries and that lookup has produced an 8-bit CGIA palette index, the half-bright flag XORs bit 2 of <strong>that</strong> CGIA index. In the CGIA’s 256-colour palette (32 hue rows × 8 brightness levels) bit 2 of the index is a brightness bit, so flipping it lands on the same hue’s brightness twin — turning the cell’s colours into their brighter (or darker) counterparts. The flag applies to every pixel of the cell, so both colours used by a 4 bpp non-multi cell jump to their twins together. The net effect is 16 visible colours from 8 palette entries, with a built-in dark/bright pairing that works regardless of how <code class="docutils literal notranslate"><span class="pre">shared_colors[]</span></code> was loaded — much more useful than arbitrary “just dim it” schemes.</p>
+<p><strong>MODE0 multi-color.</strong> The multi-color flag is available on MODE0 at 2 bpp, 3 bpp, and 4 bpp. It takes <strong>two</strong> bits of the character-generator output per screen pixel rather than one, so cells are 4 pixels wide instead of 8 and the character set encodes two-bit patterns instead of on/off. The two char-gen bits become the <strong>low two</strong> bits of the palette index, and any remaining high bits are stolen from the character code as before:</p>
+<ul class="simple">
+<li><p><strong>2 bpp multi</strong> — no bit is stolen; the char-gen bits <em>are</em> the full 2-bit palette index. All 256 character codes are usable, every cell paints from <code class="docutils literal notranslate"><span class="pre">palette[0..3]</span></code>. (This is the configuration that yields the 80-column text mode — see below.)</p></li>
+<li><p><strong>3 bpp multi</strong> — bit 7 of the character code is stolen as palette bit 2 (a “palette half” select). 128 glyphs (<code class="docutils literal notranslate"><span class="pre">$00..$7F</span></code>). Codes <code class="docutils literal notranslate"><span class="pre">$00..$7F</span></code> paint from <code class="docutils literal notranslate"><span class="pre">palette[0..3]</span></code>, codes <code class="docutils literal notranslate"><span class="pre">$80..$FF</span></code> paint from <code class="docutils literal notranslate"><span class="pre">palette[4..7]</span></code>.</p></li>
+<li><p><strong>4 bpp multi</strong> — bit 7 is the half-bright flag, bit 6 is stolen as palette bit 2, and the low six bits identify a glyph (64 glyphs, <code class="docutils literal notranslate"><span class="pre">$00..$3F</span></code>). Char-code byte splits as <code class="docutils literal notranslate"><span class="pre">[HB</span> <span class="pre">|</span> <span class="pre">P2</span> <span class="pre">|</span> <span class="pre">g5</span> <span class="pre">g4</span> <span class="pre">g3</span> <span class="pre">g2</span> <span class="pre">g1</span> <span class="pre">g0]</span></code>. Per cell: codes <code class="docutils literal notranslate"><span class="pre">$00..$3F</span></code> paint from <code class="docutils literal notranslate"><span class="pre">palette[0..3]</span></code>, <code class="docutils literal notranslate"><span class="pre">$40..$7F</span></code> from <code class="docutils literal notranslate"><span class="pre">palette[4..7]</span></code>, <code class="docutils literal notranslate"><span class="pre">$80..$BF</span></code> from <code class="docutils literal notranslate"><span class="pre">palette[0..3]</span></code> half-brighted, <code class="docutils literal notranslate"><span class="pre">$C0..$FF</span></code> from <code class="docutils literal notranslate"><span class="pre">palette[4..7]</span></code> half-brighted. The half-bright transform works exactly like in non-multi 4 bpp — XORing bit 2 of the looked-up CGIA color after <code class="docutils literal notranslate"><span class="pre">shared_colors[]</span></code> resolution — so all four colours of the cell jump to their bright/dark twin together, lifting the visible-colour ceiling to 16.</p></li>
+</ul>
+<p>1 bpp multi-color is impossible — multi-color already takes two char-gen bits per pixel, so there is no 1-bit-per-pixel configuration to fall back to.</p>
+</section>
+<section id="mode2-and-mode3-attribute-modes">
+<span id="mode2-and-mode3--attribute-modes"></span><h4>MODE2 and MODE3 — Attribute Modes<a class="headerlink" href="#mode2-and-mode3-attribute-modes" title="Link to this heading">¶</a></h4>
+<p>MODE2 (attribute text/tile) and MODE3 (attribute bitmap) are the <strong>VIC-II-style</strong> counterparts to MODE0/1. Where the paletted modes spend a lot of effort packing multiple bits per pixel against a tiny shared palette, the attribute modes spend memory instead: every cell on screen carries its <strong>own foreground and background colour bytes</strong>, fetched from two extra scan streams that run in parallel with the character/bitmap data. The result is the classic “one foreground colour and one background colour per 8×N cell” model that C64 programmers will recognize immediately — except that here the “colour bytes” are full 8-bit indices into the CGIA’s 256-colour palette, not a 4-bit nibble.</p>
+<p>Both modes use <strong>three scan pointers</strong> instead of MODE0/1’s single <code class="docutils literal notranslate"><span class="pre">LMS</span></code>:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">memory_scan</span></code> (LMS)</strong> — character codes (MODE2), one byte per cell per row or raw bitmap bytes (MODE3), N consecutive bytes per cell per row.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">colour_scan</span></code> (LFS)</strong> — per-cell <strong>foreground</strong> colour, one byte per cell per row.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">backgr_scan</span></code> (LBS)</strong> — per-cell <strong>background</strong> colour, one byte per cell per row.</p></li>
+</ul>
+<p>MODE2 also uses <strong><code class="docutils literal notranslate"><span class="pre">char_gen</span></code> (LCG)</strong> to address the character-generator memory, exactly like MODE0. MODE3 has no character generator — <code class="docutils literal notranslate"><span class="pre">memory_scan</span></code> is the bitmap.</p>
+<p>Because per-cell colour comes from the scan pointers rather than from a palette indexed by pixel data, the attribute modes have <strong>no <code class="docutils literal notranslate"><span class="pre">PIXEL_BITS</span></code> variants</strong>: each cell is 8 pixels wide with one bit per pixel (non-multi) or 4 pixels wide with two bits per pixel (multi-color). The plane’s <code class="docutils literal notranslate"><span class="pre">PLANE_MASK_PIXEL_BITS</span></code> field is ignored in MODE2/3.</p>
+<p><strong>Non-multi attribute cells (8 pixels wide).</strong> Each pixel takes a single bit from the cell’s source byte — the character-generator output for the current scanline (MODE2) or the bitmap byte itself (MODE3). The bit then picks between the two per-cell colours:</p>
+<ul class="simple">
+<li><p><strong>bit = 0</strong> → <code class="docutils literal notranslate"><span class="pre">backgr_scan</span></code> byte for this cell (or transparent when <code class="docutils literal notranslate"><span class="pre">PLANE_MASK_TRANSPARENT</span></code> is set, letting the plane below show through).</p></li>
+<li><p><strong>bit = 1</strong> → <code class="docutils literal notranslate"><span class="pre">colour_scan</span></code> byte for this cell.</p></li>
+</ul>
+<p>This is exactly the C64 hires text/bitmap colour model.</p>
+<p><strong>Multi-color attribute cells (4 pixels wide, two bits per pixel).</strong> With the <code class="docutils literal notranslate"><span class="pre">MULTICOLOR</span></code> flag set, the cell narrows to 4 pixels and each two-bit code picks one of four colours. Two come from the scan pointers (per cell) and two come from the plane’s own <code class="docutils literal notranslate"><span class="pre">color[]</span></code> registers (shared across the whole plane):</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Code</p></th>
+<th class="head"><p>Colour source</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">00</span></code></p></td>
+<td><p>Plane register <code class="docutils literal notranslate"><span class="pre">color[0]</span></code> (or transparent when <code class="docutils literal notranslate"><span class="pre">PLANE_MASK_TRANSPARENT</span></code> is set)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">01</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">backgr_scan</span></code> byte for this cell (per-cell)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">10</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">colour_scan</span></code> byte for this cell (per-cell)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">11</span></code></p></td>
+<td><p>Plane register <code class="docutils literal notranslate"><span class="pre">color[1]</span></code> (always opaque)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>So an attribute multicolor cell carries up to <strong>four colours</strong>, two of which are different in every cell. The remaining six entries of the plane’s <code class="docutils literal notranslate"><span class="pre">color[2..7]</span></code> array are unused in MODE2/3 — there is no equivalent of MODE0’s palette-half stealing.</p>
+<p><strong>Modifier flags.</strong> All three of the per-mode flags work in MODE2/3 with the same meanings as everywhere else:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PLANE_MASK_TRANSPARENT</span></code> makes the “background” code (bit <code class="docutils literal notranslate"><span class="pre">0</span></code> non-multi, code <code class="docutils literal notranslate"><span class="pre">00</span></code> multi) transparent — useful when a MODE2/3 plane is layered on top of another plane.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PLANE_MASK_DOUBLE_WIDTH</span></code> doubles the cell width (16 pixels non-multi, 8 pixels multi) for the chunky C64-style look.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PLANE_MASK_MULTICOLOR</span></code> switches from 1-bit-per-pixel to 2-bit-per-pixel decoding as described above.</p></li>
+</ul>
+<p><strong>Memory cost vs. flexibility.</strong> The attribute modes pay roughly <strong>3× the scan bandwidth</strong> of MODE0/1 — three scan streams instead of one — and need a pre-built per-cell colour map in RAM. In return they let every cell on screen carry independent colours, which the paletted modes can only approximate by stealing high bits of the character code (and only for MODE0). For VIC-II-style ports, hires-bitmap “FLI”-class effects, and tilemaps where each tile needs its own palette, the attribute modes are the right tool. For text-heavy screens, decorated UI, and anywhere a small shared palette is enough, MODE0/1 stay cheaper.</p>
+</section>
+<section id="double-width-text-and-80-column-mode">
+<h4>Double-width text and 80-column mode<a class="headerlink" href="#double-width-text-and-80-column-mode" title="Link to this heading">¶</a></h4>
+<p>Every text mode supports a per-plane <strong>double-width</strong> flag (<code class="docutils literal notranslate"><span class="pre">PLANE_MASK_DOUBLE_WIDTH</span></code>, bit 4 of the plane’s flag register). Setting it doubles the horizontal pixel size of every cell, producing the chunky “wide character” look familiar from Atari and C64 text modes. In the display list this is commonly set and cleared by the <code class="docutils literal notranslate"><span class="pre">CGIA_DL_DOUBLE_WIDTH_BIT</span></code> in the mode-row instruction, so software can switch mid-screen.</p>
+<p>The multi-color flag interacts with it cleanly: without double-width, multi-color text narrows the cell to 4×8 pixels, giving <strong>80 columns</strong> on the 320-pixel-wide screen. With a font that uses only the 00 and 11 multi-color codes (background and background-2), the result reads as a crisp monochrome 80-column mode — perfect for terminal-style UI, code listings, and long-text rendering — while staying fully byte-per-character compatible with the rest of the text-mode machinery.</p>
+</section>
+<section id="plane-order-register">
+<h4>Plane Order Register<a class="headerlink" href="#plane-order-register" title="Link to this heading">¶</a></h4>
+<p>A dedicated <strong>plane order register</strong> holds a permutation of the four plane indices, encoded compactly so any of the 24 possible Z-orderings of the four planes fits in a single byte. Writing to it on the fly — typically from a raster interrupt — lets a program shuffle which plane is on top without rebuilding any of the planes themselves, which is convenient for things like menu overlays, mid-frame UI, and parallax tricks where the foreground plane changes between scanlines.</p>
+</section>
+</section>
+<section id="beam-chasing-for-efficient-rendering">
+<h3>Beam-Chasing for Efficient Rendering<a class="headerlink" href="#beam-chasing-for-efficient-rendering" title="Link to this heading">¶</a></h3>
+<p>Once a display list is set up, <strong>the CGIA handles beam-chasing automatically</strong>, meaning that the CPU does not need to manually update graphics mid-frame. This approach ensures that the CPU remains free for <strong>game logic, audio processing, or other computations</strong>, while the <strong>VPU (Video Processing Unit) executes display list instructions</strong> and updates the screen accordingly.</p>
+</section>
+<section id="raster-interrupts-and-mid-frame-changes">
+<h3>Raster Interrupts and Mid-Frame Changes<a class="headerlink" href="#raster-interrupts-and-mid-frame-changes" title="Link to this heading">¶</a></h3>
+<p>CGIA provides three interrupt sources: <strong>vertical blank (VBI)</strong>, <strong>display-list interrupts (DLI)</strong> and a <strong>raster-line compare (RSI)</strong>. VBI schedules screen updates between frames; DLI and RSI synchronize register or memory changes within a frame.</p>
+<p>CGIA raises only sources enabled in <code class="docutils literal notranslate"><span class="pre">INT_ENABLE</span></code> at <code class="docutils literal notranslate"><span class="pre">$FF1A</span></code>. Acknowledge pending sources by writing their bits to <code class="docutils literal notranslate"><span class="pre">INT_STATUS</span></code> at <code class="docutils literal notranslate"><span class="pre">$FF1B</span></code>.</p>
+</section>
+<section id="sprite-multiplexing-system">
+<h3>Sprite Multiplexing System<a class="headerlink" href="#sprite-multiplexing-system" title="Link to this heading">¶</a></h3>
+<p>The CGIA features a <strong>hardware sprite system</strong> with built-in <strong>multiplexing</strong>. A sprite descriptor includes:</p>
+<ul class="simple">
+<li><p><strong>Position (X, Y) and size (Width, Height)</strong></p></li>
+<li><p><strong>Graphics data location</strong></p></li>
+<li><p><strong>Color attributes</strong></p></li>
+<li><p><strong>Next sprite descriptor offset</strong> (controls automatic chaining for multiplexing)</p></li>
+</ul>
+<p>When a sprite finishes rendering (i.e., it reaches <code class="docutils literal notranslate"><span class="pre">pos_y</span> <span class="pre">+</span> <span class="pre">lines_y</span></code> on the raster), <strong>CGIA automatically loads the next sprite descriptor</strong> from <code class="docutils literal notranslate"><span class="pre">next_dsc_offset</span></code>. The renderer follows at most one next-descriptor pointer per scanline, even if the next descriptor has already ended. Descriptor chains advance while output is clipped by the plane’s vertical window. To end a chain, point the final descriptor to itself (e.g., <code class="docutils literal notranslate"><span class="pre">0200</span> <span class="pre">→</span> <span class="pre">0200</span></code>).</p>
+</section>
+<section id="sprite-dimensions-and-features">
+<h3>Sprite Dimensions and Features<a class="headerlink" href="#sprite-dimensions-and-features" title="Link to this heading">¶</a></h3>
+<p>A sprite in CGIA can be <strong>8, 16, 24, 32, 40, 48, 56, or 64 pixels wide</strong> and has a <strong>variable height</strong> defined by a 16-bit value (0–65535 pixels). This allows for highly customizable sprite sizes, ranging from small objects to large, detailed images.</p>
+<p>A sprite plane’s <code class="docutils literal notranslate"><span class="pre">start_y</span></code> and <code class="docutils literal notranslate"><span class="pre">stop_y</span></code> registers define a vertical clipping window in screen-line coordinates: <code class="docutils literal notranslate"><span class="pre">start_y</span> <span class="pre">&lt;=</span> <span class="pre">y</span> <span class="pre">&lt;</span> <span class="pre">stop_y</span></code>. If <code class="docutils literal notranslate"><span class="pre">stop_y</span> <span class="pre">&lt;=</span> <span class="pre">start_y</span></code>, clipping is disabled. The window controls visibility without changing sprite positions or descriptor-chain timing.</p>
+</section>
+<section id="additional-sprite-features">
+<h3>Additional Sprite Features<a class="headerlink" href="#additional-sprite-features" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Pixel depth:</strong> Each sprite selects 1, 2, 3 or 4 bits per pixel. An 8-pixel column occupies <code class="docutils literal notranslate"><span class="pre">bpp</span></code> bytes, with MODE1 packing.</p></li>
+<li><p><strong>Double-width rendering:</strong> Doubles the displayed width without changing pixel packing.</p></li>
+<li><p><strong>Mirror X / Mirror Y:</strong> Per-sprite flags that flip the rendered sprite horizontally or vertically without re-encoding the data.</p></li>
+<li><p><strong>Color index 0 transparency:</strong> The first color is always transparent.</p></li>
+</ul>
+</section>
+<section id="memory-banking-for-graphics-rendering">
+<h3>Memory Banking for Graphics Rendering<a class="headerlink" href="#memory-banking-for-graphics-rendering" title="Link to this heading">¶</a></h3>
+<p>The CGIA has four bank registers, <strong>BANK0–BANK3</strong> at <code class="docutils literal notranslate"><span class="pre">$FF34–$FF37</span></code>. Each supplies address bits 16–23 for one plane, whether it renders a background or sprites. Display-list, bitmap, charset and sprite-descriptor pointers remain 16-bit offsets within that plane’s bank. Planes may share a bank or select different banks; each has its own VRAM cache. Sprite data reads wrap within the selected 64 KB bank.</p>
+</section>
+<section id="advanced-graphics-modes">
+<h3>Advanced Graphics Modes<a class="headerlink" href="#advanced-graphics-modes" title="Link to this heading">¶</a></h3>
+<p>CGIA includes two special graphics modes that extend its capabilities beyond traditional tile and bitmap rendering:</p>
+<ul class="simple">
+<li><p><strong>HAM6 (Hold-And-Modify, mode 6):</strong> Inspired by the Amiga HAM mode. HAM commands are 6 bits each, packing four screen pixels into three bytes; commands either select a base color or modify a single channel (R, G, or B) of the previous pixel by a signed delta, enabling more colors per screen at the cost of per-pixel precision.</p></li>
+<li><p><strong>MODE7 (affine, mode 7):</strong> A chunky-pixel graphics mode with hardware-assisted affine transformations, similar to the SNES MODE7, allowing effects like texture-mapped backgrounds and pseudo-3D perspective shifts.</p></li>
+</ul>
+</section>
+<section id="summary">
+<h3>Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h3>
+<p>The <strong>CGIA provides a powerful and flexible graphics pipeline</strong>, combining display lists, multiple graphics modes, and an efficient <strong>sprite multiplexing system</strong>. By offloading rendering work to dedicated hardware, the X65 enables complex and visually rich applications while maintaining low CPU overhead. In the next chapter, we will explore <strong>how to program the CGIA using assembly</strong>, covering display list construction, sprite handling, and direct pixel manipulation.</p>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../5_audio/">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Chapter 5: Sound and Audio</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../3_memory_storage/">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Chapter 3: Memory and Storage</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Tomasz Sterna
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Chapter 4: Graphics and Display</a><ul>
+<li><a class="reference internal" href="#the-color-graphics-interface-adaptor-cgia">The Color Graphics Interface Adaptor (CGIA)</a><ul>
+<li><a class="reference internal" href="#principles-of-operation">Principles of Operation</a><ul>
+<li><a class="reference internal" href="#background-graphics-plane-operation">Background Graphics Plane Operation</a></li>
+<li><a class="reference internal" href="#sprite-plane-operation">Sprite Plane Operation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#real-time-non-persistent-raster-line-rendering">Real-Time, Non-Persistent Raster Line Rendering</a></li>
+<li><a class="reference internal" href="#display-list-and-scan-pointers">Display List and Scan Pointers</a></li>
+<li><a class="reference internal" href="#graphics-modes-planes-and-color-palette">Graphics Modes, Planes, and Color Palette</a><ul>
+<li><a class="reference internal" href="#mode0-and-mode1-paletted-modes">MODE0 and MODE1 — Paletted Modes</a></li>
+<li><a class="reference internal" href="#mode2-and-mode3-attribute-modes">MODE2 and MODE3 — Attribute Modes</a></li>
+<li><a class="reference internal" href="#double-width-text-and-80-column-mode">Double-width text and 80-column mode</a></li>
+<li><a class="reference internal" href="#plane-order-register">Plane Order Register</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#beam-chasing-for-efficient-rendering">Beam-Chasing for Efficient Rendering</a></li>
+<li><a class="reference internal" href="#raster-interrupts-and-mid-frame-changes">Raster Interrupts and Mid-Frame Changes</a></li>
+<li><a class="reference internal" href="#sprite-multiplexing-system">Sprite Multiplexing System</a></li>
+<li><a class="reference internal" href="#sprite-dimensions-and-features">Sprite Dimensions and Features</a></li>
+<li><a class="reference internal" href="#additional-sprite-features">Additional Sprite Features</a></li>
+<li><a class="reference internal" href="#memory-banking-for-graphics-rendering">Memory Banking for Graphics Rendering</a></li>
+<li><a class="reference internal" href="#advanced-graphics-modes">Advanced Graphics Modes</a></li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=187304be"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/tabs.js?v=3ee01567"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../_static/design-tabs.js?v=fcb327ea"></script>
+    <script defer="defer" src="https://stats.chrome.pl/api/script.js?siteId=19a9a6f3e638"></script>
+    </body>
+</html>

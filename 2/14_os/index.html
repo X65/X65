@@ -1,0 +1,714 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Chapter 14: Operating System (OS/816)" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.x65.zone/2/14_os/" />
+<meta property="og:site_name" content="X65" />
+<meta property="og:description" content="OS/816 is the operating system being built for the X65. It is a minimal, 65C816-assembly kernel designed to stay out of the way — small enough that a single developer can hold it in their head, opi..." />
+<meta name="description" content="OS/816 is the operating system being built for the X65. It is a minimal, 65C816-assembly kernel designed to stay out of the way — small enough that a single developer can hold it in their head, opi..." />
+<link rel="index" title="Index" href="../../genindex/"><link rel="search" title="Search" href="../../search/"><link rel="next" title="Chapter 15: Advanced Programming Techniques" href="../15_advanced/"><link rel="prev" title="Chapter 13: Input/Output Handling" href="../13_input_output/">
+        <link rel="canonical" href="https://docs.x65.zone/2/14_os/">
+        <link rel="prefetch" href="../../_static/paw_logo_32.png" as="image">
+
+    <link rel="shortcut icon" href="../../_static/paw_logo_32_gray.png"><!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Chapter 14: Operating System (OS/816) - X65.docs</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ea49a994" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #0E556F;
+  --color-brand-content: #0E556F;
+  --color-brand-visited: #052544;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../"><div class="brand">X65.docs</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/paw_logo_32.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">X65.docs</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search/" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../part_1/">Part 1: The X65 Microcomputer</a><input aria-label="Toggle navigation of Part 1: The X65 Microcomputer" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../1/1_introduction/">Chapter 1: Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/2_overview/">Chapter 2: System Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/3_memory_storage/">Chapter 3: Memory and Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/4_graphics/">Chapter 4: Graphics and Display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/5_audio/">Chapter 5: Sound and Audio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/6_io/">Chapter 6: Input and Output Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/7_devel/">Chapter 7: Development and Emulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../part_2/">Part 2: Programming the X65 in 65816 Assembly</a><input aria-label="Toggle navigation of Part 2: Programming the X65 in 65816 Assembly" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../08_assembly/">Chapter 8: Introduction to 65816 Assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../09_dev_env/">Chapter 9: Development Environment Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../10_memory/">Chapter 10: Memory Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../11_graphics/">Chapter 11: Graphics Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../12_sound/">Chapter 12: Sound Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../13_input_output/">Chapter 13: Input/Output Handling</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Chapter 14: Operating System (OS/816)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../15_advanced/">Chapter 15: Advanced Programming Techniques</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../16_examples/">Chapter 16: Example Projects and Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../17_afterword/">Chapter 17: Afterword</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/A_memory_map/">Appendix A: Memory Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/B_glossary/">Appendix B: Glossary of X65 Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/C_65816_migration/">Appendix C: From 6502 to 65816 Migration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/D_systems_comparison/">Appendix D: X65 Compared to Classic 8-bit Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/E_cheat_sheet/">Appendix E: X65 Quick Reference Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/F_xex_format/">Appendix F: XEX File Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/G_sgu1/">Appendix G: The SGU-1 Sound Generator</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/blob/main/book/2/14_os.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/edit/main/book/2/14_os.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="chapter-14-operating-system-os-816">
+<span id="chapter-14-operating-system-os816"></span><h1>Chapter 14: Operating System (OS/816)<a class="headerlink" href="#chapter-14-operating-system-os-816" title="Link to this heading">¶</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This chapter is still under construction.</p>
+</div>
+<p><strong>OS/816</strong> is the operating system being built for the X65. It is a minimal, 65C816-assembly kernel designed to stay out of the way — small enough that a single developer can hold it in their head, opinionated enough that task isolation and cooperative I/O feel natural, and explicit enough that an application can always drop to bare-metal behaviour when it needs to.</p>
+<section id="os-816-as-the-x65-s-default-machine-personality">
+<span id="os816-as-the-x65s-default-machine-personality"></span><h2>OS/816 as the X65’s Default Machine Personality<a class="headerlink" href="#os-816-as-the-x65-s-default-machine-personality" title="Link to this heading">¶</a></h2>
+<p>OS/816 is itself shipped as a <strong>boot ROM image</strong> — a <code class="docutils literal notranslate"><span class="pre">.xex</span></code> file (format: <a class="reference internal" href="../../A/F_xex_format/"><span class="std std-doc">Appendix F</span></a>) installed in the NORTH firmware’s internal LittleFS catalogue. When the X65 powers on, the firmware initializes the hardware and then loads and jumps into whatever image is installed as the boot ROM; on a stock machine, that image is OS/816, and the first thing the user sees after the brief firmware banner is the OS shell.</p>
+<p>Because the machine personality is a <code class="docutils literal notranslate"><span class="pre">.xex</span></code> like any other, OS/816 can in principle be replaced — a developer who wants the X65 to boot into a C64-style BASIC, a games-cartridge-style front end, or a bare demo can build such a boot ROM and install it side by side to OS/816 (see <a class="reference internal" href="../09_dev_env/"><span class="std std-doc">Chapter 9</span></a> for the deployment commands). In practice this is rare; most development targets the <strong>user-application</strong> layer instead — programs that run <em>under</em> OS/816 rather than in its place.</p>
+<p>User applications are also <code class="docutils literal notranslate"><span class="pre">.xex</span></code> files, built with the same toolchain and the same linker config. They differ only in their runtime environment: instead of owning the machine, they run as a task inside OS/816’s 32-slot scheduler. Each task is effectively a <strong>small virtual machine</strong> — a dedicated 64 KB memory bank for its code and data, plus a 256-byte page in bank 0 holding its co-located direct page and hardware stack (see <strong>Task Model</strong> below) — with hardware access typically mediated by syscalls. Programs that genuinely need the full machine — a demo, a graphics experiment, a timing-critical routine — are better written as boot ROMs instead; the default application posture is “well-behaved task”.</p>
+</section>
+<section id="shape">
+<h2>Shape<a class="headerlink" href="#shape" title="Link to this heading">¶</a></h2>
+<p>OS/816 is written entirely in 65C816 assembly using the <strong>K816</strong> assembler (see <a class="reference internal" href="../../1/7_devel/"><span class="std std-doc">Chapter 7</span></a>). The kernel lives in <strong>bank <code class="docutils literal notranslate"><span class="pre">$FF</span></code></strong>; kernel data and the main CLI run in <strong>bank <code class="docutils literal notranslate"><span class="pre">$00</span></code></strong>. The first 32 × 256 bytes of bank 0 (i.e. <code class="docutils literal notranslate"><span class="pre">$0000–$1FFF</span></code>) are split into one 256-byte page per task, each of which holds that task’s <strong>direct page</strong> at the bottom (growing up) and its <strong>hardware stack</strong> at the top (growing down).</p>
+<p>A second bank-0 region, starting at <strong><code class="docutils literal notranslate"><span class="pre">$4000</span></code></strong>, holds the <strong>Task Control Block (TCB) table</strong>: 32 × 64-byte TCBs, one per task slot.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>  Bank 0:
+  $0000 ─┐
+         │  Task 0 DP+stack page (256 B)
+  $0100 ─┤
+         │  Task 1 DP+stack page (256 B)
+   ...   │
+         │  Task 31 DP+stack page (256 B)
+  $2000 ─┘
+   ...
+  $4000 ─┐
+         │  32 × 64-byte TCBs
+  $4800 ─┘
+</pre></div>
+</div>
+<p>Each task additionally gets a <strong>dedicated bank of its own</strong> — task N’s primary data bank is <code class="docutils literal notranslate"><span class="pre">$N</span></code>. The kernel task that runs the main CLI uses bank 0 alongside OS data; application tasks (1..31) are free to use their assigned banks for code and data. Banks <code class="docutils literal notranslate"><span class="pre">$20</span></code>–<code class="docutils literal notranslate"><span class="pre">$FE</span></code> are available as <strong>general-purpose banks</strong> that any task can request from the OS.</p>
+</section>
+<section id="task-model">
+<h2>Task Model<a class="headerlink" href="#task-model" title="Link to this heading">¶</a></h2>
+<section id="tcb-layout">
+<h3>TCB layout<a class="headerlink" href="#tcb-layout" title="Link to this heading">¶</a></h3>
+<p>Each TCB is 64 bytes. The parts relevant to application code:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Field</p></th>
+<th class="head"><p>Size</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sp</span></code></p></td>
+<td><p>2</p></td>
+<td><p>Saved 16-bit stack pointer</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">state</span></code></p></td>
+<td><p>1</p></td>
+<td><p>Task state (see below)</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">signals</span></code></p></td>
+<td><p>1</p></td>
+<td><p>Pending signal bitmap</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sigmask</span></code></p></td>
+<td><p>1</p></td>
+<td><p>Signals the task is currently blocking</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">evtmask</span></code></p></td>
+<td><p>1</p></td>
+<td><p>Kernel events the task subscribes to</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sighndl</span></code></p></td>
+<td><p>2</p></td>
+<td><p>Signal-handler entry address</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">message</span></code></p></td>
+<td><p>5</p></td>
+<td><p>Inter-task message slot (from, type, + 3 data bytes)</p></td>
+</tr>
+<tr class="row-odd"><td><p>…</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">_res</span></code></p></td>
+<td><p>23</p></td>
+<td><p>Reserved for future kernel use</p></td>
+</tr>
+<tr class="row-even"><td><p>…</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>12</p></td>
+<td><p>Null-terminated task name (shown by the <code class="docutils literal notranslate"><span class="pre">tasks</span></code> shell command)</p></td>
+</tr>
+<tr class="row-odd"><td><p>…</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">fds</span></code></p></td>
+<td><p>16</p></td>
+<td><p>Open file descriptors</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>TCBs are mostly managed by the kernel. Application code touches them only indirectly through syscalls (<code class="docutils literal notranslate"><span class="pre">TASK_SET_NAME</span></code>, future IPC calls).</p>
+</section>
+<section id="task-states">
+<h3>Task states<a class="headerlink" href="#task-states" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>State</p></th>
+<th class="head"><p>Symbol</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TASK_FREE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">F</span></code></p></td>
+<td><p>Slot is empty; no task allocated</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">TASK_GENESIS</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">G</span></code></p></td>
+<td><p>Task is being created but not yet runnable</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TASK_RUNNING</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">R</span></code></p></td>
+<td><p>Normal scheduled state</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">TASK_STOPPED</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">S</span></code></p></td>
+<td><p>Does not receive CPU; still processes signals</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TASK_WAITING</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">W</span></code></p></td>
+<td><p>Blocked on I/O; can still receive signals</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">TASK_SIGNAL</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">s</span></code></p></td>
+<td><p>Currently running a signal handler; cannot be preempted</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">TASK_SINGLE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
+<td><p>Non-preemptible; must yield or syscall to give up CPU</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">tasks</span></code> shell command prints the single-character symbol in its “state” column for each slot.</p>
+</section>
+</section>
+<section id="scheduling">
+<h2>Scheduling<a class="headerlink" href="#scheduling" title="Link to this heading">¶</a></h2>
+<p>Scheduling is <strong>hybrid</strong>:</p>
+<ul class="simple">
+<li><p><strong>Preemption happens at VBL</strong> — every 1/60 of a second, the NMI handler runs the scheduler and may pick a different task.</p></li>
+<li><p><strong>Yielding happens explicitly</strong> — a task can give up its timeslice via a syscall (or by calling an equivalent library routine) without waiting for the next VBL.</p></li>
+</ul>
+<p>The scheduler today is a simple round-robin that rotates between eligible <code class="docutils literal notranslate"><span class="pre">TASK_RUNNING</span></code> slots. Non-preemptible states (<code class="docutils literal notranslate"><span class="pre">SIGNAL</span></code>, <code class="docutils literal notranslate"><span class="pre">SINGLE</span></code>) make the scheduler skip the slot until the task returns to <code class="docutils literal notranslate"><span class="pre">RUNNING</span></code>.</p>
+<p>During a context switch the NMI handler saves the current task’s 16-bit <code class="docutils literal notranslate"><span class="pre">S</span></code> into its TCB (<code class="docutils literal notranslate"><span class="pre">TCB::sp</span></code>), loads the next task’s saved <code class="docutils literal notranslate"><span class="pre">S</span></code>, and returns. Because each task’s DP + stack page is co-located and because <code class="docutils literal notranslate"><span class="pre">D</span></code> is re-pointed as part of the switch, per-task state is naturally isolated without the kernel needing to walk any other memory.</p>
+</section>
+<section id="syscall-abi">
+<h2>Syscall ABI<a class="headerlink" href="#syscall-abi" title="Link to this heading">¶</a></h2>
+<section id="entry">
+<h3>Entry<a class="headerlink" href="#entry" title="Link to this heading">¶</a></h3>
+<p>System calls are issued with the <strong><code class="docutils literal notranslate"><span class="pre">COP</span></code> instruction</strong>. The kernel installs its COP handler at the native COP vector (<code class="docutils literal notranslate"><span class="pre">$FFE4</span></code>); the 65C816 pushes <code class="docutils literal notranslate"><span class="pre">PBR</span></code>, <code class="docutils literal notranslate"><span class="pre">PC</span></code>, and <code class="docutils literal notranslate"><span class="pre">P</span></code> on entry, the kernel saves the rest of the register state, and dispatches to the requested call.</p>
+<p>The syscall number is passed in the <strong>low byte of <code class="docutils literal notranslate"><span class="pre">A</span></code></strong>:</p>
+<div class="highlight-asm notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="c1">; Example: write a character via the console-write syscall (2)</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="sc">'H'</span><span class="w">                </span><span class="c1">; parameter for CON_WRITE</span>
+<span class="w">    </span><span class="k">pha</span><span class="w">                     </span><span class="c1">; argument on task stack</span>
+<span class="w">    </span><span class="k">lda</span><span class="w"> </span><span class="p">#</span><span class="mi">2</span><span class="w">                  </span><span class="c1">; CON_WRITE</span>
+<span class="w">    </span><span class="n">cop</span><span class="w"> </span><span class="p">#</span><span class="mi">0</span><span class="w">                  </span><span class="c1">; COP operand is ignored by current kernel</span>
+</pre></div>
+</div>
+<p>The saved A at syscall entry carries both the syscall id and the parameter (with <code class="docutils literal notranslate"><span class="pre">A</span></code> interpreted in 16-bit mode when appropriate). Register / stack conventions:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">A</span></code> — parameter (and return value, on success).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">X</span></code>, <code class="docutils literal notranslate"><span class="pre">Y</span></code> — preserved across the call.</p></li>
+<li><p>Additional arguments — pushed onto the task stack <strong>before</strong> the <code class="docutils literal notranslate"><span class="pre">cop</span></code>. The kernel unwinds the stack on return, so the caller does <strong>not</strong> need to balance it.</p></li>
+<li><p>Status — <code class="docutils literal notranslate"><span class="pre">C</span></code> (carry) clear on success, set on error; <code class="docutils literal notranslate"><span class="pre">A</span></code> carries the error code when <code class="docutils literal notranslate"><span class="pre">C</span></code> is set.</p></li>
+</ul>
+</section>
+<section id="mid-syscall-task-switches">
+<h3>Mid-syscall task switches<a class="headerlink" href="#mid-syscall-task-switches" title="Link to this heading">¶</a></h3>
+<p>A subtle but important property: if a VBL NMI fires while a syscall is in progress and the scheduler decides to switch tasks, the kernel <strong>completes the syscall</strong> but returns into the newly scheduled task rather than the original caller. The <code class="docutils literal notranslate"><span class="pre">SYSCALL_LOCK</span></code> mechanism defers the NMI-side switch until the COP handler finishes, then the normal switch-at-exit logic uses <code class="docutils literal notranslate"><span class="pre">NEXT_TASK</span></code> rather than <code class="docutils literal notranslate"><span class="pre">CURRENT_TASK</span></code>.</p>
+<p>The upshot for callers: a syscall cannot assume “when I return, I am still the task that called”. In a hybrid-scheduled kernel with cooperative I/O, this is the correct behavior — long-running calls become yield points for free. But it means a task that must run with no interruptions (graphics critical section, time-sensitive hardware interaction) should either avoid syscalls during that window or enter <code class="docutils literal notranslate"><span class="pre">TASK_SINGLE</span></code> state first.</p>
+</section>
+</section>
+<section id="ipc-signals-and-messages">
+<span id="ipc--signals-and-messages"></span><h2>IPC — Signals and Messages<a class="headerlink" href="#ipc-signals-and-messages" title="Link to this heading">¶</a></h2>
+<p>Each TCB carries a 5-byte <code class="docutils literal notranslate"><span class="pre">message</span></code> slot and a signal bitmap. Today the infrastructure is present (storage in the TCB) but the public send/receive API has not landed as a syscall yet. Design-level behaviour:</p>
+<ul class="simple">
+<li><p><strong>Signals</strong>: every task can send any signal (0..7 bits) to any other task; sending to task-id 255 fans out to all tasks except the sender. Stopping other tasks en masse in this way would, in principle, let an application claim sole CPU time within OS/816, though today this is design intent rather than working infrastructure — and for full machine ownership the intended pattern is to write a boot ROM instead (see <a class="reference internal" href="../09_dev_env/"><span class="std std-doc">Chapter 9</span></a>).</p></li>
+<li><p><strong>Messages</strong>: a (<code class="docutils literal notranslate"><span class="pre">from</span></code>, <code class="docutils literal notranslate"><span class="pre">type</span></code>, <code class="docutils literal notranslate"><span class="pre">data</span></code>) triple in each TCB, with <code class="docutils literal notranslate"><span class="pre">data</span></code> being either an immediate value or a pointer.</p></li>
+</ul>
+<p>These are covered here because the field reservations exist in the implemented TCB layout and because <code class="docutils literal notranslate"><span class="pre">tasks</span></code>-shell reports reflect the signal state; the send/receive mechanics will be documented here once the API stabilises.</p>
+</section>
+<section id="virtual-terminals">
+<h2>Virtual Terminals<a class="headerlink" href="#virtual-terminals" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">S</span></code> device is responsible for per-task screens. Each of the 32 tasks may register video memory, attribute memory, and a display-list pointer; only the “currently active” VT’s registration drives CGIA at any given moment.</p>
+<ul class="simple">
+<li><p>VT names: <code class="docutils literal notranslate"><span class="pre">S0</span></code>–<code class="docutils literal notranslate"><span class="pre">S31</span></code> (shell can reach <code class="docutils literal notranslate"><span class="pre">S0</span></code>–<code class="docutils literal notranslate"><span class="pre">S9</span></code>).</p></li>
+<li><p>Switching: press the <strong>🐾</strong> (Paw) modifier plus a digit <code class="docutils literal notranslate"><span class="pre">0</span></code>–<code class="docutils literal notranslate"><span class="pre">9</span></code> to jump to that VT, or <strong>🐾+</strong> / <strong>🐾-</strong> to cycle next / previous. On the X65 keyboard this is the machine’s dedicated command-modifier key; on a standard PC keyboard it sits in the position of the Windows / Meta key. The VBL handler detects the change, saves the outgoing task’s CGIA state into its TCB slot, and loads the incoming task’s.</p></li>
+<li><p>A task can have zero or one screen.</p></li>
+</ul>
+<p>This gives the X65 classic multi-terminal behaviour (per-task screen with instant switching) without the overhead of a framebuffer copy — all that moves is a handful of CGIA register pointers.</p>
+</section>
+<section id="memory-and-banks">
+<h2>Memory and Banks<a class="headerlink" href="#memory-and-banks" title="Link to this heading">¶</a></h2>
+<p>Bank ownership:</p>
+<ul class="simple">
+<li><p><strong>Bank <code class="docutils literal notranslate"><span class="pre">$00</span></code></strong> — shared by OS data, per-task DP + stack pages (<code class="docutils literal notranslate"><span class="pre">$0000–$1FFF</span></code>), and TCB table (<code class="docutils literal notranslate"><span class="pre">$4000+</span></code>).</p></li>
+<li><p><strong>Banks <code class="docutils literal notranslate"><span class="pre">$01</span></code>–<code class="docutils literal notranslate"><span class="pre">$1F</span></code></strong> — per-task primary banks (task N’s data/code bank is <code class="docutils literal notranslate"><span class="pre">$N</span></code>).</p></li>
+<li><p><strong>Banks <code class="docutils literal notranslate"><span class="pre">$20</span></code>–<code class="docutils literal notranslate"><span class="pre">$FE</span></code></strong> — free pool, request from OS. 223 general-purpose banks available.</p></li>
+<li><p><strong>Bank <code class="docutils literal notranslate"><span class="pre">$FF</span></code></strong> — the OS itself.</p></li>
+</ul>
+<p>A task requests a free bank via a syscall (future API); the OS returns a bank number for the task to own exclusively. The task is responsible for tracking which banks it owns — the OS does not keep a per-task bookkeeping list. The idiomatic pattern is to store owned bank numbers in the task’s direct page alongside other per-task globals.</p>
+</section>
+<section id="devices">
+<h2>Devices<a class="headerlink" href="#devices" title="Link to this heading">¶</a></h2>
+<p>Device names use one-letter codes with optional numeric subcodes. Currently planned / reserved:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Code</p></th>
+<th class="head"><p>Device</p></th>
+<th class="head"><p>Subcode meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">D</span></code></p></td>
+<td><p>Disk drive</p></td>
+<td><p>Drive number (0, 1, …)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">E</span></code></p></td>
+<td><p>Editor</p></td>
+<td><p>Virtual terminal number</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">K</span></code></p></td>
+<td><p>Keyboard</p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">P</span></code></p></td>
+<td><p>Printer</p></td>
+<td><p>Printer number</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">S</span></code></p></td>
+<td><p>Screen</p></td>
+<td><p>Virtual terminal number</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">R</span></code></p></td>
+<td><p>RAM disk / random</p></td>
+<td><p>—</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">N</span></code></p></td>
+<td><p>Null device</p></td>
+<td><p>—</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Default assigns: <code class="docutils literal notranslate"><span class="pre">A:</span></code> → <code class="docutils literal notranslate"><span class="pre">D0:</span></code>, <code class="docutils literal notranslate"><span class="pre">B:</span></code> → <code class="docutils literal notranslate"><span class="pre">D1:</span></code>. Letters not otherwise used can be <code class="docutils literal notranslate"><span class="pre">assign</span></code>-ed to any device / subdevice pair.</p>
+</section>
+<section id="the-shell">
+<h2>The Shell<a class="headerlink" href="#the-shell" title="Link to this heading">¶</a></h2>
+<p>OS/816 ships with a minimal built-in CLI. Command dispatch is a small table of name-to-handler pairs; today it holds three commands plus two aliases:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">help</span></code> (<code class="docutils literal notranslate"><span class="pre">?</span></code>)</p></td>
+<td><p>List available commands</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">echo</span></code></p></td>
+<td><p>Print arguments</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tasks</span></code> (<code class="docutils literal notranslate"><span class="pre">ts</span></code>)</p></td>
+<td><p>List task slots: id, state (<code class="docutils literal notranslate"><span class="pre">F/G/R/S/W/s/1</span></code>), name</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The dispatcher does a linear name-match, so new commands are added by appending a name and a handler address to the two parallel tables and bumping <code class="docutils literal notranslate"><span class="pre">CMDS_NO</span></code>. The shell uses plain <code class="docutils literal notranslate"><span class="pre">CON_READ</span></code> / <code class="docutils literal notranslate"><span class="pre">CON_WRITE</span></code> for input and output — it is a straightforward example of a syscall-using application task.</p>
+</section>
+<section id="relationship-to-ria">
+<h2>Relationship to RIA<a class="headerlink" href="#relationship-to-ria" title="Link to this heading">¶</a></h2>
+<p>OS/816 reaches hardware <strong>directly</strong> through the MMIO windows (<code class="docutils literal notranslate"><span class="pre">$FFE0–$FFE1</span></code> for the UART, <code class="docutils literal notranslate"><span class="pre">$FFB0–$FFBF</span></code> for HID, etc.) rather than going through the RIA fastcall API at <code class="docutils literal notranslate"><span class="pre">$FFF0–$FFF3</span></code>. The design reason is simple: fastcall invocations are potentially long-running, and running them from kernel-scheduled contexts would either force single-caller-at-a-time locking or require the kernel to understand how to suspend a fastcall mid-flight. Direct register access is bounded and understandable.</p>
+<p>The fastcall path is therefore currently an <strong>application</strong>-level tool — a user program can reach it directly when it wants modern services like FatFS file I/O — and the OS kernel itself stays below it.</p>
+</section>
+<section id="system-wide-locks">
+<h2>System-Wide Locks<a class="headerlink" href="#system-wide-locks" title="Link to this heading">¶</a></h2>
+<p>Hardware resources shared between tasks will eventually be coordinated through a <strong>syscall-based locks registry</strong>. A task that needs exclusive access to a resource — the SGU-1 sound chip, an expansion slot etc. — requests its lock via syscall. If the lock is free the OS grants it and returns success; if it is held by another task, the caller blocks until the lock is released.</p>
+<p>The design intent is that the registry itself stays small and generic — a named-lock table the kernel owns — so applications can coordinate access to shared hardware without needing to build a per-device kernel abstraction for each resource.</p>
+</section>
+<section id="what-s-implemented-what-s-not">
+<span id="whats-implemented-whats-not"></span><h2>What’s Implemented, What’s Not<a class="headerlink" href="#what-s-implemented-what-s-not" title="Link to this heading">¶</a></h2>
+<p>A quick summary to set expectations:</p>
+<p><strong>Working today:</strong></p>
+<ul class="simple">
+<li><p>32-task model, TCB table, per-task DP + stack pages.</p></li>
+<li><p>Round-robin scheduler with VBL preemption (60 Hz) and explicit yield.</p></li>
+<li><p>Context switch saving/restoring <code class="docutils literal notranslate"><span class="pre">S</span></code>, with task-page co-located DP.</p></li>
+<li><p>COP-based syscall trap with <code class="docutils literal notranslate"><span class="pre">SYSCALL_LOCK</span></code> handling of mid-syscall VBL.</p></li>
+<li><p>Syscalls 1 <code class="docutils literal notranslate"><span class="pre">CON_READ</span></code>, 2 <code class="docutils literal notranslate"><span class="pre">CON_WRITE</span></code>, 3 <code class="docutils literal notranslate"><span class="pre">IO_OPEN</span></code>, 8 <code class="docutils literal notranslate"><span class="pre">TASK_SET_NAME</span></code>.</p></li>
+<li><p>Shell with <code class="docutils literal notranslate"><span class="pre">help</span></code>, <code class="docutils literal notranslate"><span class="pre">echo</span></code>, <code class="docutils literal notranslate"><span class="pre">tasks</span></code> and their aliases.</p></li>
+<li><p>Virtual terminal infrastructure (per-task CGIA state in TCB; the S device to register them).</p></li>
+</ul>
+<p><strong>Stubbed / aspirational:</strong></p>
+<ul class="simple">
+<li><p>Syscalls 4–7 (<code class="docutils literal notranslate"><span class="pre">IO_CLOSE</span></code> / <code class="docutils literal notranslate"><span class="pre">IO_READ</span></code> / <code class="docutils literal notranslate"><span class="pre">IO_WRITE</span></code> / <code class="docutils literal notranslate"><span class="pre">IO_DUP</span></code>) return <code class="docutils literal notranslate"><span class="pre">EINVAL</span></code>; device-handler dispatch not implemented.</p></li>
+<li><p>Signals and messages: TCB fields reserved, send/receive syscalls not yet exposed.</p></li>
+<li><p>Bank-request syscall: banks <code class="docutils literal notranslate"><span class="pre">$20</span></code>–<code class="docutils literal notranslate"><span class="pre">$FE</span></code> design is specified; the allocator is not yet coded.</p></li>
+<li><p>Device name → handler table (<code class="docutils literal notranslate"><span class="pre">D</span></code>, <code class="docutils literal notranslate"><span class="pre">E</span></code>, <code class="docutils literal notranslate"><span class="pre">K</span></code>, <code class="docutils literal notranslate"><span class="pre">P</span></code>, <code class="docutils literal notranslate"><span class="pre">S</span></code>, <code class="docutils literal notranslate"><span class="pre">R</span></code>, <code class="docutils literal notranslate"><span class="pre">N</span></code>): names reserved; implementations pending.</p></li>
+<li><p>System-wide locks registry: designed; no syscalls yet.</p></li>
+<li><p>Fastcall bridge from OS to RIA: intentionally not implemented today.</p></li>
+</ul>
+<p>Because the OS is actively evolving, treat this chapter as a snapshot — current as of the X65 Book revision but subject to change as the kernel grows. The source of truth is always the <a class="reference external" href="https://github.com/X65/OS-816">OS/816 repository</a>.</p>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h2>
+<p>OS/816 gives the X65 a small but real multitasking environment: 32 tasks, each with its own dedicated 64 KB memory bank, a 256-byte direct-page-plus-stack page in bank 0, and a TCB slot; a round-robin VBL-preempted scheduler; a COP-based syscall trap; a three-command shell; and a device / virtual-terminal model that the rest of the kernel is growing into. Each task is, in effect, a small 64 KB virtual machine of its own, using syscalls for console I/O (or talking to hardware directly) and able to become non-preemptible for critical sections when the moment calls for it. The OS’s relationship to the RIA fastcall API is deliberately hands-off today — applications reach fastcalls themselves while the kernel stays below.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../15_advanced/">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Chapter 15: Advanced Programming Techniques</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../13_input_output/">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Chapter 13: Input/Output Handling</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Tomasz Sterna
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Chapter 14: Operating System (OS/816)</a><ul>
+<li><a class="reference internal" href="#os-816-as-the-x65-s-default-machine-personality">OS/816 as the X65’s Default Machine Personality</a></li>
+<li><a class="reference internal" href="#shape">Shape</a></li>
+<li><a class="reference internal" href="#task-model">Task Model</a><ul>
+<li><a class="reference internal" href="#tcb-layout">TCB layout</a></li>
+<li><a class="reference internal" href="#task-states">Task states</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#scheduling">Scheduling</a></li>
+<li><a class="reference internal" href="#syscall-abi">Syscall ABI</a><ul>
+<li><a class="reference internal" href="#entry">Entry</a></li>
+<li><a class="reference internal" href="#mid-syscall-task-switches">Mid-syscall task switches</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ipc-signals-and-messages">IPC — Signals and Messages</a></li>
+<li><a class="reference internal" href="#virtual-terminals">Virtual Terminals</a></li>
+<li><a class="reference internal" href="#memory-and-banks">Memory and Banks</a></li>
+<li><a class="reference internal" href="#devices">Devices</a></li>
+<li><a class="reference internal" href="#the-shell">The Shell</a></li>
+<li><a class="reference internal" href="#relationship-to-ria">Relationship to RIA</a></li>
+<li><a class="reference internal" href="#system-wide-locks">System-Wide Locks</a></li>
+<li><a class="reference internal" href="#what-s-implemented-what-s-not">What’s Implemented, What’s Not</a></li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=187304be"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/tabs.js?v=3ee01567"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../_static/design-tabs.js?v=fcb327ea"></script>
+    <script defer="defer" src="https://stats.chrome.pl/api/script.js?siteId=19a9a6f3e638"></script>
+    </body>
+</html>

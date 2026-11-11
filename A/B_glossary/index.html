@@ -1,0 +1,449 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Appendix B: Glossary of X65 Terms" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.x65.zone/A/B_glossary/" />
+<meta property="og:site_name" content="X65" />
+<meta property="og:description" content="CPU and Memory Terms: 65C816- The Western Design Center 16-bit microprocessor that serves as the CPU for the X65, offering backward compatibility with the 6502 while providing 16-bit capabilities a..." />
+<meta name="description" content="CPU and Memory Terms: 65C816- The Western Design Center 16-bit microprocessor that serves as the CPU for the X65, offering backward compatibility with the 6502 while providing 16-bit capabilities a..." />
+<link rel="index" title="Index" href="../../genindex/"><link rel="search" title="Search" href="../../search/"><link rel="next" title="Appendix C: From 6502 to 65816 Migration Guide" href="../C_65816_migration/"><link rel="prev" title="Appendix A: Memory Map" href="../A_memory_map/">
+        <link rel="canonical" href="https://docs.x65.zone/A/B_glossary/">
+        <link rel="prefetch" href="../../_static/paw_logo_32.png" as="image">
+
+    <link rel="shortcut icon" href="../../_static/paw_logo_32_gray.png"><!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Appendix B: Glossary of X65 Terms - X65.docs</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ea49a994" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #0E556F;
+  --color-brand-content: #0E556F;
+  --color-brand-visited: #052544;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../"><div class="brand">X65.docs</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/paw_logo_32.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">X65.docs</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search/" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../part_1/">Part 1: The X65 Microcomputer</a><input aria-label="Toggle navigation of Part 1: The X65 Microcomputer" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../1/1_introduction/">Chapter 1: Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/2_overview/">Chapter 2: System Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/3_memory_storage/">Chapter 3: Memory and Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/4_graphics/">Chapter 4: Graphics and Display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/5_audio/">Chapter 5: Sound and Audio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/6_io/">Chapter 6: Input and Output Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/7_devel/">Chapter 7: Development and Emulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../part_2/">Part 2: Programming the X65 in 65816 Assembly</a><input aria-label="Toggle navigation of Part 2: Programming the X65 in 65816 Assembly" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../2/08_assembly/">Chapter 8: Introduction to 65816 Assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/09_dev_env/">Chapter 9: Development Environment Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/10_memory/">Chapter 10: Memory Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/11_graphics/">Chapter 11: Graphics Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/12_sound/">Chapter 12: Sound Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/13_input_output/">Chapter 13: Input/Output Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/14_os/">Chapter 14: Operating System (OS/816)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/15_advanced/">Chapter 15: Advanced Programming Techniques</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/16_examples/">Chapter 16: Example Projects and Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/17_afterword/">Chapter 17: Afterword</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../A_memory_map/">Appendix A: Memory Map</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Appendix B: Glossary of X65 Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../C_65816_migration/">Appendix C: From 6502 to 65816 Migration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../D_systems_comparison/">Appendix D: X65 Compared to Classic 8-bit Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../E_cheat_sheet/">Appendix E: X65 Quick Reference Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../F_xex_format/">Appendix F: XEX File Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../G_sgu1/">Appendix G: The SGU-1 Sound Generator</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/blob/main/book/A/B_glossary.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/edit/main/book/A/B_glossary.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="appendix-b-glossary-of-x65-terms">
+<h1>Appendix B: Glossary of X65 Terms<a class="headerlink" href="#appendix-b-glossary-of-x65-terms" title="Link to this heading">¶</a></h1>
+<section id="cpu-and-memory-terms">
+<h2>CPU and Memory Terms<a class="headerlink" href="#cpu-and-memory-terms" title="Link to this heading">¶</a></h2>
+<p><strong>65C816</strong> - The Western Design Center 16-bit microprocessor that serves as the CPU for the X65, offering backward compatibility with the 6502 while providing 16-bit capabilities and a 16MB address space.</p>
+<p><strong>Accumulator</strong> - The primary register used for arithmetic and logical operations in the 65C816 CPU.</p>
+<p><strong>Bank</strong> - A 64KB segment of memory in the 65C816’s address space. The X65 supports 256 banks for a total of 16MB.</p>
+<p><strong>Direct Page</strong> - A 256-byte region of memory that can be located anywhere in bank 0, offering faster access for certain instructions (similar to the Zero Page in 6502 processors).</p>
+<p><strong>Emulation Mode</strong> - A compatibility mode of the 65C816 where it behaves like a 65C02 with an 8-bit accumulator and 16-bit address space.</p>
+<p><strong>L2 Cache</strong> - A 64 KB cache in the NORTH chip’s internal SRAM, sitting between the 65C816 bus bridge and the external PSRAM. Its sole purpose is to amortise the QPI PSRAM protocol delays so that typical 65C816 access patterns do not pay full PSRAM latency. Transparent to application code.</p>
+<p><strong>Native Mode</strong> - The full 16-bit operating mode of the 65C816, which the X65 uses exclusively from boot-up.</p>
+<p><strong>PSRAM</strong> - Pseudo Static Random-Access Memory, the type of memory used in the X65 to provide 16MB of RAM with low power consumption. Organised as two 8 MB banks switched at address <code class="docutils literal notranslate"><span class="pre">$800000</span></code>.</p>
+<p><strong>VAB (Valid Address Bus)</strong> - A signal derived from the 65C816’s VDA and VPA signals, used to optimize memory cycles when the CPU is performing internal operations.</p>
+<p><strong>XSTACK</strong> - A 512-byte auxiliary buffer maintained by the RIA firmware. Used by the OS fastcall API to pass call arguments and return data between 65816 software and the NORTH chip without touching the 6502 hardware stack.</p>
+</section>
+<section id="graphics-terms">
+<h2>Graphics Terms<a class="headerlink" href="#graphics-terms" title="Link to this heading">¶</a></h2>
+<p><strong>80-column mode</strong> - A readable 80-column text presentation on the 320-pixel-wide CGIA screen. Implemented by enabling <strong>multi-color</strong> on a text mode without double-width, which halves the pixel cell to 4×8 and yields exactly 80 columns. Typical fonts use only colour pairs 00 and 11 for a clean monochrome look.</p>
+<p><strong>CGIA (Color Graphics Interface Adaptor)</strong> - The X65’s graphics subsystem, combining features from Atari ANTIC and Commodore VIC-II/TED architectures.</p>
+<p><strong>Display List</strong> - A structured set of instructions in memory that dictates how each scanline is rendered by the CGIA.</p>
+<p><strong>Double-width text</strong> - A per-plane flag (<code class="docutils literal notranslate"><span class="pre">PLANE_MASK_DOUBLE_WIDTH</span></code>) that doubles the horizontal pixel size of a text mode, producing the chunky “wide character” look familiar from Atari and C64 text modes. Available on every text mode.</p>
+<p><strong>Affine Mode (MODE7)</strong> - The CGIA’s mode 7: a chunky-pixel graphics mode with hardware-assisted affine transformations, similar to the SNES MODE7.</p>
+<p><strong>HAM6 (Hold-And-Modify, mode 6)</strong> - A CGIA graphics mode inspired by the Amiga HAM mode. Uses 6-bit commands packing four screen pixels into three bytes; commands either select a base color or modify a single R/G/B channel of the previous pixel by a signed delta, enabling many more on-screen colors at the cost of per-pixel precision.</p>
+<p><strong>Half-bright flag</strong> - In CGIA 4 bpp paletted modes (MODE0 and MODE1), the highest bit of each cell’s 4-bit colour code is not part of palette selection. It acts after the <code class="docutils literal notranslate"><span class="pre">shared_colors[]</span></code> lookup, XORing bit 2 of the resulting 8-bit CGIA palette index — a brightness bit in the 32 hue × 8 brightness layout — so the cell’s colours flip to their bright/dark twin in the same hue row. Effectively, a 4 bpp cell picks one of eight <code class="docutils literal notranslate"><span class="pre">shared_colors[]</span></code> entries plus a half-bright transform, giving a 16-colour feel regardless of how <code class="docutils literal notranslate"><span class="pre">shared_colors[]</span></code> was loaded.</p>
+<p><strong>LMS (Load Memory Scan)</strong> - A display list instruction that defines the offset of display memory, holding character or tile data.</p>
+<p><strong>MODE0</strong> - The CGIA’s paletted text/tile mode (mode slot 0). Uses eight palette entries stored in the upper half of the plane’s 16 registers; selectable 1 / 2 / 3 / 4 bpp; character-generator bits supply the low bit(s) of the palette index while “stolen” high bits of the character code supply the high bits — so higher bpp means fewer usable glyphs, and consecutive char-code ranges paint with successive palette pairs (or quads, in the multi-color variant). Supports a <strong>multi-color</strong> variant at 2, 3, and 4 bpp; the 4 bpp variants (multi and non-multi) include a per-cell <strong>half-bright</strong> flag that XORs bit 2 of the looked-up CGIA color, giving 16 visible colours per cell. See <a class="reference internal" href="../../1/4_graphics/#mode0-and-mode1-paletted-modes"><span class="std std-ref">Chapter 4</span></a> for the per-bpp char-code layouts.</p>
+<p><strong>MODE1</strong> - The CGIA’s paletted bitmap mode (mode slot 1). Same palette + bpp mechanics as MODE0, but bitmap bits directly index the palette — no character generator. 3 bpp uses HAM-style bitpacking (4 pixels per 3 bytes).</p>
+<p><strong>MODE7</strong> - Common name for the CGIA’s affine mode (mode 7). See <em>Affine Mode</em>.</p>
+<p><strong>Multicolor Mode</strong> - A per-instruction flag bit on CGIA text and bitmap modes that switches to a 4-color-per-cell representation, where each byte encodes four pixels.</p>
+<p><strong>Paletted mode</strong> - A CGIA mode where each pixel selects one of a small palette table (8 entries) stored directly in the plane’s registers, rather than looking up colour via a separate attribute memory area. See MODE0 and MODE1.</p>
+<p><strong>Plane Order Register</strong> - A single CGIA register at offset <code class="docutils literal notranslate"><span class="pre">$21</span></code> whose value selects one of 24 Z-order permutations of the four planes (using Steinhaus-Johnson-Trotter ordering). Lets a program shuffle which plane is on top — typically from a raster interrupt — without rebuilding any plane.</p>
+<p><strong>Sprite Multiplexing</strong> - A technique where sprite hardware is reused to display more sprites than hardware natively supports.</p>
+<p><strong>VPU (Video Processing Unit)</strong> - The hardware component that executes display list instructions and updates the screen accordingly.</p>
+</section>
+<section id="audio-terms">
+<h2>Audio Terms<a class="headerlink" href="#audio-terms" title="Link to this heading">¶</a></h2>
+<p><strong>CODEC</strong> - The analog-mixed-signal chip that converts the audio MCU’s 48 kHz stereo I²S bitstream into analog line-out, and accepts analog line-in. On the SGU-1 module this is a TI AIC3254, whose on-chip mixer also applies the master volume to the full-scale stream the MCU hands it.</p>
+<p><strong>ESFM</strong> - The Enhanced FM synthesis mode of the ESS AudioDrive chips, and the model for SGU-1’s operator routing: instead of choosing from a fixed table of algorithms, each operator carries its own output level and modulation-input level, so any topology in between is expressible. See <a class="reference internal" href="../G_sgu1/"><span class="std std-doc">Appendix G</span></a>.</p>
+<p><strong>FM Synthesis</strong> - Frequency Modulation synthesis, the per-operator sound generation method at the heart of the X65’s SGU-1 chip.</p>
+<p><strong>GATE / TRIG</strong> - The two keying bits in an SGU-1 channel’s <code class="docutils literal notranslate"><span class="pre">FLAGS0</span></code> register, with two distinct jobs. <code class="docutils literal notranslate"><span class="pre">GATE</span></code> is the key <em>level</em>: high while the key is held, low to release it. Raising it on a released or idle voice enters attack from the envelope’s current attenuation (the SID’s soft retrigger); writing it to a voice that is already sounding leaves the envelope alone, which is what makes ties and legato possible. <code class="docutils literal notranslate"><span class="pre">TRIG</span></code> is the one-shot, self-clearing bit that restarts the envelope from silence - the only way to retrigger a sounding note. Together they express key-down, note-on, note-off and note-cut as single writes.</p>
+<p><strong>I²S</strong> - The three-wire digital audio link (bit clock, word clock, data) between the audio MCU and the CODEC. The X65 runs it at 48 kHz, 32-bit, master-mode from the audio MCU side.</p>
+<p><strong>Operator</strong> - One of the four oscillator-plus-envelope units that make up an SGU-1 channel. Each has its own waveform, frequency multiplier, envelope and routing levels, and can act as a modulator, a carrier, or both at once.</p>
+<p><strong>Paw key (🐾)</strong> - The X65 keyboard’s dedicated command-modifier key, equivalent in position to the Windows / Meta / ⌘ key on other platforms. Used for OS-level chord shortcuts — for example <code class="docutils literal notranslate"><span class="pre">🐾</span></code>+digit to switch virtual terminals.</p>
+<p><strong>PWM (Pulse-Width Modulation)</strong> - A technique for generating analog signals from digital devices. Used by the X65 system buzzer to produce simple tones.</p>
+<p><strong>Service Bank</strong> - The register page mapped into the SGU-1’s window by writing <code class="docutils literal notranslate"><span class="pre">$FF</span></code> to the channel selector. It reaches past the synthesis engine: the sample-upload port addresses PCM memory, and the master volume and routing controls are a proxy for the CODEC/DSP that follows the waveform generator. See <a class="reference internal" href="../G_sgu1/"><span class="std std-doc">Appendix G</span></a>.</p>
+<p><strong>SGM</strong> - The SGU-1’s native module format. A <code class="docutils literal notranslate"><span class="pre">.sgm</span></code> file is an <code class="docutils literal notranslate"><span class="pre">.xex</span></code> chunk stream carrying song data, a player image and any PCM sample image, with no reset vector - music as a library rather than a program.</p>
+<p><strong>SGU-1 (Sound Generator Unit 1)</strong> - The X65’s custom synthesis chip. Nine stereo channels of four-operator FM with per-operator waveform selection (including PCM as a wavetable), per-operator ADSR envelopes, a SID-style multimode filter, three independent hardware sweeps per channel, and a shared 64 KB PCM bank. A self-contained castellated module carrying its own RP2354 and CODEC; the X65 board hosts one, attached to the SOUTH chip over an SPI link and reached from the CPU as the <code class="docutils literal notranslate"><span class="pre">SPU</span></code> device on the PIX bus, which SOUTH forwards over SPI to the module.</p>
+<p><strong>SGU Tracker</strong> - The SGU-1’s own chiptune tracker, published at <a class="reference external" href="https://tracker.x65.zone/">https://tracker.x65.zone/</a> and derived from klystrack with the playback engine rewritten to drive the chip directly. Exports SGM modules that 65816 code loads and plays.</p>
+<p><strong>tSU (tildearrow Sound Unit)</strong> - The fantasy synthesis chip from the Furnace tracker that the SGU-1 is conceptually based on. SGU-1 lifts the tSU operator model and wraps it in a memory-mapped register interface sized for X65 (9 channels, 4 operators).</p>
+<p><strong>WPAR (Waveform Parameter)</strong> - A 4-bit per-operator field on the SGU-1 whose meaning depends on the selected waveform: wave-shape variants for sine/triangle/sawtooth, a fixed pulse width for pulse, and the LFSR tap configuration for periodic noise.</p>
+</section>
+<section id="i-o-and-system-terms">
+<span id="io-and-system-terms"></span><h2>I/O and System Terms<a class="headerlink" href="#i-o-and-system-terms" title="Link to this heading">¶</a></h2>
+<p><strong>SoM (System-on-Module)</strong> - A module containing a processor and supporting hardware. The SGU-1 SoM combines the synthesis processor and audio CODEC, with a service bank for module-level controls and PCM access.</p>
+<p><strong>Clockport (on-board I²C header)</strong> - A small on-board I²C header, inspired by the Amiga Clockport, for simple add-ons like real-time clocks and sensors. Shares the same I²C bus that runs over the expansion port.</p>
+<p><strong>cc65-dbg</strong> - A VS Code extension that adds a Debug Adapter Protocol (DAP) front end for cc65/ca65 workflows on the X65. Parses <code class="docutils literal notranslate"><span class="pre">ld65</span> <span class="pre">--dbgfile</span></code> output and drives any DAP-capable emulator or adapter — including X65 Emu — to provide breakpoints, register and memory views, disassembly, watch expressions, and module-scoped globals.</p>
+<p><strong>Raspberry Pi Radio Module 2</strong> - The surface-mount Wi-Fi + Bluetooth module used by the X65. Based on CYW43-series silicon (the same wireless core as on the Raspberry Pi Pico W) and driven directly by the NORTH RP2350 over a PIO-bit-banged SPI link. The 65C816 reaches the networking stack through an AT-command interface carried on the main UART.</p>
+<p><strong>DE-9</strong> - The 9-pin connector used for the X65’s two GPIO ports. Each carries eight bi-directional 5 V TTL GPIO lines plus ground; the default pin convention is Atari-style joysticks with up to four buttons, but in the C64 spirit the same pins can drive or sense external electronics.</p>
+<p><strong>DVI-D</strong> - Digital Visual Interface, the video output standard used by the X65. Physically connected via an HDMI-shaped socket; only DVI-D TMDS is transmitted, so standard HDMI cables work without the X65 needing HDMI certification.</p>
+<p><strong>Emu</strong> - The X65 emulator. Compiles firmware C code directly for CGIA/SGU-1 bring-up parity, wires the chips together via the <code class="docutils literal notranslate"><span class="pre">chip-emulators</span></code> pin-mask model, and ships as native builds (Linux, Linux ARM, Windows) plus a WebAssembly build published at <code class="docutils literal notranslate"><span class="pre">x65.zone/emu</span></code>. Shares code paths with the real firmware wherever practical; HID support, for example, runs the same source with its event source swapped between libusb and the Web Gamepad API.</p>
+<p><strong>EXPansion Port</strong> - The X65’s main expansion connector (physically a PCIe x4 slot repurposed for ease of sourcing). Exposes 8-bit data and address buses, CPU control lines (PHI2, /IRQB, /NMIB, /VAB, R/WB, /RESB, /ABORT, RDY, BE), four I/O-enable and four I/O-interrupt signals, +5 V / +3.3 V / GND, I²C, UART, stereo audio in/out, and a WS2812 LED data line.</p>
+<p><strong>HID merged gamepad (pad 0)</strong> - The virtual gamepad exposed at HID-selector value <code class="docutils literal notranslate"><span class="pre">$02</span></code> (device type 2, high-nibble pad index 0). Its report is the bitwise OR of all connected physical pads, so single-player code can read a single endpoint regardless of which controller is plugged in.</p>
+<p><strong>K816</strong> - A high-level assembler targeting the 65816, developed as part of the X65 project. Rust-based rewrite of K65 (originally an Atari VCS / 6502 assembler). Offers a C-like readable syntax, compile-time evaluation, structured blocks including far functions, a built-in formatter, and deterministic output suitable for golden testing.</p>
+<p><strong>MEMTEST</strong> - A monitor command that benchmarks and stress-tests both PSRAM banks, reporting copy speeds across SRAM, flash, and PSRAM (cached and uncached) plus a multi-block data-integrity test. Used to tune PSRAM timing parameters against the overclocked system clock.</p>
+<p><strong>MMIO (Memory-Mapped I/O)</strong> - A technique where hardware devices are accessed through memory addresses, used extensively in the X65.</p>
+<p><strong>NORTH chip</strong> - The RP2350 microcontroller in the X65 that owns the CPU bus, the PSRAM interface, and system services (RIA). Communicates with the SOUTH chip over the PIX bus.</p>
+<p><strong>PCAL6416A</strong> - The on-board 16-bit I²C GPIO expander, from NXP, behind the two DE-9 GPIO ports. Replaces an earlier TCA6416A. It level-translates between the 3.3 V I²C side and the 5 V port side, and its defining feature in X65 use is the built-in <strong>interrupt-mask registers</strong>: software requests IRQs only for the input transitions it cares about, rather than being paged for every pin change.</p>
+<p><strong>PIX (Pico Information eXchange) bus</strong> - The dedicated serial-with-handshake bus connecting the NORTH and SOUTH chips. Carries memory writes, DMA transfers, and per-device commands to the VPU (CGIA), SPU (SGU-1), and other south-side peripherals.</p>
+<p><strong>RIA (Retro Interface Adaptor)</strong> - The subsystem inside the NORTH chip that exposes the fastcall API at <code class="docutils literal notranslate"><span class="pre">$FFF0–$FFF3</span></code>, aggregates IRQ sources into a single CPU interrupt, and provides USB, storage, and other modern I/O capabilities to 65816 software.</p>
+<p><strong>RP2350</strong> - The Raspberry Pi microcontroller used in the X65 to implement the NORTH and SOUTH chips. Its Programmable I/O (PIO) blocks are how the X65 handles the CPU bus, the PIX bus, and several peripheral protocols in software. The SGU-1 module runs on an RP2354, the same silicon with flash stacked in the package.</p>
+<p><strong>SOUTH chip</strong> - The RP2350 microcontroller in the X65 that hosts the CGIA (graphics) implementation together with the terminal and font systems. Also bridges the separate SGU-1 audio chip via an SPI link, presenting it as the <code class="docutils literal notranslate"><span class="pre">SPU</span></code> device on the PIX bus. Reached from the CPU via the PIX bus.</p>
+<p><strong>SPI (Serial Peripheral Interface)</strong> - A synchronous serial communication interface used for connecting various components in the X65.</p>
+<p><strong>UART (Universal Asynchronous Receiver/Transmitter)</strong> - A serial communication protocol used for terminal access and debugging in the X65.</p>
+<p><strong>USB-CDC serial</strong> - The monitor console is reachable as a standard USB-CDC serial device over the same USB-C cable that powers the board. No separate debug header is needed: plug the X65 into a PC and the monitor port appears.</p>
+<p><strong>WS2812B</strong> - The serially-addressed RGB LED protocol used by the on-board LEDs and the RGB data line on the expansion port. Up to 256 LEDs in a chain are individually addressable through the chain-protocol registers at <code class="docutils literal notranslate"><span class="pre">$FFA4–$FFA7</span></code>.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../C_65816_migration/">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Appendix C: From 6502 to 65816 Migration Guide</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../A_memory_map/">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Appendix A: Memory Map</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Tomasz Sterna
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Appendix B: Glossary of X65 Terms</a><ul>
+<li><a class="reference internal" href="#cpu-and-memory-terms">CPU and Memory Terms</a></li>
+<li><a class="reference internal" href="#graphics-terms">Graphics Terms</a></li>
+<li><a class="reference internal" href="#audio-terms">Audio Terms</a></li>
+<li><a class="reference internal" href="#i-o-and-system-terms">I/O and System Terms</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=187304be"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/tabs.js?v=3ee01567"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../_static/design-tabs.js?v=fcb327ea"></script>
+    <script defer="defer" src="https://stats.chrome.pl/api/script.js?siteId=19a9a6f3e638"></script>
+    </body>
+</html>

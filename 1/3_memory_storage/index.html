@@ -1,0 +1,486 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Chapter 3: Memory and Storage" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.x65.zone/1/3_memory_storage/" />
+<meta property="og:site_name" content="X65" />
+<meta property="og:description" content="The X65 gives 65C816 software a flat, uniform, 16 MB address space. There is no bank switching from the programmer’s point of view, no ROM overlay to think about, and no special zero page to fight ..." />
+<meta name="description" content="The X65 gives 65C816 software a flat, uniform, 16 MB address space. There is no bank switching from the programmer’s point of view, no ROM overlay to think about, and no special zero page to fight ..." />
+<link rel="index" title="Index" href="../../genindex/"><link rel="search" title="Search" href="../../search/"><link rel="next" title="Chapter 4: Graphics and Display" href="../4_graphics/"><link rel="prev" title="Chapter 2: System Architecture Overview" href="../2_overview/">
+        <link rel="canonical" href="https://docs.x65.zone/1/3_memory_storage/">
+        <link rel="prefetch" href="../../_static/paw_logo_32.png" as="image">
+
+    <link rel="shortcut icon" href="../../_static/paw_logo_32_gray.png"><!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Chapter 3: Memory and Storage - X65.docs</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ea49a994" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #0E556F;
+  --color-brand-content: #0E556F;
+  --color-brand-visited: #052544;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../"><div class="brand">X65.docs</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/paw_logo_32.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">X65.docs</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search/" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../part_1/">Part 1: The X65 Microcomputer</a><input aria-label="Toggle navigation of Part 1: The X65 Microcomputer" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../1_introduction/">Chapter 1: Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../2_overview/">Chapter 2: System Architecture Overview</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Chapter 3: Memory and Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_graphics/">Chapter 4: Graphics and Display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../5_audio/">Chapter 5: Sound and Audio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../6_io/">Chapter 6: Input and Output Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../7_devel/">Chapter 7: Development and Emulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../part_2/">Part 2: Programming the X65 in 65816 Assembly</a><input aria-label="Toggle navigation of Part 2: Programming the X65 in 65816 Assembly" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../2/08_assembly/">Chapter 8: Introduction to 65816 Assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/09_dev_env/">Chapter 9: Development Environment Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/10_memory/">Chapter 10: Memory Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/11_graphics/">Chapter 11: Graphics Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/12_sound/">Chapter 12: Sound Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/13_input_output/">Chapter 13: Input/Output Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/14_os/">Chapter 14: Operating System (OS/816)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/15_advanced/">Chapter 15: Advanced Programming Techniques</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/16_examples/">Chapter 16: Example Projects and Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/17_afterword/">Chapter 17: Afterword</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/A_memory_map/">Appendix A: Memory Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/B_glossary/">Appendix B: Glossary of X65 Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/C_65816_migration/">Appendix C: From 6502 to 65816 Migration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/D_systems_comparison/">Appendix D: X65 Compared to Classic 8-bit Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/E_cheat_sheet/">Appendix E: X65 Quick Reference Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/F_xex_format/">Appendix F: XEX File Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/G_sgu1/">Appendix G: The SGU-1 Sound Generator</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/blob/main/book/1/3_memory_storage.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/edit/main/book/1/3_memory_storage.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="chapter-3-memory-and-storage">
+<h1>Chapter 3: Memory and Storage<a class="headerlink" href="#chapter-3-memory-and-storage" title="Link to this heading">¶</a></h1>
+<p>The X65 gives 65C816 software a flat, uniform, 16 MB address space. There is no bank switching from the programmer’s point of view, no ROM overlay to think about, and no special zero page to fight over. Behind that simplicity sits a tiered memory system — PSRAM for bulk, an L2 cache for speed, and a pair of smaller fast areas (direct page, hardware stack, XSTACK) for the idioms the 65C816 rewards. This chapter covers each layer and how it is reached.</p>
+<section id="flat-16-mb-address-space">
+<h2>Flat 16 MB Address Space<a class="headerlink" href="#flat-16-mb-address-space" title="Link to this heading">¶</a></h2>
+<p>The main memory is <strong>16 MB of QPI PSRAM</strong>, supplied as two <strong>8 MB banks</strong> running at <strong>112 MHz</strong>. The NORTH chip owns the QPI link and presents a single unified view to the CPU: bank 1 is reached by the high half of the 24-bit address (<code class="docutils literal notranslate"><span class="pre">$800000</span></code> and above), bank 0 by the low half, and the switch between them is done on the fly without 65C816 software intervention.</p>
+<p>From the 65C816’s point of view, then:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">K</span></code> (bank) + <code class="docutils literal notranslate"><span class="pre">A</span></code> (16-bit address) pair directly names a byte in PSRAM.</p></li>
+<li><p>Long addressing (<code class="docutils literal notranslate"><span class="pre">lda</span> <span class="pre">$123456</span></code>) just works across the full range.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PBR</span></code> and <code class="docutils literal notranslate"><span class="pre">DBR</span></code> move code and data wherever is convenient.</p></li>
+</ul>
+<p>There is no ROM. A small flash chip on the QPI bus stores firmware and boot assets (see <strong>Persistent Storage</strong> below), but from the CPU’s side it is not mapped into the 16 MB address space during normal execution.</p>
+<p>The only holes in that flat space are the MMIO windows documented in <a class="reference internal" href="../../A/A_memory_map/"><span class="std std-doc">Appendix A: Memory Map</span></a>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">$FC00–$FCFF</span></code> — Expansion slots</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">$FE00–$FFFF</span></code> — On-board chip registers (SGU-1, CGIA, timers, LEDs, buzzer, HID, RIA)</p></li>
+</ul>
+<p>Everything else is RAM.</p>
+</section>
+<section id="l2-cache">
+<h2>L2 Cache<a class="headerlink" href="#l2-cache" title="Link to this heading">¶</a></h2>
+<p>PSRAM is not slow in absolute terms, but a serial QPI link still costs tens of nanoseconds per access compared to a few nanoseconds for internal SRAM. NORTH closes that gap with a <strong>64 KB L2 cache</strong> held in the RP2350’s internal SRAM. Its sole purpose is to amortise the QPI PSRAM protocol delays so that typical 65C816 access patterns do not pay full PSRAM latency on every access.</p>
+<p>From the 65C816’s perspective there is nothing to do: the cache is fully transparent. Neither reads nor writes need any special instructions or flags — the CPU just issues normal accesses and NORTH handles the rest. Application code should never need to reason about the cache; it is an implementation detail of the PSRAM path, mentioned here for completeness.</p>
+<p>A useful by-product of routing every PSRAM access through the cache is that the two physical 8 MB banks present themselves to the CPU as a single flat 16 MB space without any bank-switching logic visible to software. Chip-select between the two PSRAM parts is decided when a cache line is fetched or flushed — entirely inside the cache-line code path — so bank selection is naturally contained there and the rest of the system does not see it.</p>
+</section>
+<section id="direct-page">
+<h2>Direct Page<a class="headerlink" href="#direct-page" title="Link to this heading">¶</a></h2>
+<p>The 65C816’s <strong>direct page</strong> is a 256-byte window within bank 0 used by direct-addressing-mode instructions. Unlike the 6502’s fixed zero page, direct page is <strong>relocatable</strong> via the <code class="docutils literal notranslate"><span class="pre">D</span></code> (Direct Page) register. Any <code class="docutils literal notranslate"><span class="pre">D</span></code> value in bank 0 is legal; the familiar zero-page style of fast single-byte-operand instructions is simply what you get when <code class="docutils literal notranslate"><span class="pre">D</span> <span class="pre">=</span> <span class="pre">$0000</span></code>.</p>
+<p>On the X65 this is exploited heavily:</p>
+<ul class="simple">
+<li><p>The OS gives each <strong>task</strong> its own direct page, so context switches can move <code class="docutils literal notranslate"><span class="pre">D</span></code> and not clobber other tasks’ zero-page state.</p></li>
+<li><p><strong>Interrupt handlers</strong> can have their own direct page set up during dispatch, keeping handler locals separate from the interrupted task’s.</p></li>
+<li><p><strong>Modules and libraries</strong> can claim a direct page at load time and never collide with the application.</p></li>
+</ul>
+<p>The programming details of direct-page management are in <a class="reference internal" href="../../2/10_memory/"><span class="std std-doc">Chapter 10: Memory Management</span></a>.</p>
+</section>
+<section id="hardware-stack">
+<h2>Hardware Stack<a class="headerlink" href="#hardware-stack" title="Link to this heading">¶</a></h2>
+<p>In native mode the 65C816’s stack pointer <code class="docutils literal notranslate"><span class="pre">S</span></code> is 16 bits wide, so the hardware stack is not architecturally constrained to the 256-byte page the 6502 was stuck with — it can live anywhere within bank 0. The stack instructions also gain full width along with <code class="docutils literal notranslate"><span class="pre">S</span></code>: <code class="docutils literal notranslate"><span class="pre">PHA</span></code>/<code class="docutils literal notranslate"><span class="pre">PLA</span></code> push and pull 16-bit accumulators when the <code class="docutils literal notranslate"><span class="pre">M</span></code> flag is clear, <code class="docutils literal notranslate"><span class="pre">PHX</span></code>/<code class="docutils literal notranslate"><span class="pre">PHY</span></code>/<code class="docutils literal notranslate"><span class="pre">PLX</span></code>/<code class="docutils literal notranslate"><span class="pre">PLY</span></code> follow the <code class="docutils literal notranslate"><span class="pre">X</span></code> flag similarly, and <code class="docutils literal notranslate"><span class="pre">PEA</span></code> / <code class="docutils literal notranslate"><span class="pre">PEI</span></code> / <code class="docutils literal notranslate"><span class="pre">PER</span></code> push address literals and indirect references useful for far calls and structured parameter passing.</p>
+<p>How much of that 16-bit range a program actually gets depends on the execution context:</p>
+<p><strong>Bare-metal (software takes over the machine).</strong> When a program takes exclusive control of the X65 — a classic demo, a game that bypasses the OS, a bring-up test — it is free to place the stack wherever in bank 0 makes sense (typically high, growing down) and to use as much of it as the bank can spare. With 64 KB of bank 0 at its disposal and no other tasks to worry about, deep recursion, long interrupt chains, and stack-heavy calling conventions are all comfortably supported.</p>
+<p><strong>OS/816 tasks.</strong> Under OS/816 each task is effectively a small <strong>virtual machine</strong>: a dedicated 64 KB memory bank for the task’s own code and data, plus a 256-byte page in bank 0 that holds <strong>both</strong> the task’s direct page and its hardware stack. The direct page sits at the bottom of that page and grows upward; the stack sits at the top and grows downward; they meet in the middle:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+------------------+ ← page top:   stack base (S grows down)
+|     stack        |
+|       ↓          |
+|                  |
+|       ↑          |
+|   direct page    |
++------------------+ ← page bottom: direct page (D points here)
+</pre></div>
+</div>
+<p>The dedicated 64 KB bank is where the task’s code, constants, and data live — no different from a bare-metal program’s bank 0, just relocated into the task’s own slot. The co-located DP-plus-stack page in bank 0 is what makes context switches cheap: one pointer swap and the next task’s direct page and stack are in place, with no further memory to walk. The only tight budget is inside that 256-byte page — direct-page footprint and deepest stack depth, added together, must stay comfortably below 256 bytes. Code and data are not part of that budget.</p>
+<p>The contrast is worth remembering: the 16-bit stack pointer is a hardware capability of the CPU, but whether a given program has the whole bank 0 to itself or a 64 KB dedicated bank plus a co-located 256-byte page is a question of execution context, not of silicon.</p>
+</section>
+<section id="xstack">
+<h2>XSTACK<a class="headerlink" href="#xstack" title="Link to this heading">¶</a></h2>
+<p>Alongside the hardware stack, the RIA firmware exposes a <strong>512-byte auxiliary buffer called XSTACK</strong> — a last-in-first-out region that lives inside NORTH, not in CPU-visible PSRAM. Its job is to carry arguments and return data between 65C816 code and the fastcall API at <code class="docutils literal notranslate"><span class="pre">$FFF0–$FFF3</span></code> without clobbering the hardware stack or forcing callers to pass pointers into PSRAM.</p>
+<p>A fastcall pushes every argument onto XSTACK through <code class="docutils literal notranslate"><span class="pre">$FFF2</span></code>, then writes its operation code to <code class="docutils literal notranslate"><span class="pre">$FFF0</span></code>. There are no CPU-register arguments. Poll <code class="docutils literal notranslate"><span class="pre">$FFF3</span></code> until bit 7 clears, check bit 0 for an error, then read the result from <code class="docutils literal notranslate"><span class="pre">$FFF0–$FFF1</span></code> or pop any documented return data from XSTACK. Each call consumes its entire argument stack; missing or extra bytes are errors. XSTACK is NORTH-local, so its accesses do not stall on PSRAM.</p>
+</section>
+<section id="memory-mapped-i-o-window">
+<span id="memory-mapped-io-window"></span><h2>Memory-Mapped I/O Window<a class="headerlink" href="#memory-mapped-i-o-window" title="Link to this heading">¶</a></h2>
+<p>All the custom chips live in a small window at the top of bank 0:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Range</p></th>
+<th class="head"><p>Device</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FC00–$FCFF</span></code></p></td>
+<td><p>Expansion slots (16 × 16 bytes)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FEC0–$FEFF</span></code></p></td>
+<td><p>SGU-1 sound</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF00–$FF7F</span></code></p></td>
+<td><p>CGIA graphics (128 registers)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF80–$FF97</span></code></p></td>
+<td><p>GPIO expander (reserved)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF98–$FF9F</span></code></p></td>
+<td><p>System timers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA0–$FFA7</span></code></p></td>
+<td><p>RGB LEDs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA8–$FFAB</span></code></p></td>
+<td><p>System buzzer</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB0–$FFBF</span></code></p></td>
+<td><p>USB HID</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFC0–$FFFF</span></code></p></td>
+<td><p>RIA (including fastcall + vectors)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Reads and writes to these ranges are diverted by NORTH to the relevant chip or PIX device rather than going to PSRAM. Every MMIO access is a real transaction against the target device.</p>
+<p>Because MMIO shares the same address space as RAM, the usual 65C816 idioms apply: <code class="docutils literal notranslate"><span class="pre">lda</span> <span class="pre">$FFB1</span></code> reads the HID data byte, <code class="docutils literal notranslate"><span class="pre">sta</span> <span class="pre">$FFA0</span></code> lights up LED 0. The byte-level layout of each window is documented in <a class="reference internal" href="../../A/A_memory_map/"><span class="std std-doc">Appendix A: Memory Map</span></a>; detailed programming sequences for each subsystem are covered in Part 2.</p>
+</section>
+<section id="persistent-storage">
+<h2>Persistent Storage<a class="headerlink" href="#persistent-storage" title="Link to this heading">¶</a></h2>
+<p>The X65 carries a <strong>flash chip</strong> on the same QPI bus as PSRAM. It is used internally by the NORTH firmware for its own configuration and for a <strong>LittleFS</strong>-formatted store of <strong>boot ROM images</strong> — snapshots of 65C816 code that the firmware loads into PSRAM at start-up or on demand. The LittleFS volume is an internal detail of the firmware; it is <strong>not</strong> exposed to the 65C816 as a filesystem and 65816 software cannot <code class="docutils literal notranslate"><span class="pre">open</span></code> / <code class="docutils literal notranslate"><span class="pre">read</span></code> files from it.</p>
+<p>User-accessible storage comes from <strong>USB Mass Storage</strong> devices — pen drives, SD-card readers, external SSDs — plugged into the X65’s USB port. The USB host is implemented on the <strong>NORTH RP2350</strong> using its own USB interface running in host mode; NORTH exposes the mounted volume as a FatFS filesystem reached through the fastcall API at <code class="docutils literal notranslate"><span class="pre">$FFF0–$FFF3</span></code> (<code class="docutils literal notranslate"><span class="pre">open</span></code> / <code class="docutils literal notranslate"><span class="pre">read</span></code> / <code class="docutils literal notranslate"><span class="pre">write</span></code> / <code class="docutils literal notranslate"><span class="pre">close</span></code> idioms). This is the path applications use for loading program data, saving game state, and generally putting user files in front of 65C816 software.</p>
+<p>The practical division of labour, then: flash holds the boot/runtime images the firmware itself needs; USB is where everything an application or user touches lives.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../4_graphics/">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Chapter 4: Graphics and Display</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../2_overview/">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Chapter 2: System Architecture Overview</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Tomasz Sterna
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Chapter 3: Memory and Storage</a><ul>
+<li><a class="reference internal" href="#flat-16-mb-address-space">Flat 16 MB Address Space</a></li>
+<li><a class="reference internal" href="#l2-cache">L2 Cache</a></li>
+<li><a class="reference internal" href="#direct-page">Direct Page</a></li>
+<li><a class="reference internal" href="#hardware-stack">Hardware Stack</a></li>
+<li><a class="reference internal" href="#xstack">XSTACK</a></li>
+<li><a class="reference internal" href="#memory-mapped-i-o-window">Memory-Mapped I/O Window</a></li>
+<li><a class="reference internal" href="#persistent-storage">Persistent Storage</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=187304be"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/tabs.js?v=3ee01567"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../_static/design-tabs.js?v=fcb327ea"></script>
+    <script defer="defer" src="https://stats.chrome.pl/api/script.js?siteId=19a9a6f3e638"></script>
+    </body>
+</html>

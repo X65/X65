@@ -1,0 +1,1691 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Appendix A: Memory Map" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.x65.zone/A/A_memory_map/" />
+<meta property="og:site_name" content="X65" />
+<meta property="og:description" content="The X65 exposes a flat 24-bit address space to the 65C816. Most of that space is plain PSRAM; a 512-byte window at the top of bank 0 is carved up into memory-mapped-I/O regions owned by the custom ..." />
+<meta name="description" content="The X65 exposes a flat 24-bit address space to the 65C816. Most of that space is plain PSRAM; a 512-byte window at the top of bank 0 is carved up into memory-mapped-I/O regions owned by the custom ..." />
+<link rel="index" title="Index" href="../../genindex/"><link rel="search" title="Search" href="../../search/"><link rel="next" title="Appendix B: Glossary of X65 Terms" href="../B_glossary/"><link rel="prev" title="Chapter 17: Afterword" href="../../2/17_afterword/">
+        <link rel="canonical" href="https://docs.x65.zone/A/A_memory_map/">
+        <link rel="prefetch" href="../../_static/paw_logo_32.png" as="image">
+
+    <link rel="shortcut icon" href="../../_static/paw_logo_32_gray.png"><!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Appendix A: Memory Map - X65.docs</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ea49a994" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #0E556F;
+  --color-brand-content: #0E556F;
+  --color-brand-visited: #052544;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../"><div class="brand">X65.docs</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/paw_logo_32.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">X65.docs</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search/" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../part_1/">Part 1: The X65 Microcomputer</a><input aria-label="Toggle navigation of Part 1: The X65 Microcomputer" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../1/1_introduction/">Chapter 1: Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/2_overview/">Chapter 2: System Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/3_memory_storage/">Chapter 3: Memory and Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/4_graphics/">Chapter 4: Graphics and Display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/5_audio/">Chapter 5: Sound and Audio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/6_io/">Chapter 6: Input and Output Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../1/7_devel/">Chapter 7: Development and Emulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../part_2/">Part 2: Programming the X65 in 65816 Assembly</a><input aria-label="Toggle navigation of Part 2: Programming the X65 in 65816 Assembly" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../2/08_assembly/">Chapter 8: Introduction to 65816 Assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/09_dev_env/">Chapter 9: Development Environment Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/10_memory/">Chapter 10: Memory Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/11_graphics/">Chapter 11: Graphics Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/12_sound/">Chapter 12: Sound Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/13_input_output/">Chapter 13: Input/Output Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/14_os/">Chapter 14: Operating System (OS/816)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/15_advanced/">Chapter 15: Advanced Programming Techniques</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/16_examples/">Chapter 16: Example Projects and Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/17_afterword/">Chapter 17: Afterword</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Appendix A: Memory Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../B_glossary/">Appendix B: Glossary of X65 Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../C_65816_migration/">Appendix C: From 6502 to 65816 Migration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../D_systems_comparison/">Appendix D: X65 Compared to Classic 8-bit Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../E_cheat_sheet/">Appendix E: X65 Quick Reference Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../F_xex_format/">Appendix F: XEX File Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../G_sgu1/">Appendix G: The SGU-1 Sound Generator</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/blob/main/book/A/A_memory_map.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/edit/main/book/A/A_memory_map.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="appendix-a-memory-map">
+<h1>Appendix A: Memory Map<a class="headerlink" href="#appendix-a-memory-map" title="Link to this heading">¶</a></h1>
+<p>The X65 exposes a flat 24-bit address space to the 65C816. Most of that space is plain PSRAM; a 512-byte window at the top of bank 0 is carved up into memory-mapped-I/O regions owned by the custom chips, and a small expansion window sits slightly below it. This appendix documents every byte of that MMIO region.</p>
+<p>The canonical live spreadsheet is at <a class="reference external" href="https://tinyurl.com/x65-memory-map">https://tinyurl.com/x65-memory-map</a>:</p>
+<iframe width="100%" height="600" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRL2pdhGaOKfOaP7AGEpHNyDYzaYB4PVj7eJQSQAT52y95yiliqZ90WcLBRTPOZ93MihAFuKKmyBL1n/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
+<p>The tables below mirror that spreadsheet for offline and search-engine-friendly reference.</p>
+<section id="top-level-mmio-layout">
+<h2>Top-Level MMIO Layout<a class="headerlink" href="#top-level-mmio-layout" title="Link to this heading">¶</a></h2>
+<p>Bank 0, pages <code class="docutils literal notranslate"><span class="pre">$FC</span></code>–<code class="docutils literal notranslate"><span class="pre">$FF</span></code>:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Range</p></th>
+<th class="head"><p>Owner</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FC00–$FDFF</span></code></p></td>
+<td><p>Expansion slots</p></td>
+<td><p>4 cards × 128 bytes</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FEC0–$FEFF</span></code></p></td>
+<td><p>SGU-1 (sound)</p></td>
+<td><p>64-byte channel-switched window</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF00–$FF7F</span></code></p></td>
+<td><p>CGIA (graphics)</p></td>
+<td><p>128 registers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF80–$FF97</span></code></p></td>
+<td><p>GPIO expander / joystick</p></td>
+<td><p>PCAL6416A, 2× DE-9 (not decoded by firmware yet)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF98–$FF9F</span></code></p></td>
+<td><p>System timers</p></td>
+<td><p>Two CIA-compatible 16-bit counters, 1 µs resolution</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA0–$FFA7</span></code></p></td>
+<td><p>RGB LED chain</p></td>
+<td><p>4 direct RGB332 + 4-byte chain protocol</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA8–$FFAB</span></code></p></td>
+<td><p>System buzzer</p></td>
+<td><p>16-bit log frequency + 8-bit duty</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFAC–$FFAF</span></code></p></td>
+<td><p>Reserved</p></td>
+<td><p>Reads return <code class="docutils literal notranslate"><span class="pre">$FF</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB0–$FFBF</span></code></p></td>
+<td><p>USB HID (keyboard / mouse / gamepad)</p></td>
+<td><p>Device-selector at <code class="docutils literal notranslate"><span class="pre">$FFB0</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFC0–$FFFF</span></code></p></td>
+<td><p>RIA</p></td>
+<td><p>Math, TOD, DMA, files, UART, IRQ, fastcall API, CPU vectors</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Everything outside the top half-page (<code class="docutils literal notranslate"><span class="pre">$FExx–$FFxx</span></code>) and the expansion window at <code class="docutils literal notranslate"><span class="pre">$FCxx–$FDxx</span></code> is plain PSRAM and available to software; chunks of the expansion window can be reclaimed as PSRAM through <code class="docutils literal notranslate"><span class="pre">EXTIOCTL</span></code> (see below). Bank crossing happens on the fly at <code class="docutils literal notranslate"><span class="pre">$800000</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="fc00-fdff-expansion-slots">
+<span id="fc00fdff--expansion-slots"></span><h2><code class="docutils literal notranslate"><span class="pre">$FC00–$FDFF</span></code> — Expansion Slots<a class="headerlink" href="#fc00-fdff-expansion-slots" title="Link to this heading">¶</a></h2>
+<p>The expansion window is <strong>512 bytes</strong>, divided into <strong>four 128-byte slots</strong> — one per card. The expansion port routes four <code class="docutils literal notranslate"><span class="pre">IO_EN</span></code> signals and four <code class="docutils literal notranslate"><span class="pre">IO_INT</span></code> signals, and a card claims its slot through its own <code class="docutils literal notranslate"><span class="pre">IO_EN</span></code> line:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Range</p></th>
+<th class="head"><p>Slot</p></th>
+<th class="head"><p>Enable</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FC00–$FC7F</span></code></p></td>
+<td><p>0</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IO0_EN</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FC80–$FCFF</span></code></p></td>
+<td><p>1</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IO1_EN</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FD00–$FD7F</span></code></p></td>
+<td><p>2</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IO2_EN</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FD80–$FDFF</span></code></p></td>
+<td><p>3</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IO3_EN</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The whole window belongs to the expansion bus by default. Few peripherals have any use for 128 registers, though, so the RIA can hand parts of it back: <strong><code class="docutils literal notranslate"><span class="pre">EXTIOCTL</span></code> (<code class="docutils literal notranslate"><span class="pre">$FFF6</span></code>)</strong> is a bitmap of <strong>eight 64-byte chunks</strong>, two per slot, and setting a bit maps that chunk back to <strong>RAM</strong>. A card that only needs 64 bytes therefore need not cost the program the other 64.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Bit</p></th>
+<th class="head"><p>Chunk range</p></th>
+<th class="head"><p>Slot</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FC00–$FC3F</span></code></p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FC40–$FC7F</span></code></p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FC80–$FCBF</span></code></p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FCC0–$FCFF</span></code></p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FD00–$FD3F</span></code></p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FD40–$FD7F</span></code></p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FD80–$FDBF</span></code></p></td>
+<td><p>3</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FDC0–$FDFF</span></code></p></td>
+<td><p>3</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">EXTIOCTL</span></code> powers up as <code class="docutils literal notranslate"><span class="pre">$00</span></code>, so a freshly started machine has the entire <code class="docutils literal notranslate"><span class="pre">$FC00–$FDFF</span></code> window on the expansion bus and none of it as memory. Reading a chunk that is on the bus with no card answering returns <code class="docutils literal notranslate"><span class="pre">$FF</span></code>; writes to it go nowhere.</p>
+<p>No register layout is imposed by the core system — each expansion board defines its own map within its slot, and a board is free to use only the first few bytes of it. See <a class="reference internal" href="../../1/6_io/"><span class="std std-doc">Chapter 6: Input and Output Interfaces</span></a> for the expansion port pinout.</p>
+</section>
+<hr class="docutils" />
+<section id="fec0-feff-sgu-1">
+<span id="fec0feff--sgu-1"></span><h2><code class="docutils literal notranslate"><span class="pre">$FEC0–$FEFF</span></code> — SGU-1<a class="headerlink" href="#fec0-feff-sgu-1" title="Link to this heading">¶</a></h2>
+<p>SGU-1 presents a <strong>single 64-byte window</strong> that is re-bound to a specific bank by writing a selector to the last byte. Values <code class="docutils literal notranslate"><span class="pre">$00</span></code>–<code class="docutils literal notranslate"><span class="pre">$08</span></code> select the nine synthesis channels. <code class="docutils literal notranslate"><span class="pre">$FF</span></code> selects the <strong>service bank</strong>, which reaches past the synthesis engine: PCM sample data is uploaded through it, and the master volume there is a proxy for the CODEC/DSP downstream of the waveform generator. Everything in between (<code class="docutils literal notranslate"><span class="pre">$09</span></code>–<code class="docutils literal notranslate"><span class="pre">$FE</span></code>) is reserved: writes are ignored and reads return <code class="docutils literal notranslate"><span class="pre">$FF</span></code>. The selector is stored verbatim; out-of-range values are <strong>not</strong> wrapped onto a channel.</p>
+<p><strong>SGU-1 comes up muted.</strong> The service bank’s master volume gates the entire mix and resets to <code class="docutils literal notranslate"><span class="pre">0</span></code>, so the chip is silent until software raises it. This is deliberate: a reset must never blast the user with whatever the channel register file happened to power up holding. Put the channels into a known state first, then unmute. Under OS/816 that is the system’s job; a bare-metal program has to do it itself, or it will hear nothing.</p>
+<p>The selector:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>R/W</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$3F</span></code> (<code class="docutils literal notranslate"><span class="pre">$FEFF</span></code>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CH_SELECT</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Write: select bank — <code class="docutils literal notranslate"><span class="pre">$00</span></code>–<code class="docutils literal notranslate"><span class="pre">$08</span></code> channel, <code class="docutils literal notranslate"><span class="pre">$FF</span></code> service bank, <code class="docutils literal notranslate"><span class="pre">$09</span></code>–<code class="docutils literal notranslate"><span class="pre">$FE</span></code> reserved. Read: returns the value last written. Reset value <code class="docutils literal notranslate"><span class="pre">$00</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Once a channel is selected, the first 32 bytes (<code class="docutils literal notranslate"><span class="pre">$00–$1F</span></code>) are four <strong>operators</strong> of 8 bytes each; the next 32 bytes (<code class="docutils literal notranslate"><span class="pre">$20–$3F</span></code>) hold <strong>channel-wide</strong> controls.</p>
+<section id="operators-4-8-bytes-at-00-1f">
+<span id="operators-4--8-bytes-at-001f"></span><h3>Operators (4 × 8 bytes at <code class="docutils literal notranslate"><span class="pre">$00–$1F</span></code>)<a class="headerlink" href="#operators-4-8-bytes-at-00-1f" title="Link to this heading">¶</a></h3>
+<p>Each operator occupies eight bytes. Operator <em>n</em> starts at offset <code class="docutils literal notranslate"><span class="pre">0x08*n</span></code>.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>Bit layout</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">+0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">R0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[7]</span> <span class="pre">TRM</span></code> · <code class="docutils literal notranslate"><span class="pre">[6]</span> <span class="pre">VIB</span></code> · <code class="docutils literal notranslate"><span class="pre">[5:4]</span> <span class="pre">KSR</span></code> · <code class="docutils literal notranslate"><span class="pre">[3:0]</span> <span class="pre">MUL</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">+1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">R1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[7:6]</span> <span class="pre">KSL</span></code> · <code class="docutils literal notranslate"><span class="pre">[5:0]</span> <span class="pre">TL_lo</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">+2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">R2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[7:4]</span> <span class="pre">AR_lo</span></code> · <code class="docutils literal notranslate"><span class="pre">[3:0]</span> <span class="pre">DR_lo</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">+3</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">R3</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[7:4]</span> <span class="pre">SL</span></code> · <code class="docutils literal notranslate"><span class="pre">[3:0]</span> <span class="pre">RR</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">+4</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">R4</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[7:5]</span> <span class="pre">DT</span></code> · <code class="docutils literal notranslate"><span class="pre">[4:0]</span> <span class="pre">SR</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">+5</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">R5</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[7:5]</span> <span class="pre">DELAY</span></code> · <code class="docutils literal notranslate"><span class="pre">[4]</span> <span class="pre">FIX</span></code> · <code class="docutils literal notranslate"><span class="pre">[3:0]</span> <span class="pre">WPAR</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">+6</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">R6</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[7]</span> <span class="pre">TRMD</span></code> · <code class="docutils literal notranslate"><span class="pre">[6]</span> <span class="pre">VIBD</span></code> · <code class="docutils literal notranslate"><span class="pre">[5]</span> <span class="pre">SYNC</span></code> · <code class="docutils literal notranslate"><span class="pre">[4]</span> <span class="pre">RING</span></code> · <code class="docutils literal notranslate"><span class="pre">[3:1]</span> <span class="pre">MOD</span></code> · <code class="docutils literal notranslate"><span class="pre">[0]</span> <span class="pre">TL_msb</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">+7</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">R7</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[7:5]</span> <span class="pre">OUT</span></code> · <code class="docutils literal notranslate"><span class="pre">[4]</span> <span class="pre">AR_msb</span></code> · <code class="docutils literal notranslate"><span class="pre">[3]</span> <span class="pre">DR_msb</span></code> · <code class="docutils literal notranslate"><span class="pre">[2:0]</span> <span class="pre">WAVE</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The 5-bit envelope rates <code class="docutils literal notranslate"><span class="pre">AR</span></code> and <code class="docutils literal notranslate"><span class="pre">DR</span></code> are split across <code class="docutils literal notranslate"><span class="pre">R2</span></code> and <code class="docutils literal notranslate"><span class="pre">R7</span></code>. <code class="docutils literal notranslate"><span class="pre">TL</span></code> (Total Level) is 7 bits, split as <code class="docutils literal notranslate"><span class="pre">R1[5:0]</span></code> plus <code class="docutils literal notranslate"><span class="pre">R6[0]</span></code>. <code class="docutils literal notranslate"><span class="pre">SL</span></code> is 4 bits, <code class="docutils literal notranslate"><span class="pre">RR</span></code> 4 bits, <code class="docutils literal notranslate"><span class="pre">SR</span></code> 5 bits. <code class="docutils literal notranslate"><span class="pre">WAVE</span></code> selects one of seven per-operator waveforms (0 SINE, 1 TRIANGLE, 2 SAWTOOTH, 3 PULSE, 4 NOISE, 5 PERIODIC_NOISE, 6 reserved, 7 SAMPLE). <code class="docutils literal notranslate"><span class="pre">WPAR</span></code> shapes SINE/TRIANGLE/SAWTOOTH, picks a tap configuration for PERIODIC_NOISE, or sets a fixed pulse width for PULSE.</p>
+</section>
+<section id="channel-controls-32-bytes-at-20-3f">
+<span id="channel-controls-32-bytes-at-203f"></span><h3>Channel Controls (32 bytes at <code class="docutils literal notranslate"><span class="pre">$20–$3F</span></code>)<a class="headerlink" href="#channel-controls-32-bytes-at-20-3f" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$20</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FREQ_L</span></code></p></td>
+<td><p>Channel base frequency, low byte</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$21</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FREQ_H</span></code></p></td>
+<td><p>Channel base frequency, high byte</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$22</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">VOL</span></code></p></td>
+<td><p>Channel volume (signed)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$23</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PAN</span></code></p></td>
+<td><p>Stereo pan (signed; negative = left, positive = right)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$24</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FLAGS0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[0]</span> <span class="pre">GATE</span></code> (key level: a rise out of release attacks from the current attenuation; a sounding envelope is left alone), <code class="docutils literal notranslate"><span class="pre">[1]</span> <span class="pre">TRIG</span></code> (one-shot, self-clearing: restarts the envelope from silence), <code class="docutils literal notranslate"><span class="pre">[3]</span> <span class="pre">PCM</span></code>, <code class="docutils literal notranslate"><span class="pre">[4]</span> <span class="pre">RING_MOD</span></code>, <code class="docutils literal notranslate"><span class="pre">[5]</span> <span class="pre">NSLOW</span></code> / <code class="docutils literal notranslate"><span class="pre">[6]</span> <span class="pre">NSHIGH</span></code> / <code class="docutils literal notranslate"><span class="pre">[7]</span> <span class="pre">NSBAND</span></code> filter output selects</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$25</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FLAGS1</span></code></p></td>
+<td><p>Phase reset, filter reset, PCM loop, per-sweep enables, <code class="docutils literal notranslate"><span class="pre">[7]</span> <span class="pre">DIAG</span></code> diagnostic-readback switch</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$26</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUTOFF_L</span></code></p></td>
+<td><p>Filter cutoff, low byte</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$27</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CUTOFF_H</span></code></p></td>
+<td><p>Filter cutoff, high byte</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$28</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DUTY</span></code></p></td>
+<td><p>Pulse width, <strong>signed</strong> (<code class="docutils literal notranslate"><span class="pre">int8</span></code>): the magnitude is the LOW-run length out of 128; the sign places that run at the start (positive) or the end (negative) of the period</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$29</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RESON</span></code></p></td>
+<td><p>Filter resonance (0–255; feedback is 256 − RESON)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$2A</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PCM_POS_L</span></code></p></td>
+<td><p>Current PCM sample position, low byte</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$2B</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PCM_POS_H</span></code></p></td>
+<td><p>Current PCM sample position, high byte</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$2C</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PCM_END_L</span></code></p></td>
+<td><p>PCM end boundary, low byte</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$2D</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PCM_END_H</span></code></p></td>
+<td><p>PCM end boundary, high byte</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$2E</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PCM_RST_L</span></code></p></td>
+<td><p>PCM loop restart, low byte; also the 1024-sample wavetable base for <code class="docutils literal notranslate"><span class="pre">SAMPLE</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$2F</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PCM_RST_H</span></code></p></td>
+<td><p>PCM loop restart, high byte</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$30</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SWFREQ_SPD_L</span></code></p></td>
+<td><p>Frequency-sweep speed, low byte</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$31</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SWFREQ_SPD_H</span></code></p></td>
+<td><p>Frequency-sweep speed, high byte</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$32</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SWFREQ_AMT</span></code></p></td>
+<td><p>Frequency-sweep amount + direction/mode</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$33</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SWFREQ_BND</span></code></p></td>
+<td><p>Frequency-sweep boundary</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$34</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SWVOL_SPD_L</span></code></p></td>
+<td><p>Volume-sweep speed, low byte</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$35</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SWVOL_SPD_H</span></code></p></td>
+<td><p>Volume-sweep speed, high byte</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$36</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SWVOL_AMT</span></code></p></td>
+<td><p>Volume-sweep amount + mode</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$37</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SWVOL_BND</span></code></p></td>
+<td><p>Volume-sweep boundary</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$38</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SWCUT_SPD_L</span></code></p></td>
+<td><p>Cutoff-sweep speed, low byte</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$39</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SWCUT_SPD_H</span></code></p></td>
+<td><p>Cutoff-sweep speed, high byte</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$3A</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SWCUT_AMT</span></code></p></td>
+<td><p>Cutoff-sweep amount + mode</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$3B</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">SWCUT_BND</span></code></p></td>
+<td><p>Cutoff-sweep boundary</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$3C</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RESTIMER_L</span></code></p></td>
+<td><p>Phase-reset timer, low byte</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$3D</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RESTIMER_H</span></code></p></td>
+<td><p>Phase-reset timer, high byte</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$3E</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">LFOW</span></code></p></td>
+<td><p>LFO shapes: <code class="docutils literal notranslate"><span class="pre">[3:2]</span> <span class="pre">PM_SHAPE</span></code>, <code class="docutils literal notranslate"><span class="pre">[1:0]</span> <span class="pre">AM_SHAPE</span></code> — <code class="docutils literal notranslate"><span class="pre">0</span></code> saw, <code class="docutils literal notranslate"><span class="pre">1</span></code> square, <code class="docutils literal notranslate"><span class="pre">2</span></code> triangle, <code class="docutils literal notranslate"><span class="pre">3</span></code> noise</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$3F</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CH_SELECT</span></code></p></td>
+<td><p>Bank selector (see above)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>PCM sample data itself lives in 64 KB of RAM internal to the audio chip, addressed via the <code class="docutils literal notranslate"><span class="pre">PCM_POS</span></code> / <code class="docutils literal notranslate"><span class="pre">PCM_END</span></code> / <code class="docutils literal notranslate"><span class="pre">PCM_RST</span></code> pointers; it is <strong>not</strong> visible in the 65816’s address space.</p>
+<p>Writes to this window are intercepted by NORTH and forwarded to the audio chip via the <code class="docutils literal notranslate"><span class="pre">SPU</span></code> device on the PIX bus (see <a class="reference internal" href="../../1/2_overview/"><span class="std std-doc">Chapter 2: System Architecture Overview</span></a>). The SGU-1 is a self-contained module hosted on the board and bridged from SOUTH over SPI; the SOUTH-side driver caches register values so repeat reads avoid a round-trip.</p>
+</section>
+<section id="sgu-1-service-bank">
+<h3>SGU-1 Service Bank<a class="headerlink" href="#sgu-1-service-bank" title="Link to this heading">¶</a></h3>
+<p>The service bank is part of the <strong>SGU-1 system-on-module (SoM) interface</strong>.
+Select <code class="docutils literal notranslate"><span class="pre">$FF</span></code> at <code class="docutils literal notranslate"><span class="pre">$FEFF</span></code> to access chip identification, PCM sample memory,
+reset controls and master volume. The emulator implements the same interface.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FEC0–$FEC3</span></code></p></td>
+<td><p>MAGIC</p></td>
+<td><p>ASCII <code class="docutils literal notranslate"><span class="pre">SGU1</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FEC4–$FEC5</span></code></p></td>
+<td><p>VERSION</p></td>
+<td><p>Implementation version, major/minor; the emulator reports 1.0.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FECE</span></code></p></td>
+<td><p>PCM_BANKS</p></td>
+<td><p>Number of backed 64 KB PCM banks; the emulator provides four.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FED0</span></code></p></td>
+<td><p>STATUS</p></td>
+<td><p>Bit 0 latches clipping; CPU read clears it.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FED8</span></code></p></td>
+<td><p>CHIP_RESET</p></td>
+<td><p>High nibble <code class="docutils literal notranslate"><span class="pre">$A</span></code>; low bits select voices (1), timebase (2), mix (4), service (8).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FEDC–$FEDD</span></code></p></td>
+<td><p>SAMPLE_OFF</p></td>
+<td><p>16-bit sample offset.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FEDE</span></code></p></td>
+<td><p>SAMPLE_BANK</p></td>
+<td><p>Selected PCM bank.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FEDF</span></code></p></td>
+<td><p>SAMPLE_DATA</p></td>
+<td><p>Read/write sample byte, then advance offset within the bank.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FEE0</span></code></p></td>
+<td><p>MASTER_VOL</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$00</span></code> mute through <code class="docutils literal notranslate"><span class="pre">$FF</span></code> unity gain. Reset value zero.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Core resets apply at the next audio sample boundary; service reset is immediate.
+Neither clears PCM memory. Sample-offset wrap does not increment the bank.
+Unbacked sample banks read zero and discard writes. Emulator debugger
+inspection does not consume sample bytes or acknowledge clip status.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ff00-ff7f-cgia">
+<span id="ff00ff7f--cgia"></span><h2><code class="docutils literal notranslate"><span class="pre">$FF00–$FF7F</span></code> — CGIA<a class="headerlink" href="#ff00-ff7f-cgia" title="Link to this heading">¶</a></h2>
+<p>CGIA exposes <strong>128 registers</strong>. The control block occupies the first 64; the upper 64 are four per-plane banks.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>R/W</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF00</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MODE</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[0]</span> <span class="pre">HIRES</span></code> (96-column / 768 px horizontal) · <code class="docutils literal notranslate"><span class="pre">[1]</span> <span class="pre">INTERLACE</span></code> (480-line vertical)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF10–$FF11</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RASTER</span></code></p></td>
+<td><p>R</p></td>
+<td><p>Current raster line (16-bit)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF12</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RST_STATUS</span></code></p></td>
+<td><p>R</p></td>
+<td><p>Raster status bits</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF18–$FF19</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">INT_RASTER</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Line at which to fire a raster interrupt (16-bit)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF1A</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">INT_ENABLE</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[7]</span> <span class="pre">VBI</span> <span class="pre">·</span> <span class="pre">[6]</span> <span class="pre">DLI</span> <span class="pre">·</span> <span class="pre">[5]</span> <span class="pre">RSI</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF1B</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">INT_STATUS</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Same layout; write to acknowledge</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF30</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PLANES</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[7:4]</span></code> plane type (0 background, 1 sprite) · <code class="docutils literal notranslate"><span class="pre">[3:0]</span></code> per-plane enable</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF31</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ORDER</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Encodes one of 24 Z-order permutations of the four planes (Steinhaus-Johnson-Trotter)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF32</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">BACK_COLOR</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Backdrop / border colour</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF34–$FF37</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">BANK0–BANK3</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>High address byte for each plane, independent of background/sprite type.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF38–$FF39</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">OFFSET0</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Plane 0 display-list or sprite-descriptor table start (16-bit)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF3A–$FF3B</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">OFFSET1</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Plane 1 table start</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF3C–$FF3D</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">OFFSET2</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Plane 2 table start</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF3E–$FF3F</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">OFFSET3</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Plane 3 table start</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF40–$FF4F</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PLANE0[16]</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Plane 0 registers — interpretation depends on plane type and active mode</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF50–$FF5F</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PLANE1[16]</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Plane 1 registers</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF60–$FF6F</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PLANE2[16]</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Plane 2 registers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF70–$FF7F</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PLANE3[16]</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Plane 3 registers</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Addresses not listed inside <code class="docutils literal notranslate"><span class="pre">$FF00–$FF3F</span></code> are reserved. For the per-plane register layouts see <a class="reference internal" href="../../1/4_graphics/"><span class="std std-doc">Chapter 4: Graphics and Display</span></a> and <a class="reference internal" href="../../2/11_graphics/"><span class="std std-doc">Chapter 11: Graphics Programming</span></a> for the plane-register map, display-list instruction encoding, and sprite-descriptor format.</p>
+</section>
+<hr class="docutils" />
+<section id="ff80-ff97-gpio-expander">
+<span id="ff80ff97--gpio-expander"></span><h2><code class="docutils literal notranslate"><span class="pre">$FF80–$FF97</span></code> — GPIO Expander<a class="headerlink" href="#ff80-ff97-gpio-expander" title="Link to this heading">¶</a></h2>
+<p>This 24-byte window maps the on-board <strong>PCAL6416A</strong> I²C GPIO expander behind the two DE-9 ports — <strong>bi-directional, 5 V-TTL general-purpose I/O</strong> that conventionally carries Atari-style joysticks (see <a class="reference internal" href="../../1/6_io/"><span class="std std-doc">Chapter 6</span></a>). Expander port 0 is the first connector, port 1 the second; port bits 0–7 map to DE-9 pins 1–7 and 9 in order (pin 8 is ground). Under the joystick convention that is Up/Down/Left/Right on bits 0–3, fire on bit 5 (pin 6), and buttons 2/3/4 on bits 7/4/6 (pins 9/5/7), all active-low. Bit 6 can instead be driven high as an output to recreate the classic +5 V supply on pin 7 for old-machine accessories — optional, at the cost of button 4 (see <a class="reference internal" href="../../1/6_io/"><span class="std std-doc">Chapter 6</span></a>). Registers pair up as <code class="docutils literal notranslate"><span class="pre">xx0</span></code> for port 0 and <code class="docutils literal notranslate"><span class="pre">xx1</span></code> for port 1:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>R/W</p></th>
+<th class="head"><p>Reset</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF80</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF81</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IN0</span></code> / <code class="docutils literal notranslate"><span class="pre">IN1</span></code></p></td>
+<td><p>R</p></td>
+<td><p>live</p></td>
+<td><p>Input port — actual pin levels regardless of direction; reading clears that port’s pending interrupt</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF82</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF83</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">OUT0</span></code> / <code class="docutils literal notranslate"><span class="pre">OUT1</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FF</span></code></p></td>
+<td><p>Output port — level driven on output-configured pins; reads return the written value, not the pin</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF84</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF85</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">POL0</span></code> / <code class="docutils literal notranslate"><span class="pre">POL1</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$00</span></code></p></td>
+<td><p>Polarity inversion — 1 inverts that input’s sense in <code class="docutils literal notranslate"><span class="pre">IN</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF86</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF87</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CFG0</span></code> / <code class="docutils literal notranslate"><span class="pre">CFG1</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FF</span></code></p></td>
+<td><p>Direction — 1 = high-impedance input, 0 = output</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF88</span></code>–<code class="docutils literal notranslate"><span class="pre">$FF8B</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">STR0L</span></code>/<code class="docutils literal notranslate"><span class="pre">STR0H</span></code>/<code class="docutils literal notranslate"><span class="pre">STR1L</span></code>/<code class="docutils literal notranslate"><span class="pre">STR1H</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FF</span></code></p></td>
+<td><p>Output drive strength, two bits per pin (<code class="docutils literal notranslate"><span class="pre">L</span></code> = bits 0–3, <code class="docutils literal notranslate"><span class="pre">H</span></code> = bits 4–7): <code class="docutils literal notranslate"><span class="pre">00</span></code>=¼ … <code class="docutils literal notranslate"><span class="pre">11</span></code>=full</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF8C</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF8D</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">LTCH0</span></code> / <code class="docutils literal notranslate"><span class="pre">LTCH1</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$00</span></code></p></td>
+<td><p>Input latch — 1 = a level change is held in <code class="docutils literal notranslate"><span class="pre">IN</span></code> until read</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF8E</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF8F</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PLE0</span></code> / <code class="docutils literal notranslate"><span class="pre">PLE1</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$00</span></code></p></td>
+<td><p>Pull resistor enable — 1 connects the internal 100 kΩ resistor</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF90</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF91</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PLS0</span></code> / <code class="docutils literal notranslate"><span class="pre">PLS1</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FF</span></code></p></td>
+<td><p>Pull direction — 1 = pull-up, 0 = pull-down (needs <code class="docutils literal notranslate"><span class="pre">PLE</span></code> set)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF92</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF93</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">INTE0</span></code> / <code class="docutils literal notranslate"><span class="pre">INTE1</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FF</span></code></p></td>
+<td><p>Interrupt mask — clear a bit to request an IRQ on that pin change; all masked at power-on</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF94</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF95</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">INST0</span></code> / <code class="docutils literal notranslate"><span class="pre">INST1</span></code></p></td>
+<td><p>R</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$00</span></code></p></td>
+<td><p>Interrupt status — 1 = this pin is the interrupt source</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF96</span></code></p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+<td><p>Reserved</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF97</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">OUTCF</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$00</span></code></p></td>
+<td><p>Output stage per port: bit 0 = port 0, bit 1 = port 1; 0 = push-pull, 1 = open-drain</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The expander’s <code class="docutils literal notranslate"><span class="pre">INT</span></code> output feeds bit 1 of the RIA interrupt controller (<code class="docutils literal notranslate"><span class="pre">$FFEC</span></code>/<code class="docutils literal notranslate"><span class="pre">$FFED</span></code>). The interrupt-mask registers are its defining feature for the X65: software asks for IRQs only on the pin transitions it cares about, instead of re-reading every pin on every change.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The NORTH firmware does not decode this window yet — reads currently return <code class="docutils literal notranslate"><span class="pre">$FF</span></code> and writes are ignored. Until it is activated, use USB HID gamepads via <code class="docutils literal notranslate"><span class="pre">$FFB0–$FFBF</span></code>.</p>
+</div>
+</section>
+<hr class="docutils" />
+<section id="ff98-ff9f-system-timers-cia-compatible">
+<span id="ff98ff9f--system-timers-cia-compatible"></span><h2><code class="docutils literal notranslate"><span class="pre">$FF98–$FF9F</span></code> — System Timers (CIA-Compatible)<a class="headerlink" href="#ff98-ff9f-system-timers-cia-compatible" title="Link to this heading">¶</a></h2>
+<p>Two 16-bit countdown timers with 1 µs resolution, modelled on the MOS 6526 CIA.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>R/W</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF98</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">TAL</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Timer A counter, low byte</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF99</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">TAH</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Timer A counter, high byte</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF9A</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">TBL</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Timer B counter, low byte</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF9B</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">TBH</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Timer B counter, high byte</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF9C</span></code></p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+<td><p>Reserved, reads <code class="docutils literal notranslate"><span class="pre">$FF</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF9D</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ICR</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Interrupt control / flags</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF9E</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CRA</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Timer A control</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF9F</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CRB</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Timer B control</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Counter semantics.</strong> Reading a counter returns the current remaining count (in µs). Writing the low byte latches it; writing the high byte loads the latched 16-bit pair into the counter when the timer is stopped, or sets the reload value used on underflow when running.</p>
+<p><strong><code class="docutils literal notranslate"><span class="pre">ICR</span></code> bits.</strong> <code class="docutils literal notranslate"><span class="pre">[0]</span></code> Timer A underflow, <code class="docutils literal notranslate"><span class="pre">[1]</span></code> Timer B underflow, <code class="docutils literal notranslate"><span class="pre">[7]</span></code> any-interrupt summary. Reading <code class="docutils literal notranslate"><span class="pre">ICR</span></code> clears all pending flags. To set or clear interrupt enables: write with <code class="docutils literal notranslate"><span class="pre">[7]=1</span></code> to set the bits listed in <code class="docutils literal notranslate"><span class="pre">[1:0]</span></code>, <code class="docutils literal notranslate"><span class="pre">[7]=0</span></code> to clear them.</p>
+<p><strong>Control registers (<code class="docutils literal notranslate"><span class="pre">CRA</span></code>/<code class="docutils literal notranslate"><span class="pre">CRB</span></code>).</strong> <code class="docutils literal notranslate"><span class="pre">[0]</span> <span class="pre">START</span></code>, <code class="docutils literal notranslate"><span class="pre">[3]</span> <span class="pre">RUN_MODE</span></code> (0 continuous, 1 one-shot), <code class="docutils literal notranslate"><span class="pre">[4]</span> <span class="pre">FORCE_LOAD</span></code>. <code class="docutils literal notranslate"><span class="pre">CRB</span></code> additionally has <code class="docutils literal notranslate"><span class="pre">[6:5]</span> <span class="pre">INPUT_MODE</span></code> (0 counts PHI2, 2 counts Timer A underflows, useful for compounding to a 32-bit period).</p>
+</section>
+<hr class="docutils" />
+<section id="ffa0-ffa7-rgb-led-chain">
+<span id="ffa0ffa7--rgb-led-chain"></span><h2><code class="docutils literal notranslate"><span class="pre">$FFA0–$FFA7</span></code> — RGB LED Chain<a class="headerlink" href="#ffa0-ffa7-rgb-led-chain" title="Link to this heading">¶</a></h2>
+<p>The RIA decodes four direct LED registers and the firmware drives all four (<code class="docutils literal notranslate"><span class="pre">RGB_LED_COUNT</span> <span class="pre">4</span></code>), but the X65 DEV-board populates only the first <strong>three</strong> WS2812B-style RGB LEDs; <code class="docutils literal notranslate"><span class="pre">$FFA3</span></code> addresses a fourth position you can populate yourself on the strip header. A chain of up to 256 LEDs is supported via the expansion port’s <code class="docutils literal notranslate"><span class="pre">WS2812</span></code> data line.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>R/W</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">LED0</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Direct RGB332 colour for LED 0; write commits immediately</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">LED1</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Direct RGB332 colour for LED 1</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">LED2</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Direct RGB332 colour for LED 2</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA3</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">LED3</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Direct RGB332 colour for LED 3 (position unpopulated on the DEV-board)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA4</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">LED_IDX</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>LED index in the chain (0–255); <strong>writing here commits the chain update</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA5</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">LED_RED</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Red byte (0–255); latched</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA6</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">LED_GREEN</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Green byte (0–255); latched</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA7</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">LED_BLUE</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Blue byte (0–255); latched</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>RGB332 byte</strong> (<code class="docutils literal notranslate"><span class="pre">$FFA0–$FFA3</span></code>): <code class="docutils literal notranslate"><span class="pre">[7:5]</span> <span class="pre">R</span></code> · <code class="docutils literal notranslate"><span class="pre">[4:2]</span> <span class="pre">G</span></code> · <code class="docutils literal notranslate"><span class="pre">[1:0]</span> <span class="pre">B</span></code>. A single <code class="docutils literal notranslate"><span class="pre">STA</span> <span class="pre">$FFA0</span></code> sets LED 0 — the LED 0–3 interface is one instruction per LED.</p>
+<p><strong>Chain protocol</strong> (<code class="docutils literal notranslate"><span class="pre">$FFA4–$FFA7</span></code>): to set LED <em>n</em> to 24-bit colour, latch the red, green and blue bytes into <code class="docutils literal notranslate"><span class="pre">$FFA5</span></code>, <code class="docutils literal notranslate"><span class="pre">$FFA6</span></code> and <code class="docutils literal notranslate"><span class="pre">$FFA7</span></code>, then write the LED index to <code class="docutils literal notranslate"><span class="pre">$FFA4</span></code>. The write to <code class="docutils literal notranslate"><span class="pre">$FFA4</span></code> is what dispatches the update to the hardware; the other three bytes are simply latched. (Order of the latch writes is free; only the write to <code class="docutils literal notranslate"><span class="pre">$FFA4</span></code> must be last.)</p>
+</section>
+<hr class="docutils" />
+<section id="ffa8-ffab-system-buzzer">
+<span id="ffa8ffab--system-buzzer"></span><h2><code class="docutils literal notranslate"><span class="pre">$FFA8–$FFAB</span></code> — System Buzzer<a class="headerlink" href="#ffa8-ffab-system-buzzer" title="Link to this heading">¶</a></h2>
+<p>A PWM-driven piezo buzzer. Two commands are exposed to the CPU; each write forwards a PIX command to the south-side driver.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>R/W</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA8</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">BUZZ_FREQ_LO</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Frequency, low byte (see encoding)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA9</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">BUZZ_FREQ_HI</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Frequency, high byte</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFAA</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">BUZZ_DUTY</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Duty cycle, 0 (silent) – 255 (50 % square peak)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFAB</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">BUZZ_RES</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Reserved; currently unused</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Frequency encoding.</strong> The 16-bit value <code class="docutils literal notranslate"><span class="pre">FREQ</span> <span class="pre">=</span> <span class="pre">BUZZ_FREQ_HI:BUZZ_FREQ_LO</span></code> is mapped logarithmically to audio Hz:</p>
+<p>$$
+f(\text{FREQ}) = 20,\text{Hz} \cdot 2^{10,\text{FREQ}/65535}
+$$</p>
+<p>This covers roughly 20 Hz to 20 kHz across the 16-bit range. Writing either byte commits the new frequency. Writing <code class="docutils literal notranslate"><span class="pre">$FFAA</span></code> commits a new duty cycle independently.</p>
+</section>
+<hr class="docutils" />
+<section id="ffb0-ffbf-usb-hid">
+<span id="ffb0ffbf--usb-hid"></span><h2><code class="docutils literal notranslate"><span class="pre">$FFB0–$FFBF</span></code> — USB HID<a class="headerlink" href="#ffb0-ffbf-usb-hid" title="Link to this heading">¶</a></h2>
+<p>USB keyboards, mice, and gamepads attached to the NORTH chip’s USB host stack are exposed as a 16-byte window whose contents depend on which device is currently selected.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>R/W</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">HID_SEL</span></code></p></td>
+<td><p>W</p></td>
+<td><p>Device selector: <code class="docutils literal notranslate"><span class="pre">[3:0]</span></code> device type, <code class="docutils literal notranslate"><span class="pre">[7:4]</span></code> page / player index</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB1–$FFBF</span></code></p></td>
+<td><p>device data</p></td>
+<td><p>R</p></td>
+<td><p>Depends on selected device</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Device-type codes</strong> (<code class="docutils literal notranslate"><span class="pre">HID_SEL[3:0]</span></code>):</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Code</p></th>
+<th class="head"><p>Device</p></th>
+<th class="head"><p>High-nibble meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+<td><p>Keyboard</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0</span></code> or <code class="docutils literal notranslate"><span class="pre">1</span></code> — keyboard-state page (the full state is 32 bytes long)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
+<td><p>Mouse</p></td>
+<td><p>Ignored</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2</span></code></p></td>
+<td><p>Gamepad</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0</span></code> — merged view (OR of all connected pads); <code class="docutils literal notranslate"><span class="pre">1</span></code>–<code class="docutils literal notranslate"><span class="pre">15</span></code> — individual pad</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Writing to offset <code class="docutils literal notranslate"><span class="pre">$FFB0</span></code> commits the selector; the other fifteen bytes in the window are <strong>read-only</strong>.</p>
+<section id="keyboard-selector-low-nibble-0">
+<h3>Keyboard (selector low nibble <code class="docutils literal notranslate"><span class="pre">0</span></code>)<a class="headerlink" href="#keyboard-selector-low-nibble-0" title="Link to this heading">¶</a></h3>
+<p>The full keyboard state is 256 bits (32 bytes) — one bit per HID keycode. Bit <code class="docutils literal notranslate"><span class="pre">n</span></code> is set iff the key with HID keycode <code class="docutils literal notranslate"><span class="pre">n</span></code> is currently pressed. Because only 16 bytes are visible at a time, the window is split into two pages; set <code class="docutils literal notranslate"><span class="pre">HID_SEL</span></code> to <code class="docutils literal notranslate"><span class="pre">$00</span></code> to read bytes 0–15 of the state at <code class="docutils literal notranslate"><span class="pre">$FFB0–$FFBF</span></code>, and <code class="docutils literal notranslate"><span class="pre">$10</span></code> to read bytes 16–31.</p>
+<p>The first byte (<code class="docutils literal notranslate"><span class="pre">$FFB0</span></code> when page 0 is selected) carries device status: <code class="docutils literal notranslate"><span class="pre">[0]</span></code> connected, <code class="docutils literal notranslate"><span class="pre">[1]</span></code> NUMLOCK LED, <code class="docutils literal notranslate"><span class="pre">[2]</span></code> CAPSLOCK LED, <code class="docutils literal notranslate"><span class="pre">[3]</span></code> SCROLLLOCK LED.</p>
+</section>
+<section id="mouse-selector-low-nibble-1">
+<h3>Mouse (selector low nibble <code class="docutils literal notranslate"><span class="pre">1</span></code>)<a class="headerlink" href="#mouse-selector-low-nibble-1" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Field</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB1</span></code></p></td>
+<td><p>Buttons</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[0]</span></code> left · <code class="docutils literal notranslate"><span class="pre">[1]</span></code> right · <code class="docutils literal notranslate"><span class="pre">[2]</span></code> middle · <code class="docutils literal notranslate"><span class="pre">[3:7]</span></code> extended</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB2</span></code></p></td>
+<td><p>X delta (8-bit)</p></td>
+<td><p>Signed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB3</span></code></p></td>
+<td><p>Y delta (8-bit)</p></td>
+<td><p>Signed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB4</span></code></p></td>
+<td><p>Wheel</p></td>
+<td><p>Signed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB5</span></code></p></td>
+<td><p>Pan</p></td>
+<td><p>Signed horizontal wheel</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB9–$FFBC</span></code></p></td>
+<td><p>X / Y counters</p></td>
+<td><p>16-bit absolute X and Y counters</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="gamepad-selector-low-nibble-2">
+<h3>Gamepad (selector low nibble <code class="docutils literal notranslate"><span class="pre">2</span></code>)<a class="headerlink" href="#gamepad-selector-low-nibble-2" title="Link to this heading">¶</a></h3>
+<p>Ten-byte snapshot for the selected pad (or for pad 0, the OR of all connected pads):</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Field</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB1</span></code></p></td>
+<td><p>D-pad + features</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[0]</span></code> up · <code class="docutils literal notranslate"><span class="pre">[1]</span></code> down · <code class="docutils literal notranslate"><span class="pre">[2]</span></code> left · <code class="docutils literal notranslate"><span class="pre">[3]</span></code> right · <code class="docutils literal notranslate"><span class="pre">[6]</span></code> Sony layout · <code class="docutils literal notranslate"><span class="pre">[7]</span></code> gamepad valid</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB2</span></code></p></td>
+<td><p>Stick digitals</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[3:0]</span></code> left-stick 4-direction · <code class="docutils literal notranslate"><span class="pre">[7:4]</span></code> right-stick 4-direction</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB3</span></code></p></td>
+<td><p>Buttons 0</p></td>
+<td><p>Bits 0–7 of the button bitmap</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB4</span></code></p></td>
+<td><p>Buttons 1</p></td>
+<td><p>Bits 8–15, including the Home button at bit 4</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB5</span></code></p></td>
+<td><p>Left stick X</p></td>
+<td><p>Signed 8-bit</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB6</span></code></p></td>
+<td><p>Left stick Y</p></td>
+<td><p>Signed 8-bit</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB7</span></code></p></td>
+<td><p>Right stick X</p></td>
+<td><p>Signed 8-bit</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB8</span></code></p></td>
+<td><p>Right stick Y</p></td>
+<td><p>Signed 8-bit</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFB9</span></code></p></td>
+<td><p>Left trigger</p></td>
+<td><p>Unsigned 8-bit</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFBA</span></code></p></td>
+<td><p>Right trigger</p></td>
+<td><p>Unsigned 8-bit</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The <strong>merged-pad 0</strong> view is the bitwise OR of all connected pads across every field. It is the right endpoint for single-player code that should accept input from any controller; multiplayer code should loop across pads 1–15.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ffc0-ffff-ria">
+<span id="ffc0ffff--ria"></span><h2><code class="docutils literal notranslate"><span class="pre">$FFC0–$FFFF</span></code> — RIA<a class="headerlink" href="#ffc0-ffff-ria" title="Link to this heading">¶</a></h2>
+<p>The RIA registers live at the very top of bank 0. The 65C816 reserves two vector tables up here — native at <code class="docutils literal notranslate"><span class="pre">$FFE4–$FFEF</span></code> and emulation at <code class="docutils literal notranslate"><span class="pre">$FFF4–$FFFF</span></code> — and the RIA fills the gaps the CPU leaves in and around them with system services: hardware multiply/divide, a time-of-day counter, DMA, file descriptors, the UART, an RNG, the interrupt controller and the fastcall API.</p>
+<section id="hardware-multiply-and-divide">
+<h3>Hardware Multiply and Divide<a class="headerlink" href="#hardware-multiply-and-divide" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>R/W</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFC0–$FFC1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">OPERA</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Operand A (16-bit)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFC2–$FFC3</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">OPERB</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Operand B (16-bit)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFC4–$FFC7</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MULAB</span></code></p></td>
+<td><p>R</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">OPERA</span> <span class="pre">×</span> <span class="pre">OPERB</span></code> (32-bit product)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFC8–$FFC9</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DIVAB</span></code></p></td>
+<td><p>R</p></td>
+<td><p>Signed <code class="docutils literal notranslate"><span class="pre">OPERA</span></code> ÷ unsigned <code class="docutils literal notranslate"><span class="pre">OPERB</span></code> (16-bit quotient)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Both results are computed combinatorially from the current operands — write the operands, then read the result; there is no “start” or “busy” handshake. Division by zero yields <code class="docutils literal notranslate"><span class="pre">$FFFF</span></code>.</p>
+</section>
+<section id="time-of-day">
+<h3>Time of Day<a class="headerlink" href="#time-of-day" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>R/W</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFCA–$FFCF</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">TM0</span></code>–<code class="docutils literal notranslate"><span class="pre">TM5</span></code></p></td>
+<td><p>R</p></td>
+<td><p>Monotonic microseconds since boot (48-bit, little-endian)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="dma">
+<h3>DMA<a class="headerlink" href="#dma" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>R/W</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFD0–$FFD2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ADDRSRC</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Source address (24-bit)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFD3</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">STEPSRC</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Source step</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFD4–$FFD6</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ADDRDST</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Destination address (24-bit)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFD7</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">STEPDST</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Destination step</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFD8</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">COUNT</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Transfer count</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFD9</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DMAERR</span></code></p></td>
+<td><p>R</p></td>
+<td><p>Transfer <code class="docutils literal notranslate"><span class="pre">errno</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="file-descriptors">
+<h3>File Descriptors<a class="headerlink" href="#file-descriptors" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>R/W</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFDA</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FDA</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>File-descriptor A number (obtained from the <code class="docutils literal notranslate"><span class="pre">open()</span></code> API call)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFDB</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FDB</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>File-descriptor B number</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFDC</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FDARW</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Read a byte from FDA / write a byte to FDA</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFDD</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FDBRW</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Read a byte from FDB / write a byte to FDB</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFDE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FDAST</span></code></p></td>
+<td><p>R</p></td>
+<td><p>File-descriptor A status</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFDF</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FDBST</span></code></p></td>
+<td><p>R</p></td>
+<td><p>File-descriptor B status</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Streaming a file is a tight loop on <code class="docutils literal notranslate"><span class="pre">FDARW</span></code> — no API round-trip per byte.</p>
+</section>
+<section id="uart-rng-and-interrupt-controller">
+<h3>UART, RNG and Interrupt Controller<a class="headerlink" href="#uart-rng-and-interrupt-controller" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>R/W</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFE0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">READY</span></code></p></td>
+<td><p>R</p></td>
+<td><p>UART FIFO flow control — TX-ready and RX-available flags</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFE1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">TX</span></code> / <code class="docutils literal notranslate"><span class="pre">RX</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Write to transmit, read to receive</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFE2–$FFE3</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RNG</span></code></p></td>
+<td><p>R</p></td>
+<td><p>Random number generator; two bytes so 16-bit values can be read at once</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFEC</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IRQ_ENABLE</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>RIA interrupt enable mask</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFED</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IRQ_STATUS</span></code></p></td>
+<td><p>R</p></td>
+<td><p>Interrupt controller status — which source raised <code class="docutils literal notranslate"><span class="pre">IRQB</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">IRQ_ENABLE</span></code> and <code class="docutils literal notranslate"><span class="pre">IRQ_STATUS</span></code> sit in the two bytes the 65C816 leaves reserved inside the native vector table, and <code class="docutils literal notranslate"><span class="pre">EXTIOCTL</span></code> / <code class="docutils literal notranslate"><span class="pre">EXTMEM</span></code> (below) occupy the matching reserved pair in the emulation table.</p>
+</section>
+<section id="fastcall-api">
+<h3>Fastcall API<a class="headerlink" href="#fastcall-api" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>R/W</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFF0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">OP</span></code>/<code class="docutils literal notranslate"><span class="pre">RET</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Write the API operation id to begin a kernel call; read the return value</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFF1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RET_HI</span></code></p></td>
+<td><p>R</p></td>
+<td><p>High byte of a 16-bit return value, otherwise <code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFF2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">STACK</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>XSTACK port — 512 bytes for passing call parameters</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFF3</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">STATUS</span></code></p></td>
+<td><p>R</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[7]</span></code> high while the operation is running; <code class="docutils literal notranslate"><span class="pre">[0]</span></code> high when <code class="docutils literal notranslate"><span class="pre">ERRNO</span></code> is set</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>System calls pass all arguments through the 512-byte <strong>XSTACK</strong> at <code class="docutils literal notranslate"><span class="pre">$FFF2</span></code>. Push the
+arguments in order, most-significant byte first within each numeric value.
+Push strings with their terminating NUL. Every call consumes its complete
+argument stack. Poll <code class="docutils literal notranslate"><span class="pre">STATUS</span></code> bit 7 until clear, then test bit 0 before reading
+<code class="docutils literal notranslate"><span class="pre">RET</span></code> at <code class="docutils literal notranslate"><span class="pre">$FFF0–$FFF1</span></code> (or errno there on failure). Bit 6 reports a refused
+operation submitted while another was busy; the running operation continues.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Operation</p></th>
+<th class="head"><p>Code</p></th>
+<th class="head"><p>Arguments and result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Clear XSTACK</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$00</span></code></p></td>
+<td><p>Discard pending stack contents.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Code page</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$03</span></code></p></td>
+<td><p>Push the requested 16-bit code page; returns the active code page.</p></td>
+</tr>
+<tr class="row-even"><td><p>Keyboard layout</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$07</span></code></p></td>
+<td><p>Push a NUL-terminated layout name (empty string queries). Returns the active name on XSTACK and its length including NUL in RET.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Keyboard layout name</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$0C</span></code></p></td>
+<td><p>Push an 8-bit index. Returns the name on XSTACK and length including NUL in RET; ENOENT ends enumeration.</p></td>
+</tr>
+<tr class="row-even"><td><p>Character generator</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$10</span></code></p></td>
+<td><p>Push destination bank, destination address high/low, then code page high/low. Copies 2048 bytes; returns the loaded code page, or zero if unavailable.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Wait for character-generator completion before using its destination or
+starting another call. A program’s code-page selection is distinct from the
+persistent monitor setting.</p>
+</section>
+<section id="extension-control">
+<h3>Extension Control<a class="headerlink" href="#extension-control" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>R/W</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFF6</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">EXTIOCTL</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Bitmap of the eight 64-byte chunks of <code class="docutils literal notranslate"><span class="pre">$FC00–$FDFF</span></code> (see the expansion section above)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFF7</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">EXTMEM</span></code></p></td>
+<td><p>R/W</p></td>
+<td><p>Reserved for future use (extended-memory MMU)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="cpu-vectors">
+<h3>CPU Vectors<a class="headerlink" href="#cpu-vectors" title="Link to this heading">¶</a></h3>
+<p>The 65C816 vectors (reserved by the CPU) live at fixed offsets:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Vector</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFE4</span></code></p></td>
+<td><p>COP (native)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFE6</span></code></p></td>
+<td><p>BRK (native)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFE8</span></code></p></td>
+<td><p>ABORTB (native)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFEA</span></code></p></td>
+<td><p>NMIB (native)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFEE</span></code></p></td>
+<td><p>IRQB (native)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFF4</span></code></p></td>
+<td><p>COP (emulation)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFF8</span></code></p></td>
+<td><p>ABORTB (emulation)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFFA</span></code></p></td>
+<td><p>NMIB (emulation)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFFC</span></code></p></td>
+<td><p>RESB</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFFE</span></code></p></td>
+<td><p>IRQB / BRK (emulation)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Because the X65 boots and operates exclusively in native mode, the emulation-mode vectors exist for completeness but are not used by X65 firmware or applications.</p>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../B_glossary/">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Appendix B: Glossary of X65 Terms</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../../2/17_afterword/">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Chapter 17: Afterword</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Tomasz Sterna
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Appendix A: Memory Map</a><ul>
+<li><a class="reference internal" href="#top-level-mmio-layout">Top-Level MMIO Layout</a></li>
+<li><a class="reference internal" href="#fc00-fdff-expansion-slots"><code class="docutils literal notranslate"><span class="pre">$FC00–$FDFF</span></code> — Expansion Slots</a></li>
+<li><a class="reference internal" href="#fec0-feff-sgu-1"><code class="docutils literal notranslate"><span class="pre">$FEC0–$FEFF</span></code> — SGU-1</a><ul>
+<li><a class="reference internal" href="#operators-4-8-bytes-at-00-1f">Operators (4 × 8 bytes at <code class="docutils literal notranslate"><span class="pre">$00–$1F</span></code>)</a></li>
+<li><a class="reference internal" href="#channel-controls-32-bytes-at-20-3f">Channel Controls (32 bytes at <code class="docutils literal notranslate"><span class="pre">$20–$3F</span></code>)</a></li>
+<li><a class="reference internal" href="#sgu-1-service-bank">SGU-1 Service Bank</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ff00-ff7f-cgia"><code class="docutils literal notranslate"><span class="pre">$FF00–$FF7F</span></code> — CGIA</a></li>
+<li><a class="reference internal" href="#ff80-ff97-gpio-expander"><code class="docutils literal notranslate"><span class="pre">$FF80–$FF97</span></code> — GPIO Expander</a></li>
+<li><a class="reference internal" href="#ff98-ff9f-system-timers-cia-compatible"><code class="docutils literal notranslate"><span class="pre">$FF98–$FF9F</span></code> — System Timers (CIA-Compatible)</a></li>
+<li><a class="reference internal" href="#ffa0-ffa7-rgb-led-chain"><code class="docutils literal notranslate"><span class="pre">$FFA0–$FFA7</span></code> — RGB LED Chain</a></li>
+<li><a class="reference internal" href="#ffa8-ffab-system-buzzer"><code class="docutils literal notranslate"><span class="pre">$FFA8–$FFAB</span></code> — System Buzzer</a></li>
+<li><a class="reference internal" href="#ffb0-ffbf-usb-hid"><code class="docutils literal notranslate"><span class="pre">$FFB0–$FFBF</span></code> — USB HID</a><ul>
+<li><a class="reference internal" href="#keyboard-selector-low-nibble-0">Keyboard (selector low nibble <code class="docutils literal notranslate"><span class="pre">0</span></code>)</a></li>
+<li><a class="reference internal" href="#mouse-selector-low-nibble-1">Mouse (selector low nibble <code class="docutils literal notranslate"><span class="pre">1</span></code>)</a></li>
+<li><a class="reference internal" href="#gamepad-selector-low-nibble-2">Gamepad (selector low nibble <code class="docutils literal notranslate"><span class="pre">2</span></code>)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ffc0-ffff-ria"><code class="docutils literal notranslate"><span class="pre">$FFC0–$FFFF</span></code> — RIA</a><ul>
+<li><a class="reference internal" href="#hardware-multiply-and-divide">Hardware Multiply and Divide</a></li>
+<li><a class="reference internal" href="#time-of-day">Time of Day</a></li>
+<li><a class="reference internal" href="#dma">DMA</a></li>
+<li><a class="reference internal" href="#file-descriptors">File Descriptors</a></li>
+<li><a class="reference internal" href="#uart-rng-and-interrupt-controller">UART, RNG and Interrupt Controller</a></li>
+<li><a class="reference internal" href="#fastcall-api">Fastcall API</a></li>
+<li><a class="reference internal" href="#extension-control">Extension Control</a></li>
+<li><a class="reference internal" href="#cpu-vectors">CPU Vectors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=187304be"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/tabs.js?v=3ee01567"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../_static/design-tabs.js?v=fcb327ea"></script>
+    <script defer="defer" src="https://stats.chrome.pl/api/script.js?siteId=19a9a6f3e638"></script>
+    </body>
+</html>

@@ -1,0 +1,924 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Chapter 6: Input and Output Interfaces" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.x65.zone/1/6_io/" />
+<meta property="og:site_name" content="X65" />
+<meta property="og:description" content="The X65 surfaces its I/O through a small, disciplined register window at the top of bank 0 and a handful of physical connectors on the board. This chapter walks the hardware side of each subsystem ..." />
+<meta name="description" content="The X65 surfaces its I/O through a small, disciplined register window at the top of bank 0 and a handful of physical connectors on the board. This chapter walks the hardware side of each subsystem ..." />
+<link rel="index" title="Index" href="../../genindex/"><link rel="search" title="Search" href="../../search/"><link rel="next" title="Chapter 7: Development and Emulation" href="../7_devel/"><link rel="prev" title="Chapter 5: Sound and Audio" href="../5_audio/">
+        <link rel="canonical" href="https://docs.x65.zone/1/6_io/">
+        <link rel="prefetch" href="../../_static/paw_logo_32.png" as="image">
+
+    <link rel="shortcut icon" href="../../_static/paw_logo_32_gray.png"><!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Chapter 6: Input and Output Interfaces - X65.docs</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ea49a994" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #0E556F;
+  --color-brand-content: #0E556F;
+  --color-brand-visited: #052544;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../"><div class="brand">X65.docs</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/paw_logo_32.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">X65.docs</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search/" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../part_1/">Part 1: The X65 Microcomputer</a><input aria-label="Toggle navigation of Part 1: The X65 Microcomputer" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../1_introduction/">Chapter 1: Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../2_overview/">Chapter 2: System Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../3_memory_storage/">Chapter 3: Memory and Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_graphics/">Chapter 4: Graphics and Display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../5_audio/">Chapter 5: Sound and Audio</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Chapter 6: Input and Output Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../7_devel/">Chapter 7: Development and Emulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../part_2/">Part 2: Programming the X65 in 65816 Assembly</a><input aria-label="Toggle navigation of Part 2: Programming the X65 in 65816 Assembly" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../2/08_assembly/">Chapter 8: Introduction to 65816 Assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/09_dev_env/">Chapter 9: Development Environment Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/10_memory/">Chapter 10: Memory Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/11_graphics/">Chapter 11: Graphics Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/12_sound/">Chapter 12: Sound Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/13_input_output/">Chapter 13: Input/Output Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/14_os/">Chapter 14: Operating System (OS/816)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/15_advanced/">Chapter 15: Advanced Programming Techniques</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/16_examples/">Chapter 16: Example Projects and Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/17_afterword/">Chapter 17: Afterword</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/A_memory_map/">Appendix A: Memory Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/B_glossary/">Appendix B: Glossary of X65 Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/C_65816_migration/">Appendix C: From 6502 to 65816 Migration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/D_systems_comparison/">Appendix D: X65 Compared to Classic 8-bit Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/E_cheat_sheet/">Appendix E: X65 Quick Reference Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/F_xex_format/">Appendix F: XEX File Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/G_sgu1/">Appendix G: The SGU-1 Sound Generator</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/blob/main/book/1/6_io.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/edit/main/book/1/6_io.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="chapter-6-input-and-output-interfaces">
+<h1>Chapter 6: Input and Output Interfaces<a class="headerlink" href="#chapter-6-input-and-output-interfaces" title="Link to this heading">¶</a></h1>
+<p>The X65 surfaces its I/O through a small, disciplined register window at the top of bank 0 and a handful of physical connectors on the board. This chapter walks the hardware side of each subsystem — what it is, where it lives in memory, and how the pieces fit together. Assembly-level programming sequences for the same subsystems are covered in <a class="reference internal" href="../../2/13_input_output/"><span class="std std-doc">Chapter 13: Input/Output Handling</span></a>.</p>
+<section id="uart-and-the-monitor-console">
+<h2>UART and the Monitor Console<a class="headerlink" href="#uart-and-the-monitor-console" title="Link to this heading">¶</a></h2>
+<p>The NORTH chip exposes a simple UART at <strong><code class="docutils literal notranslate"><span class="pre">$FFE0–$FFE1</span></code></strong> — two registers used to talk to the on-board monitor and, through it, to the OS and to applications.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>R/W</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFE0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">UART_STATUS</span></code></p></td>
+<td><p>R</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[7]</span></code> TX writable (space in TX buffer), <code class="docutils literal notranslate"><span class="pre">[6]</span></code> RX ready (byte waiting)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFE1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">UART_RX</span></code></p></td>
+<td><p>R</p></td>
+<td><p>Receive a byte; clears the RX-ready flag</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFE1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">UART_TX</span></code></p></td>
+<td><p>W</p></td>
+<td><p>Send a byte; dropped if <code class="docutils literal notranslate"><span class="pre">TX</span> <span class="pre">writable</span></code> was clear</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Polling is idiomatic: read <code class="docutils literal notranslate"><span class="pre">$FFE0</span></code>, test <code class="docutils literal notranslate"><span class="pre">[7]</span></code> before writing, test <code class="docutils literal notranslate"><span class="pre">[6]</span></code> before reading. A byte-per-call discipline keeps the firmware UART buffer happy.</p>
+<p>The same UART register pair also carries the <strong>USB-CDC serial</strong> path. When the X65 is powered over USB-C, the connection doubles as a virtual serial port — plugging the DEV-board into a host PC brings up a CDC device that the monitor can be reached through directly, with no extra wiring.</p>
+<p>A few neighbouring addresses share the <code class="docutils literal notranslate"><span class="pre">$FFE0</span></code> page:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Function</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFE2–$FFE3</span></code></p></td>
+<td><p>Hardware random-number generator (read two bytes)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFEC</span></code></p></td>
+<td><p>IRQ mask — enable/disable interrupt sources per bit</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFED</span></code></p></td>
+<td><p>IRQ status — which sources are currently asserting</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="monitor-commands">
+<h2>Monitor Commands<a class="headerlink" href="#monitor-commands" title="Link to this heading">¶</a></h2>
+<p>The monitor is reached through the same UART (<code class="docutils literal notranslate"><span class="pre">$FFE0–$FFE1</span></code>), whether attached physically or via the USB-CDC path. Two ways in:</p>
+<ul class="simple">
+<li><p><strong>From a host terminal over USB-CDC</strong>: open the virtual serial port; the monitor prompt appears once a full system boot has happened.</p></li>
+<li><p><strong>From an attached screen + keyboard</strong>: press <strong>Ctrl-Alt-Delete</strong>. The combination halts the 65C816 — the CPU is held in RESET — and switches the display / keyboard to the monitor console. Resetting or <code class="docutils literal notranslate"><span class="pre">reboot</span></code>-ing from the monitor releases the CPU back into normal execution.</p></li>
+</ul>
+<p>The currently-implemented commands are:</p>
+<section id="system">
+<h3>System<a class="headerlink" href="#system" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">help</span></code>, <code class="docutils literal notranslate"><span class="pre">h</span></code>, <code class="docutils literal notranslate"><span class="pre">?</span></code></p></td>
+<td><p>List available commands</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>Print system info: firmware build, CPU + core clocks, DVI mode, RAM size/topology</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">set</span></code></p></td>
+<td><p>Get or set a firmware configuration value</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">reboot</span></code></p></td>
+<td><p>Restart the whole system</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">reset</span></code></p></td>
+<td><p>Reset only the 65C816</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="filesystem-usb-storage">
+<h3>Filesystem (USB storage)<a class="headerlink" href="#filesystem-usb-storage" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ls</span></code>, <code class="docutils literal notranslate"><span class="pre">dir</span></code></p></td>
+<td><p>List directory contents on the mounted USB volume</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cd</span></code>, <code class="docutils literal notranslate"><span class="pre">chdir</span></code></p></td>
+<td><p>Change the current working directory</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mkdir</span></code></p></td>
+<td><p>Create a directory</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">upload</span></code></p></td>
+<td><p>Receive a file from the host over the serial link</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">unlink</span></code></p></td>
+<td><p>Delete a file</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">binary</span></code></p></td>
+<td><p>Switch the console into a binary transfer mode</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="boot-rom-catalogue">
+<h3>Boot ROM catalogue<a class="headerlink" href="#boot-rom-catalogue" title="Link to this heading">¶</a></h3>
+<p>These commands manage the <code class="docutils literal notranslate"><span class="pre">.xex</span></code> images that the NORTH firmware loads at power-on — the machine’s built-in-ROM layer. On a stock X65, the shipped boot ROM is OS/816; normal user applications live <em>under</em> OS/816 and are not deployed here. See <a class="reference internal" href="../../2/09_dev_env/"><span class="std std-doc">Chapter 9</span></a> for the two deployment paths.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">load</span></code></p></td>
+<td><p>Load a <code class="docutils literal notranslate"><span class="pre">.xex</span></code> into PSRAM and jump to its entry point (bare-metal; single session)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">info</span></code></p></td>
+<td><p>Show the INFO-segment metadata of a <code class="docutils literal notranslate"><span class="pre">.xex</span></code> without running it (see <a class="reference internal" href="../../A/F_xex_format/"><span class="std std-doc">Appendix F</span></a>)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">install</span></code></p></td>
+<td><p>Install a <code class="docutils literal notranslate"><span class="pre">.xex</span></code> into the LittleFS boot catalogue</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">remove</span></code></p></td>
+<td><p>Remove a <code class="docutils literal notranslate"><span class="pre">.xex</span></code> from the boot catalogue</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="diagnostics">
+<h3>Diagnostics<a class="headerlink" href="#diagnostics" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Command</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">memtest</span></code></p></td>
+<td><p>Benchmark and stress-test both PSRAM banks; report copy speeds and block-test results</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The combination of <code class="docutils literal notranslate"><span class="pre">upload</span></code> + <code class="docutils literal notranslate"><span class="pre">install</span></code> + <code class="docutils literal notranslate"><span class="pre">info</span></code> + <code class="docutils literal notranslate"><span class="pre">load</span></code> is the normal development loop: upload a freshly-built <code class="docutils literal notranslate"><span class="pre">.xex</span></code> from the host, inspect its metadata, load to run, install to persist.</p>
+</section>
+</section>
+<section id="usb-hid">
+<h2>USB HID<a class="headerlink" href="#usb-hid" title="Link to this heading">¶</a></h2>
+<p>USB keyboards, mice, and gamepads plugged into the X65 are handled by the NORTH chip’s USB host stack and surfaced to the 65C816 as a 16-byte memory-mapped window at <strong><code class="docutils literal notranslate"><span class="pre">$FFB0–$FFBF</span></code></strong>.</p>
+<p>The window is <strong>device-switched</strong>: writing to <code class="docutils literal notranslate"><span class="pre">$FFB0</span></code> picks which device appears in the other fifteen bytes. The selector byte packs two fields:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Bits</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[3:0]</span></code></p></td>
+<td><p>Device type — <code class="docutils literal notranslate"><span class="pre">0</span></code> keyboard, <code class="docutils literal notranslate"><span class="pre">1</span></code> mouse, <code class="docutils literal notranslate"><span class="pre">2</span></code> gamepad</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[7:4]</span></code></p></td>
+<td><p>For keyboard: page index (0 or 1). For gamepad: pad number (0–15; 0 merges connected pads).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Keyboards expose a 32-byte state bitmap — one bit per HID keycode — split across two 16-byte pages. Page 0 also carries a small status byte at offset 0 (connected, NUMLOCK, CAPSLOCK, SCROLLLOCK).</p>
+<p>Gamepads present a 10-byte report: D-pad and feature flags, digital stick directions, two button bytes, analog stick coordinates, and triggers. A writable selector value of <code class="docutils literal notranslate"><span class="pre">2</span></code> (high nibble zero) targets <strong>pad 0 — the merged view</strong>, whose bytes are the bitwise OR of every physically-connected gamepad. Single-player applications can read pad 0 unconditionally; multiplayer applications loop across pad indices 1–15.</p>
+<p>Full register offsets and bit layouts live in <a class="reference internal" href="../../A/A_memory_map/"><span class="std std-doc">Appendix A: Memory Map</span></a>; polling patterns are in <a class="reference internal" href="../../2/13_input_output/"><span class="std std-doc">Chapter 13: Input/Output Handling</span></a>.</p>
+</section>
+<section id="de-9-gpio-ports">
+<h2>DE-9 GPIO Ports<a class="headerlink" href="#de-9-gpio-ports" title="Link to this heading">¶</a></h2>
+<p>The board carries two <strong>DE-9 connectors</strong> in the classic double-joystick-port arrangement — but read the label carefully: these are <strong>general-purpose, bi-directional GPIO ports</strong> first and joystick ports second. Each of the sixteen lines can be individually configured as an input or an output, and the port side runs at <strong>5 V TTL levels</strong>. In the spirit of the C64’s control and user ports, the same connectors that accept an Atari-style stick can just as well read a sensor, switch a relay driver, or bit-bang a home-built peripheral — the retro joystick pinout is simply the default <em>convention</em> for how the pins are used, not what the hardware is.</p>
+<p>Behind the connectors sits an NXP <strong>PCAL6416A</strong>, a 16-bit I²C GPIO expander with built-in voltage level translation: its I²C side talks to the NORTH chip at 3.3 V while its port side runs from the 5 V rail. Expander port 0 is the first DE-9 connector and port 1 the second, eight lines each. The expander’s other defining property for the X65 is its <strong>interrupt-mask registers</strong> — software requests IRQs only for the pin transitions it cares about, avoiding the paging-on-every-pin-change behaviour of simpler expanders.</p>
+<section id="connector-pinout">
+<h3>Connector pinout<a class="headerlink" href="#connector-pinout" title="Link to this heading">¶</a></h3>
+<p>Port bits map to DE-9 pins in order; pin 8 is ground, so the eight GPIO lines occupy pins 1–7 and 9:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>DE-9 pin</p></th>
+<th class="head"><p>Port bit</p></th>
+<th class="head"><p>Joystick convention</p></th>
+<th class="head"><p>As GPIO</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>0</p></td>
+<td><p>Up</p></td>
+<td><p>GPIO line 0</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>1</p></td>
+<td><p>Down</p></td>
+<td><p>GPIO line 1</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>2</p></td>
+<td><p>Left</p></td>
+<td><p>GPIO line 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>3</p></td>
+<td><p>Right</p></td>
+<td><p>GPIO line 3</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>4</p></td>
+<td><p>Button 3</p></td>
+<td><p>GPIO line 4</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p>5</p></td>
+<td><p>Fire (button 1)</p></td>
+<td><p>GPIO line 5</p></td>
+</tr>
+<tr class="row-even"><td><p>7</p></td>
+<td><p>6</p></td>
+<td><p>Button 4</p></td>
+<td><p>GPIO line 6</p></td>
+</tr>
+<tr class="row-odd"><td><p>8</p></td>
+<td><p>—</p></td>
+<td><p>Ground</p></td>
+<td><p>Ground</p></td>
+</tr>
+<tr class="row-even"><td><p>9</p></td>
+<td><p>7</p></td>
+<td><p>Button 2</p></td>
+<td><p>GPIO line 7</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Joystick inputs are <strong>active-low</strong>: a closed switch shorts the pin to ground (pin 8), so with the pull-ups enabled a pressed direction or button reads <code class="docutils literal notranslate"><span class="pre">0</span></code>. Note that on classic machines pin 7 carried +5 V; on the X65 it is a full GPIO line, used as button 4 under the joystick convention. Pins 5 and 9 — the analog paddle inputs of the old ports — are plain digital lines here, used as buttons 3 and 2.</p>
+<p>Because the port side runs at 5 V, classic-machine accessories that expect power on pin 7 are still an option: configure bit 6 as an output and drive it permanently high, and the pin becomes the +5 V supply the old ports provided. That is enough for the light electronics of the era — autofire circuits, adapter dongles — within the expander’s drive limits (see below). The trade-off is losing button 4 on that connector, which classic devices never had anyway.</p>
+</section>
+<section id="register-file">
+<h3>Register file<a class="headerlink" href="#register-file" title="Link to this heading">¶</a></h3>
+<p>The expander’s complete register file is memory-mapped at <strong><code class="docutils literal notranslate"><span class="pre">$FF80–$FF97</span></code></strong>; the 65C816 sees plain bank-0 addresses while the firmware relays accesses over I²C. Registers come in pairs — one per port / connector, suffix <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code>:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>Reset</p></th>
+<th class="head"><p>Function</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF80</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF81</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IN0</span></code> / <code class="docutils literal notranslate"><span class="pre">IN1</span></code></p></td>
+<td><p>live</p></td>
+<td><p><strong>Input port</strong> (read-only). The actual pin levels, regardless of direction. Reading clears a pending interrupt for that port.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF82</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF83</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">OUT0</span></code> / <code class="docutils literal notranslate"><span class="pre">OUT1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FF</span></code></p></td>
+<td><p><strong>Output port.</strong> Level driven on pins configured as outputs; bits for input pins are ignored. Reads return what was written, not the pin.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF84</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF85</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">POL0</span></code> / <code class="docutils literal notranslate"><span class="pre">POL1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$00</span></code></p></td>
+<td><p><strong>Polarity inversion.</strong> <code class="docutils literal notranslate"><span class="pre">1</span></code> inverts that input pin’s sense as seen in <code class="docutils literal notranslate"><span class="pre">IN</span></code> — handy for reading active-low joystick switches as <code class="docutils literal notranslate"><span class="pre">1</span></code> = pressed.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF86</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF87</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CFG0</span></code> / <code class="docutils literal notranslate"><span class="pre">CFG1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FF</span></code></p></td>
+<td><p><strong>Direction.</strong> <code class="docutils literal notranslate"><span class="pre">1</span></code> = high-impedance input (the reset state), <code class="docutils literal notranslate"><span class="pre">0</span></code> = output.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF88</span></code>–<code class="docutils literal notranslate"><span class="pre">$FF8B</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">STR0L/H</span></code>, <code class="docutils literal notranslate"><span class="pre">STR1L/H</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FF</span></code></p></td>
+<td><p><strong>Output drive strength</strong>, two bits per pin (<code class="docutils literal notranslate"><span class="pre">STRxL</span></code> covers bits 0–3, <code class="docutils literal notranslate"><span class="pre">STRxH</span></code> bits 4–7): <code class="docutils literal notranslate"><span class="pre">00</span></code> = ¼, <code class="docutils literal notranslate"><span class="pre">01</span></code> = ½, <code class="docutils literal notranslate"><span class="pre">10</span></code> = ¾, <code class="docutils literal notranslate"><span class="pre">11</span></code> = full drive.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF8C</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF8D</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">LTCH0</span></code> / <code class="docutils literal notranslate"><span class="pre">LTCH1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$00</span></code></p></td>
+<td><p><strong>Input latch.</strong> <code class="docutils literal notranslate"><span class="pre">1</span></code> = a level change is captured into <code class="docutils literal notranslate"><span class="pre">IN</span></code> and held until <code class="docutils literal notranslate"><span class="pre">IN</span></code> is read, so a short pulse cannot slip between polls. <code class="docutils literal notranslate"><span class="pre">0</span></code> = <code class="docutils literal notranslate"><span class="pre">IN</span></code> tracks the pin live.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF8E</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF8F</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PLE0</span></code> / <code class="docutils literal notranslate"><span class="pre">PLE1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$00</span></code></p></td>
+<td><p><strong>Pull resistor enable.</strong> <code class="docutils literal notranslate"><span class="pre">1</span></code> connects the pin’s internal 100 kΩ resistor.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF90</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF91</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PLS0</span></code> / <code class="docutils literal notranslate"><span class="pre">PLS1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FF</span></code></p></td>
+<td><p><strong>Pull direction.</strong> <code class="docutils literal notranslate"><span class="pre">1</span></code> = pull-up, <code class="docutils literal notranslate"><span class="pre">0</span></code> = pull-down (effective only where <code class="docutils literal notranslate"><span class="pre">PLE</span></code> is set).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF92</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF93</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">INTE0</span></code> / <code class="docutils literal notranslate"><span class="pre">INTE1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$FF</span></code></p></td>
+<td><p><strong>Interrupt mask.</strong> <code class="docutils literal notranslate"><span class="pre">0</span></code> = a change on that input asserts the IRQ. All pins power up masked — no spurious interrupts at boot.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF94</span></code> / <code class="docutils literal notranslate"><span class="pre">$FF95</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">INST0</span></code> / <code class="docutils literal notranslate"><span class="pre">INST1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$00</span></code></p></td>
+<td><p><strong>Interrupt status</strong> (read-only). <code class="docutils literal notranslate"><span class="pre">1</span></code> = this pin is the source of the pending interrupt.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FF96</span></code></p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+<td><p>Reserved.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FF97</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">OUTCF</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">$00</span></code></p></td>
+<td><p><strong>Output stage configuration</strong>, per port: bit 0 = port 0, bit 1 = port 1; <code class="docutils literal notranslate"><span class="pre">0</span></code> = push-pull, <code class="docutils literal notranslate"><span class="pre">1</span></code> = open-drain (set it <em>before</em> switching pins to output).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The reset state is deliberately benign: every pin an input, pulls disconnected, every interrupt masked. Reading a joystick therefore takes two setup writes — enable the pull-ups (<code class="docutils literal notranslate"><span class="pre">PLS</span></code> already defaults to “up”, so just set <code class="docutils literal notranslate"><span class="pre">PLE</span></code> to <code class="docutils literal notranslate"><span class="pre">$FF</span></code>) — after which <code class="docutils literal notranslate"><span class="pre">IN0</span></code>/<code class="docutils literal notranslate"><span class="pre">IN1</span></code> deliver the stick state directly. Driving external hardware is the mirror image: write the level to <code class="docutils literal notranslate"><span class="pre">OUT</span></code>, then clear the pin’s <code class="docutils literal notranslate"><span class="pre">CFG</span></code> bit to turn the driver on.</p>
+</section>
+<section id="electrical-limits">
+<h3>Electrical limits<a class="headerlink" href="#electrical-limits" title="Link to this heading">¶</a></h3>
+<p>For the “control external devices” use case, the numbers that matter (from the PCAL6416A datasheet):</p>
+<ul class="simple">
+<li><p>Inputs are high-impedance and tolerate up to 5.5 V regardless of the port supply.</p></li>
+<li><p>Internal pull resistors are nominally 100 kΩ (50–150 kΩ across conditions).</p></li>
+<li><p>Outputs sink up to <strong>25 mA per pin</strong> — enough to drive an LED directly — but keep each 8-pin port under 100 mA total, and mind the per-pin drive-strength setting.</p></li>
+<li><p>Open-drain mode (<code class="docutils literal notranslate"><span class="pre">OUTCF</span></code>) disconnects the internal pulls on that port; provide an external pull-up when wire-OR-ing.</p></li>
+</ul>
+</section>
+<section id="interrupts">
+<h3>Interrupts<a class="headerlink" href="#interrupts" title="Link to this heading">¶</a></h3>
+<p>The expander’s <code class="docutils literal notranslate"><span class="pre">INT</span></code> line feeds <strong>bit 1 of the RIA interrupt controller</strong> (<code class="docutils literal notranslate"><span class="pre">$FFEC</span></code> mask / <code class="docutils literal notranslate"><span class="pre">$FFED</span></code> status — see the <a class="reference internal" href="#uart-and-the-monitor-console">UART section</a> above). Unmasking a pin in <code class="docutils literal notranslate"><span class="pre">INTE</span></code> makes any change on it assert the IRQ; the handler reads <code class="docutils literal notranslate"><span class="pre">INST0</span></code>/<code class="docutils literal notranslate"><span class="pre">INST1</span></code> to find which pin fired and then reads <code class="docutils literal notranslate"><span class="pre">IN</span></code> to clear the condition. Combined with the input latch this gives fully edge-driven joystick handling — no per-frame polling required.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The NORTH firmware does not decode this window yet — reads currently return <code class="docutils literal notranslate"><span class="pre">$FF</span></code> and writes are ignored. Until the I²C path to the expander is brought up, use USB HID gamepads via <code class="docutils literal notranslate"><span class="pre">$FFB0–$FFBF</span></code> for controller input.</p>
+</div>
+</section>
+</section>
+<section id="rgb-led-chain">
+<h2>RGB LED Chain<a class="headerlink" href="#rgb-led-chain" title="Link to this heading">¶</a></h2>
+<p>The DEV-board has three on-board RGB LEDs (intended for keyboard state on the full machine) plus a WS2812 data line on the expansion port, which together support a chain of up to 256 addressable LEDs. The RIA decodes and the firmware drives <strong>four</strong> direct LED registers; the fourth position is simply not populated on the DEV-board, so <code class="docutils literal notranslate"><span class="pre">$FFA3</span></code> addresses an LED you can solder onto the strip header yourself. The CPU reaches them through two parallel interfaces at <strong><code class="docutils literal notranslate"><span class="pre">$FFA0–$FFA7</span></code></strong>:</p>
+<section id="direct-rgb332-for-leds-03">
+<h3>Direct RGB332 for LEDs 0–3<a class="headerlink" href="#direct-rgb332-for-leds-03" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>LED</p></th>
+<th class="head"><p>Byte format</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA0</span></code></p></td>
+<td><p>0</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[7:5]</span> <span class="pre">R</span> <span class="pre">·</span> <span class="pre">[4:2]</span> <span class="pre">G</span> <span class="pre">·</span> <span class="pre">[1:0]</span> <span class="pre">B</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA1</span></code></p></td>
+<td><p>1</p></td>
+<td><p>same</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA2</span></code></p></td>
+<td><p>2</p></td>
+<td><p>same</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA3</span></code></p></td>
+<td><p>3</p></td>
+<td><p>same</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>A single <code class="docutils literal notranslate"><span class="pre">STA</span></code> lights up one of the first four LEDs — no sequencing required. LED 3 is unpopulated on the DEV-board; the write still reaches the chain.</p>
+</section>
+<section id="chain-protocol-any-led-0255-full-24-bit-colour">
+<h3>Chain protocol (any LED 0–255, full 24-bit colour)<a class="headerlink" href="#chain-protocol-any-led-0255-full-24-bit-colour" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Role</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA4</span></code></p></td>
+<td><p>LED index in the chain — <strong>writing this commits the update</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA5</span></code></p></td>
+<td><p>Red byte (latched)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA6</span></code></p></td>
+<td><p>Green byte (latched)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA7</span></code></p></td>
+<td><p>Blue byte (latched)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Writing to <code class="docutils literal notranslate"><span class="pre">$FFA5</span></code>, <code class="docutils literal notranslate"><span class="pre">$FFA6</span></code>, or <code class="docutils literal notranslate"><span class="pre">$FFA7</span></code> only latches a value — no output is sent to the LED chain. Writing to <code class="docutils literal notranslate"><span class="pre">$FFA4</span></code> dispatches the PIX command to the SOUTH-side WS2812 driver with the current latched G / B / index and the freshly-written R.</p>
+<p>Internally, both paths go out over the PIX bus as messages on the <code class="docutils literal notranslate"><span class="pre">MISC</span></code> device; the SOUTH chip drives the WS2812 line at the board’s timing spec.</p>
+</section>
+</section>
+<section id="system-buzzer">
+<h2>System Buzzer<a class="headerlink" href="#system-buzzer" title="Link to this heading">¶</a></h2>
+<p>A small PWM-driven piezo <strong>buzzer</strong> on the board handles the kinds of tones an OS or application wants without needing to spin up an SGU-1 channel. Its registers live at <strong><code class="docutils literal notranslate"><span class="pre">$FFA8–$FFAB</span></code></strong>:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA8</span></code></p></td>
+<td><p>FREQ_L</p></td>
+<td><p>Low byte of the 16-bit frequency code</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFA9</span></code></p></td>
+<td><p>FREQ_H</p></td>
+<td><p>High byte of the 16-bit frequency code</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">$FFAA</span></code></p></td>
+<td><p>DUTY</p></td>
+<td><p>Duty cycle, 0 (silent) – 255 (peak square wave)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">$FFAB</span></code></p></td>
+<td><p>—</p></td>
+<td><p>Reserved</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The 16-bit <code class="docutils literal notranslate"><span class="pre">FREQ</span></code> value is mapped <strong>logarithmically</strong> to audio Hz, covering roughly 20 Hz to 20 kHz across the full range:</p>
+<p>$$
+f(\text{FREQ}) = 20,\text{Hz} \cdot 2^{10,\text{FREQ}/65535}
+$$</p>
+<p>Writing either <code class="docutils literal notranslate"><span class="pre">FREQ_L</span></code> or <code class="docutils literal notranslate"><span class="pre">FREQ_H</span></code> commits the new frequency via a PIX command to the SOUTH buzzer driver. Writing <code class="docutils literal notranslate"><span class="pre">DUTY</span></code> commits the new duty cycle independently — setting it to zero is the canonical way to silence a running tone without changing its pitch.</p>
+</section>
+<section id="expansion-port">
+<h2>Expansion Port<a class="headerlink" href="#expansion-port" title="Link to this heading">¶</a></h2>
+<p>The X65’s main expansion connector is physically a <strong>PCIe x4 slot</strong> (chosen for cheap, ubiquitous mechanical availability) repurposed as a CPU-bus expansion. The signal list exposes enough of the system bus for a wide range of add-on boards — memory, custom chips, external I/O:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Group</p></th>
+<th class="head"><p>Signals</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Data bus</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">D0–D7</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Address bus</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">A0–A7</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>CPU control</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PHI2</span></code>, <code class="docutils literal notranslate"><span class="pre">/IRQB</span></code>, <code class="docutils literal notranslate"><span class="pre">/NMIB</span></code>, <code class="docutils literal notranslate"><span class="pre">/VAB</span></code>, <code class="docutils literal notranslate"><span class="pre">R/WB</span></code>, <code class="docutils literal notranslate"><span class="pre">/RESB</span></code>, <code class="docutils literal notranslate"><span class="pre">/ABORT</span></code>, <code class="docutils literal notranslate"><span class="pre">RDY</span></code>, <code class="docutils literal notranslate"><span class="pre">BE</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>I/O enables</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IO0_EN</span></code>, <code class="docutils literal notranslate"><span class="pre">IO1_EN</span></code>, <code class="docutils literal notranslate"><span class="pre">IO2_EN</span></code>, <code class="docutils literal notranslate"><span class="pre">IO3_EN</span></code> (four expansion slot selects)</p></td>
+</tr>
+<tr class="row-even"><td><p>I/O interrupts</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">IO0_INT</span></code>, <code class="docutils literal notranslate"><span class="pre">IO1_INT</span></code>, <code class="docutils literal notranslate"><span class="pre">IO2_INT</span></code>, <code class="docutils literal notranslate"><span class="pre">IO3_INT</span></code> (one per slot)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Power</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">+5</span> <span class="pre">V</span></code>, <code class="docutils literal notranslate"><span class="pre">+3.3</span> <span class="pre">V</span></code>, <code class="docutils literal notranslate"><span class="pre">GND</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Other buses</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">I²C</span></code> (SDA / SCL), <code class="docutils literal notranslate"><span class="pre">UART</span></code> (TX / RX)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Audio</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MIX_OUT_L</span></code>, <code class="docutils literal notranslate"><span class="pre">MIX_OUT_R</span></code>, <code class="docutils literal notranslate"><span class="pre">EXT_IN_L</span></code>, <code class="docutils literal notranslate"><span class="pre">EXT_IN_R</span></code>, <code class="docutils literal notranslate"><span class="pre">AUDIO_EXT3</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>LEDs</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">WS2812</span></code> data line</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Each of the four I/O slots on the connector gets its own enable and interrupt line, meaning up to four cards can be installed at once with independent address decoding and IRQ routing. CPU-bus expansion boards see the same 8-bit data and low-address signalling as the on-board chips, so a custom peripheral can map itself into the <code class="docutils literal notranslate"><span class="pre">$FC00–$FDFF</span></code> expansion window using its own <code class="docutils literal notranslate"><span class="pre">IO_EN</span></code> line — one 128-byte slot per card. See <a class="reference internal" href="../../A/A_memory_map/"><span class="std std-doc">Appendix A</span></a> for the slot ranges and the RIA chunk bitmap that decides which parts of the window reach the bus.</p>
+<p>For a working reference: the board KiCad project and schematic PDF are published in the <a class="reference external" href="https://github.com/X65/schematic">X65 schematic repository</a>.</p>
+</section>
+<section id="on-board-i2c-header-clockport">
+<span id="on-board-i²c-header-clockport"></span><h2>On-Board I²C Header (Clockport)<a class="headerlink" href="#on-board-i2c-header-clockport" title="Link to this heading">¶</a></h2>
+<p>Inspired by the Amiga Clockport, the DEV-board carries a small <strong>on-board I²C header</strong> intended for simple add-ons — real-time clocks, temperature sensors, EEPROMs — that do not warrant a full expansion-port slot. The header shares the same I²C bus that runs over the expansion port, so device addresses must be allocated to avoid collision across both surfaces.</p>
+<p>Software reaches I²C peripherals via the RIA fastcall API rather than bit-banging the bus from the 65C816.</p>
+</section>
+<section id="networking-raspberry-pi-radio-module-2">
+<h2>Networking (Raspberry Pi Radio Module 2)<a class="headerlink" href="#networking-raspberry-pi-radio-module-2" title="Link to this heading">¶</a></h2>
+<p>The board’s wireless connectivity is provided by the <strong>Raspberry Pi Radio Module 2</strong> — a small ready-to-use surface-mount module carrying CYW43-series silicon, the same wireless core used by the Raspberry Pi Pico W. It is driven directly by the NORTH chip over a PIO-bit-banged SPI link (GPIOs 34–37).</p>
+<p>Capabilities:</p>
+<ul class="simple">
+<li><p><strong>Wi-Fi</strong>: TCP / UDP networking, IP configuration, DNS.</p></li>
+<li><p><strong>Bluetooth</strong>: BLE and classic Bluetooth links.</p></li>
+<li><p><strong>AT command interface</strong> — a text protocol for configuring the networking stack, parsed by NORTH. Modern extensions take the form <code class="docutils literal notranslate"><span class="pre">AT+XXX?</span></code> (query) and <code class="docutils literal notranslate"><span class="pre">AT+XXX=YYY</span></code> (set); traditional Hayes-like commands (<code class="docutils literal notranslate"><span class="pre">D</span></code>, <code class="docutils literal notranslate"><span class="pre">E</span></code>, <code class="docutils literal notranslate"><span class="pre">H</span></code>, <code class="docutils literal notranslate"><span class="pre">O</span></code>, <code class="docutils literal notranslate"><span class="pre">S</span></code>, <code class="docutils literal notranslate"><span class="pre">Z</span></code>, <code class="docutils literal notranslate"><span class="pre">&amp;…</span></code>) remain available for modem-style dial-out paths.</p></li>
+</ul>
+<p>Implemented AT+ extensions today include <code class="docutils literal notranslate"><span class="pre">AT+RF</span></code> and <code class="docutils literal notranslate"><span class="pre">AT+RFCC</span></code> (radio country code), <code class="docutils literal notranslate"><span class="pre">AT+SSID</span></code>, and <code class="docutils literal notranslate"><span class="pre">AT+PASS</span></code>.</p>
+<p>For a program to reach the network layer, it issues AT commands via the UART (<code class="docutils literal notranslate"><span class="pre">$FFE0–$FFE1</span></code>) the same way it reaches the monitor; the firmware routes the bytes to the correct back-end based on whether the current console context is “monitor” or “modem”.</p>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h2>
+<p>The X65 keeps its I/O surface shallow and direct: a dozen named MMIO windows at the top of bank 0, a monitor console reachable from the UART / USB-CDC path, a generous expansion connector exposing the raw 65C816 bus with I/O enables and interrupts, and a small I²C header for the kinds of add-ons a modern retro-style machine expects. <a class="reference internal" href="../../2/13_input_output/"><span class="std std-doc">Chapter 13: Input/Output Handling</span></a> shows how to actually talk to each of these from 65C816 assembly.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../7_devel/">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Chapter 7: Development and Emulation</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../5_audio/">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Chapter 5: Sound and Audio</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Tomasz Sterna
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Chapter 6: Input and Output Interfaces</a><ul>
+<li><a class="reference internal" href="#uart-and-the-monitor-console">UART and the Monitor Console</a></li>
+<li><a class="reference internal" href="#monitor-commands">Monitor Commands</a><ul>
+<li><a class="reference internal" href="#system">System</a></li>
+<li><a class="reference internal" href="#filesystem-usb-storage">Filesystem (USB storage)</a></li>
+<li><a class="reference internal" href="#boot-rom-catalogue">Boot ROM catalogue</a></li>
+<li><a class="reference internal" href="#diagnostics">Diagnostics</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usb-hid">USB HID</a></li>
+<li><a class="reference internal" href="#de-9-gpio-ports">DE-9 GPIO Ports</a><ul>
+<li><a class="reference internal" href="#connector-pinout">Connector pinout</a></li>
+<li><a class="reference internal" href="#register-file">Register file</a></li>
+<li><a class="reference internal" href="#electrical-limits">Electrical limits</a></li>
+<li><a class="reference internal" href="#interrupts">Interrupts</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rgb-led-chain">RGB LED Chain</a><ul>
+<li><a class="reference internal" href="#direct-rgb332-for-leds-03">Direct RGB332 for LEDs 0–3</a></li>
+<li><a class="reference internal" href="#chain-protocol-any-led-0255-full-24-bit-colour">Chain protocol (any LED 0–255, full 24-bit colour)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#system-buzzer">System Buzzer</a></li>
+<li><a class="reference internal" href="#expansion-port">Expansion Port</a></li>
+<li><a class="reference internal" href="#on-board-i2c-header-clockport">On-Board I²C Header (Clockport)</a></li>
+<li><a class="reference internal" href="#networking-raspberry-pi-radio-module-2">Networking (Raspberry Pi Radio Module 2)</a></li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=187304be"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/tabs.js?v=3ee01567"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../_static/design-tabs.js?v=fcb327ea"></script>
+    <script defer="defer" src="https://stats.chrome.pl/api/script.js?siteId=19a9a6f3e638"></script>
+    </body>
+</html>

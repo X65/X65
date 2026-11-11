@@ -1,0 +1,477 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Chapter 7: Development and Emulation" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://docs.x65.zone/1/7_devel/" />
+<meta property="og:site_name" content="X65" />
+<meta property="og:description" content="Developing for the X65 is a mix of classic 8-bit workflow — write 65C816 assembly or C, assemble, test — and modern conveniences: a proper emulator, a DAP-based debugger, a tracker for sound, and a..." />
+<meta name="description" content="Developing for the X65 is a mix of classic 8-bit workflow — write 65C816 assembly or C, assemble, test — and modern conveniences: a proper emulator, a DAP-based debugger, a tracker for sound, and a..." />
+<link rel="index" title="Index" href="../../genindex/"><link rel="search" title="Search" href="../../search/"><link rel="next" title="Part 2: Programming the X65 in 65816 Assembly" href="../../part_2/"><link rel="prev" title="Chapter 6: Input and Output Interfaces" href="../6_io/">
+        <link rel="canonical" href="https://docs.x65.zone/1/7_devel/">
+        <link rel="prefetch" href="../../_static/paw_logo_32.png" as="image">
+
+    <link rel="shortcut icon" href="../../_static/paw_logo_32_gray.png"><!-- Generated with Sphinx 9.1.1 and Furo 2025.12.19 -->
+        <title>Chapter 7: Development and Emulation - X65.docs</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/tabs.css?v=4c969af8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=6a604523" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ea49a994" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  --color-brand-primary: #0E556F;
+  --color-brand-content: #0E556F;
+  --color-brand-visited: #052544;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #272822;
+  --color-code-foreground: #f8f8f2;
+  --color-brand-primary: #90D5F1;
+  --color-brand-content: #90D5F1;
+  --color-brand-visited: #4586A0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../"><div class="brand">X65.docs</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../">
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/paw_logo_32.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">X65.docs</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search/" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../part_1/">Part 1: The X65 Microcomputer</a><input aria-label="Toggle navigation of Part 1: The X65 Microcomputer" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../1_introduction/">Chapter 1: Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../2_overview/">Chapter 2: System Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../3_memory_storage/">Chapter 3: Memory and Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../4_graphics/">Chapter 4: Graphics and Display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../5_audio/">Chapter 5: Sound and Audio</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../6_io/">Chapter 6: Input and Output Interfaces</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Chapter 7: Development and Emulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../part_2/">Part 2: Programming the X65 in 65816 Assembly</a><input aria-label="Toggle navigation of Part 2: Programming the X65 in 65816 Assembly" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../2/08_assembly/">Chapter 8: Introduction to 65816 Assembly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/09_dev_env/">Chapter 9: Development Environment Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/10_memory/">Chapter 10: Memory Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/11_graphics/">Chapter 11: Graphics Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/12_sound/">Chapter 12: Sound Programming</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/13_input_output/">Chapter 13: Input/Output Handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/14_os/">Chapter 14: Operating System (OS/816)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/15_advanced/">Chapter 15: Advanced Programming Techniques</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/16_examples/">Chapter 16: Example Projects and Applications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../2/17_afterword/">Chapter 17: Afterword</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/A_memory_map/">Appendix A: Memory Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/B_glossary/">Appendix B: Glossary of X65 Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/C_65816_migration/">Appendix C: From 6502 to 65816 Migration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/D_systems_comparison/">Appendix D: X65 Compared to Classic 8-bit Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/E_cheat_sheet/">Appendix E: X65 Quick Reference Cheat Sheet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/F_xex_format/">Appendix F: XEX File Format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../A/G_sgu1/">Appendix G: The SGU-1 Sound Generator</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/blob/main/book/1/7_devel.md?plain=true" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div><div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/X65/X65/edit/main/book/1/7_devel.md" rel="edit" title="Edit this page">
+    <svg><use href="#svg-pencil"></use></svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="chapter-7-development-and-emulation">
+<h1>Chapter 7: Development and Emulation<a class="headerlink" href="#chapter-7-development-and-emulation" title="Link to this heading">¶</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This chapter is still under construction.</p>
+</div>
+<p>Developing for the X65 is a mix of classic 8-bit workflow — write 65C816 assembly or C, assemble, test — and modern conveniences: a proper emulator, a DAP-based debugger, a tracker for sound, and a choice of two assemblers depending on whether comfort or hand-rolled control matters more. This chapter tours the tools that make up that environment. Concrete setup steps and command lines are in <a class="reference internal" href="../../2/09_dev_env/"><span class="std std-doc">Chapter 9: Development Environment Setup</span></a>; programming idioms for each subsystem are in Part 2.</p>
+<section id="emu-the-x65-emulator">
+<span id="emu--the-x65-emulator"></span><h2>Emu — the X65 Emulator<a class="headerlink" href="#emu-the-x65-emulator" title="Link to this heading">¶</a></h2>
+<p><strong>Emu</strong> is the official X65 emulator and the primary way most developers see their code run. It is built on the <code class="docutils literal notranslate"><span class="pre">chip-emulators</span></code> toolbox: chips are modelled as small state machines and wired together through a <strong>pin-mask model</strong> — each cycle, every chip reads a shared bus state, decides what its pins should do, and writes them back, just as the real parts would on a breadboard. The result is fast, cycle-accurate enough for timing-sensitive code, and easy to extend when new chips land.</p>
+<p>What makes Emu genuinely useful (rather than just another 65C816 simulator) is how much of the X65 it actually shares with the real hardware:</p>
+<ul class="simple">
+<li><p><strong>CGIA is the real firmware C code</strong>, compiled into Emu rather than a separate emulator-only reimplementation. The handful of assembly-language inner loops in the firmware were rewritten to C so they fit both paths. This means a graphics bug seen on hardware reproduces in Emu, and a fix in either place lands in both.</p></li>
+<li><p><strong>SGU-1 runs the same DSP code</strong> as the audio MCU. Emu renders its stereo 48 kHz output via the host’s audio API.</p></li>
+<li><p><strong>USB HID uses the same source</strong> as the firmware’s HID layer, just with its event source swapped — SDL on native builds, the Web Gamepad API in the browser. Controller compatibility therefore matches the real board’s, including merged-pad-0 semantics.</p></li>
+</ul>
+<p>Emu is available for <strong>Linux (x86_64)</strong>, <strong>Linux (ARM)</strong>, and <strong>Windows</strong>.</p>
+<p>From a workflow perspective: after the host’s cc65 (or K816) toolchain emits a <code class="docutils literal notranslate"><span class="pre">.xex</span></code>, Emu is the fast iteration loop — edit, rebuild, drag-and-drop into Emu, observe. When the program behaves as intended in Emu, pushing it to real hardware via the monitor’s <code class="docutils literal notranslate"><span class="pre">upload</span></code> / <code class="docutils literal notranslate"><span class="pre">install</span></code> / <code class="docutils literal notranslate"><span class="pre">load</span></code> path is a one-line difference. Because the chip cores are shared between the two targets, the hardware trip-up rate is low.</p>
+</section>
+<section id="web-emulator">
+<h2>Web Emulator<a class="headerlink" href="#web-emulator" title="Link to this heading">¶</a></h2>
+<p>The same Emu also ships as a <strong>WebAssembly build</strong> hosted at <strong><a class="reference external" href="https://x65.zone/emu/">https://x65.zone/emu/</a></strong>. The web version runs in any modern browser, loads <code class="docutils literal notranslate"><span class="pre">.xex</span></code> ROMs from URLs or drag-and-drop, and produces the same 768×480 picture and stereo audio as its desktop sibling. It is the primary way to share a working program without asking someone to install a toolchain.</p>
+<p>A few things the web Emu is particularly good for:</p>
+<ul class="simple">
+<li><p><strong>Publishing example programs</strong>: every post in the X65 blog that shows a running demo links to a playable web Emu session.</p></li>
+<li><p><strong>Bug reports</strong>: “it reproduces here, <em>[link]</em>” is a much tighter feedback loop than explaining setup.</p></li>
+<li><p><strong>Teaching</strong>: walk-throughs can run the code live in an embedded frame, no toolchain required.</p></li>
+<li><p><strong>First contact with the machine</strong>: before buying a DEV-board, a prospective user can drive the real graphics / sound / HID behavior with a keyboard and a gamepad straight from their browser.</p></li>
+</ul>
+<p>Because HID runs off the Web Gamepad API, the controller merge/select semantics on the web match the board: pad 0 returns the OR of any connected controllers; pads 1–15 return per-controller state.</p>
+</section>
+<section id="cc65-dbg-vs-code-debugger">
+<span id="cc65-dbg--vs-code-debugger"></span><h2>cc65-dbg — VS Code Debugger<a class="headerlink" href="#cc65-dbg-vs-code-debugger" title="Link to this heading">¶</a></h2>
+<p><strong>cc65-dbg</strong> (<a class="reference external" href="https://github.com/X65/cc65-dbg">https://github.com/X65/cc65-dbg</a>) is a VS Code extension that adds a proper source-level debugger to the cc65/ca65 workflow. It speaks the <strong>Debug Adapter Protocol (DAP)</strong>, so it attaches to any DAP-compatible emulator or hardware adapter — in practice, Emu — and lets the editor drive step-through execution.</p>
+<p>What it gives you:</p>
+<ul class="simple">
+<li><p><strong>Breakpoints</strong> synchronised between the source and the running program.</p></li>
+<li><p><strong>Registers, memory, and disassembly</strong> views updated live as you step.</p></li>
+<li><p><strong>Watch expressions</strong> evaluated against the loaded debug info.</p></li>
+<li><p><strong>Module-scoped globals</strong> — variables named and grouped by their defining source file, not just listed as a flat symbol dump.</p></li>
+</ul>
+<p>cc65-dbg uses the debug-info file emitted by <code class="docutils literal notranslate"><span class="pre">ld65</span> <span class="pre">--dbgfile</span></code> alongside the <code class="docutils literal notranslate"><span class="pre">.xex</span></code> and communicates with Emu through DAP. See <a class="reference internal" href="../../2/09_dev_env/"><span class="std std-doc">Chapter 9</span></a> for setup instructions.</p>
+</section>
+<section id="k816-high-level-assembler">
+<span id="k816--high-level-assembler"></span><h2>K816 — High-Level Assembler<a class="headerlink" href="#k816-high-level-assembler" title="Link to this heading">¶</a></h2>
+<p><strong>K816</strong> (<a class="reference external" href="https://github.com/X65/K816">https://github.com/X65/K816</a>) is a high-level assembler targeting the WDC 65C816. It is the direct descendant of <strong>K65</strong>, a long-running 6502 assembler for Atari VCS work, rewritten and extended so that 65C816 native-mode idioms — 24-bit addressing, 16-bit registers, relocatable direct page, structured functions — are first-class.</p>
+<p>K816’s design goals:</p>
+<ul class="simple">
+<li><p><strong>Readable, C-like source</strong> for control flow and expression, without giving up the exact bit-for-bit control hand-written assembly provides.</p></li>
+<li><p><strong>Compile-time evaluation</strong> for generating constants and data tables programmatically.</p></li>
+<li><p><strong>Structured blocks</strong> — functions, inlining, and an explicit <code class="docutils literal notranslate"><span class="pre">far</span></code> function form for cross-bank calls.</p></li>
+<li><p><strong>Fast, small toolchain</strong> written in modern Rust.</p></li>
+</ul>
+<p>The significant thing about K816 for the X65 project is that <strong>OS/816 is written entirely in it</strong>. K816 is therefore battle tested in a complex project. Application and game programmers still have a choice: cc65/ca65 remains the main path for ordinary 65C816 programs, with K816 available for those who prefer its style.</p>
+<p>A short taste of K816 source (a <code class="docutils literal notranslate"><span class="pre">Hello,</span> <span class="pre">UART</span></code> program) is walked through in <a class="reference internal" href="../../2/09_dev_env/"><span class="std std-doc">Chapter 9</span></a>.</p>
+</section>
+<section id="sgu-tracker">
+<h2>SGU Tracker<a class="headerlink" href="#sgu-tracker" title="Link to this heading">¶</a></h2>
+<p>Music for the SGU-1 is composed in <strong>SGU Tracker</strong>, published at <a class="reference external" href="https://tracker.x65.zone/">https://tracker.x65.zone/</a>. It grew out of the klystrack tracker — the same pattern editor, keyboard workflow and module importers — with the playback engine rewritten to drive an SGU-1 directly, so songs are written, auditioned, and exported against the real register behavior of the X65’s sound hardware. It runs directly in the browser at that address, and ready-made Linux and Windows builds are under <a class="reference external" href="https://tracker.x65.zone/latest/">https://tracker.x65.zone/latest/</a>.</p>
+<p>From a development workflow perspective the tracker replaces the “write a lot of register-poking code by hand” step: a composer writes a song in SGU Tracker and exports it as a <code class="docutils literal notranslate"><span class="pre">.sgm</span></code> module, which carries both the song data and a player image the 65C816 side calls from its own interrupt handler. Assembly-level programming patterns for consuming tracker output are in <a class="reference internal" href="../../2/12_sound/"><span class="std std-doc">Chapter 12: Sound Programming</span></a>.</p>
+</section>
+<section id="monitor-console">
+<h2>Monitor Console<a class="headerlink" href="#monitor-console" title="Link to this heading">¶</a></h2>
+<p>The monitor is the <strong>firmware-level</strong> shell. Once a terminal is attached — either via USB-CDC on the DEV-board’s USB-C connector or via the Ctrl-Alt-Delete key combination on a screen-plus-keyboard setup — its 16 commands provide everything needed to examine a running system and, importantly, to <strong>manage the machine’s boot-ROM catalogue</strong>: the <code class="docutils literal notranslate"><span class="pre">.xex</span></code> images stored in internal LittleFS and loaded by NORTH firmware at boot. The default boot ROM is <strong>OS/816</strong> (see <a class="reference internal" href="../../2/14_os/"><span class="std std-doc">Chapter 14</span></a>); monitor commands like <code class="docutils literal notranslate"><span class="pre">install</span></code> / <code class="docutils literal notranslate"><span class="pre">remove</span></code> / <code class="docutils literal notranslate"><span class="pre">load</span></code> operate at that layer.</p>
+<p>User-level applications — games, utilities, productivity tools that a normal X65 user would run — live <strong>one layer up</strong>, launched by OS/816’s shell rather than by the firmware monitor. The build pipeline is the same (<code class="docutils literal notranslate"><span class="pre">.xex</span></code> from cc65 or K816); the deployment target and the invocation differ. Both paths are walked through concretely in <a class="reference internal" href="../../2/09_dev_env/"><span class="std std-doc">Chapter 9: Development Environment Setup</span></a>.</p>
+<p>The full monitor catalogue, grouped by purpose, is in <a class="reference internal" href="../6_io/"><span class="std std-doc">Chapter 6: Input and Output Interfaces</span></a>; the assembly-side of reaching the monitor’s UART from a program is in <a class="reference internal" href="../../2/13_input_output/"><span class="std std-doc">Chapter 13</span></a>.</p>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h2>
+<p>The X65 development environment is built from a small number of pieces designed to feel modern without erasing the low-level character of the machine: <strong>Emu</strong> for fast iteration on desktop or in the browser, <strong>cc65-dbg</strong> for source-level debugging in VS Code, <strong>cc65/ca65</strong> as the default assembler, <strong>K816</strong> as the structured, Rust-based alternative that the OS itself is written in, <strong>SGU Tracker</strong> for composing music, and the on-target <strong>monitor</strong> for moving artifacts between host and board. Setup and invocation details for each of these are covered in the Part 2 chapters that follow.</p>
+</section>
+<section id="deterministic-scripts-and-inspection">
+<h2>Deterministic Scripts and Inspection<a class="headerlink" href="#deterministic-scripts-and-inspection" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">emu</span> <span class="pre">--script</span> <span class="pre">drive.scr</span> <span class="pre">--fill-mem=0</span> <span class="pre">--seed=1</span> <span class="pre">game.xex</span></code> runs a repeatable input
+sequence. <code class="docutils literal notranslate"><span class="pre">run</span> <span class="pre">N</span></code> advances fixed time slices; <code class="docutils literal notranslate"><span class="pre">vbl</span> <span class="pre">N</span></code> stops after N completed
+CGIA frames. <code class="docutils literal notranslate"><span class="pre">shot</span> <span class="pre">&quot;frame.png&quot;</span> <span class="pre">frame</span></code> and <code class="docutils literal notranslate"><span class="pre">crc</span> <span class="pre">frame</span></code> inspect the last completed
+frame. <code class="docutils literal notranslate"><span class="pre">until</span> <span class="pre">label</span></code> stops at a symbol loaded from the matching cc65 <code class="docutils literal notranslate"><span class="pre">.dbg</span></code> file.
+<code class="docutils literal notranslate"><span class="pre">watch</span> <span class="pre">first</span> <span class="pre">last</span></code> stops on a CPU write, while <code class="docutils literal notranslate"><span class="pre">mark</span> <span class="pre">label</span></code> logs visits without
+stopping. <code class="docutils literal notranslate"><span class="pre">atvbl</span> <span class="pre">joy</span> <span class="pre">right</span></code> queues input for the next vertical blank.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">--script-realtime</span></code> to watch a script at 60 Hz, and <code class="docutils literal notranslate"><span class="pre">--wav</span> <span class="pre">recording.wav</span></code>
+to record stereo audio. Scripts exit nonzero when a check fails. On Linux,
+<code class="docutils literal notranslate"><span class="pre">xvfb-run</span> <span class="pre">-a</span> <span class="pre">emu</span> <span class="pre">--disable-gui</span> <span class="pre">--script</span> <span class="pre">drive.scr</span> <span class="pre">game.xex</span></code> needs no visible
+window. On a Wayland host, forcing <code class="docutils literal notranslate"><span class="pre">EGL_PLATFORM=x11</span></code> and unsetting
+<code class="docutils literal notranslate"><span class="pre">WAYLAND_DISPLAY</span></code> keeps EGL on the virtual X display.</p>
+<p>The native Linux build also provides <code class="docutils literal notranslate"><span class="pre">--mcp</span></code> over stdin/stdout and DAP debugging.
+The shared debug core supports symbols, watchpoints, instruction history,
+call stacks, and source-level stepping. The web build needs cross-origin
+isolation headers for its shared-memory AudioWorklet; use the emulator’s local
+WASM server when testing a build.</p>
+</section>
+<section id="monitor-file-and-configuration-commands">
+<h2>Monitor File and Configuration Commands<a class="headerlink" href="#monitor-file-and-configuration-commands" title="Link to this heading">¶</a></h2>
+<p>The firmware monitor accepts quoted filenames and multiple arguments.
+<code class="docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">src</span> <span class="pre">dst</span></code> copies a file; <code class="docutils literal notranslate"><span class="pre">MOVE</span> <span class="pre">src</span> <span class="pre">dst</span></code> moves or renames a file or directory;
+<code class="docutils literal notranslate"><span class="pre">RM</span> <span class="pre">file</span></code> aliases <code class="docutils literal notranslate"><span class="pre">UNLINK</span></code>. <code class="docutils literal notranslate"><span class="pre">INSTALL</span> <span class="pre">file</span> <span class="pre">(rom)</span></code> optionally names the installed
+ROM. Keyboard layouts are data files, with French among the supplied layouts.
+<code class="docutils literal notranslate"><span class="pre">HELP</span> <span class="pre">SET</span> <span class="pre">SSID</span></code> lists nearby Wi-Fi networks, and <code class="docutils literal notranslate"><span class="pre">SET</span> <span class="pre">BLE</span> <span class="pre">86</span></code> clears saved
+Bluetooth bonds. These are monitor facilities, separate from an OS shell.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../../part_2/">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Part 2: Programming the X65 in 65816 Assembly</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../6_io/">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Chapter 6: Input and Output Interfaces</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Tomasz Sterna
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Chapter 7: Development and Emulation</a><ul>
+<li><a class="reference internal" href="#emu-the-x65-emulator">Emu — the X65 Emulator</a></li>
+<li><a class="reference internal" href="#web-emulator">Web Emulator</a></li>
+<li><a class="reference internal" href="#cc65-dbg-vs-code-debugger">cc65-dbg — VS Code Debugger</a></li>
+<li><a class="reference internal" href="#k816-high-level-assembler">K816 — High-Level Assembler</a></li>
+<li><a class="reference internal" href="#sgu-tracker">SGU Tracker</a></li>
+<li><a class="reference internal" href="#monitor-console">Monitor Console</a></li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+<li><a class="reference internal" href="#deterministic-scripts-and-inspection">Deterministic Scripts and Inspection</a></li>
+<li><a class="reference internal" href="#monitor-file-and-configuration-commands">Monitor File and Configuration Commands</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=187304be"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../_static/tabs.js?v=3ee01567"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../_static/design-tabs.js?v=fcb327ea"></script>
+    <script defer="defer" src="https://stats.chrome.pl/api/script.js?siteId=19a9a6f3e638"></script>
+    </body>
+</html>
